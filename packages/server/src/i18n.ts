@@ -1,4 +1,4 @@
-import { en, type TranslationSchema, zh } from "@miu2d/shared/locales";
+import { en, type TranslationSchema, vi, zh } from "@miu2d/shared/locales";
 import type { Language } from "@miu2d/types";
 import { normalizeLanguage } from "@miu2d/types";
 
@@ -7,6 +7,7 @@ export { normalizeLanguage };
 export type { Language };
 
 const resources = {
+  vi,
   zh,
   en,
 } as const;
@@ -22,7 +23,7 @@ const getByPath = (root: TranslationRoot, path: string): unknown => {
 };
 
 export const t = (language: Language, key: string): string => {
-  const root = resources[language]?.translation ?? resources.zh.translation;
+  const root = resources[language]?.translation ?? resources.vi.translation;
   const value = getByPath(root, key);
   return typeof value === "string" ? value : key;
 };

@@ -6,4 +6,5 @@
  */
 
 export { en } from "./en.js";
+export { vi } from "./vi.js";
 export { type TranslationSchema, zh } from "./zh.js";

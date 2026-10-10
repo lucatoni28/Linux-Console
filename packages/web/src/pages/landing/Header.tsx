@@ -61,7 +61,7 @@ export function Header() {
           <motion.button
             type="button"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="flex items-center gap-2 text-xl font-bold bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent"
+            className="flex shrink-0 items-center gap-2 text-xl font-bold bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent"
             whileHover={{ scale: 1.02 }}
           >
             <img src="/icons/wuxia-v1-192.png" alt="" className="w-8 h-8 rounded-lg" />
@@ -95,7 +95,7 @@ export function Header() {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             {/* GitHub */}
             <motion.a
               href="https://github.com/luckyyyyy/JXQY-WEB"
@@ -103,7 +103,7 @@ export function Header() {
               rel="noreferrer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="hidden sm:block p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
               aria-label="GitHub"
             >
               <GitHubIcon className="w-5 h-5 text-zinc-600 dark:text-zinc-400" />
@@ -132,7 +132,7 @@ export function Header() {
                         : "text-zinc-600 dark:text-zinc-400"
                     }`}
                   >
-                    {t(`lang.${l}` as "lang.zh" | "lang.en" | "lang.ja")}
+                    {t(`lang.${l}` as "lang.zh" | "lang.en" | "lang.ja" | "lang.vi")}
                   </button>
                 ))}
               </div>
@@ -163,16 +163,16 @@ export function Header() {
                 <span className="hidden sm:inline">{user?.name}</span>
               </Link>
             ) : (
-              <div className="flex items-center gap-2 ml-1">
+              <div className="flex items-center gap-1 sm:gap-2 ml-1">
                 <Link
                   to="/login"
-                  className="px-3 py-1.5 rounded-lg text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                  className="whitespace-nowrap px-2 sm:px-3 py-1.5 rounded-lg text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                 >
                   {t("nav.login")}
                 </Link>
                 <Link
                   to="/register"
-                  className="px-3 py-1.5 rounded-lg text-sm font-medium bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 transition-all shadow-sm"
+                  className="whitespace-nowrap px-2 sm:px-3 py-1.5 rounded-lg text-sm font-medium bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 transition-all shadow-sm"
                 >
                   {t("nav.register")}
                 </Link>

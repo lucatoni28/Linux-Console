@@ -26,15 +26,15 @@ export type MessageResponse = z.infer<typeof MessageResponseSchema>;
 
 // ── 语言类型 ──
 
-export const LanguageSchema = z.enum(["zh", "en"]);
+export const LanguageSchema = z.enum(["vi", "zh", "en"]);
 
 export type Language = z.infer<typeof LanguageSchema>;
 
 /** 将任意字符串标准化为 Language */
 export const normalizeLanguage = (value?: string): Language => {
-  if (!value) return "zh";
+  if (!value) return "vi";
   const lower = value.toLowerCase();
   if (lower.startsWith("en")) return "en";
   if (lower.startsWith("zh")) return "zh";
-  return "zh";
+  return "vi";
 };

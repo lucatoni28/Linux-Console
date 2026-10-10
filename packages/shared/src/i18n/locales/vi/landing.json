@@ -1,0 +1,248 @@
+{
+  "demo": {
+    "title": "Chơi thử trực tuyến",
+    "subtitle": "Làm lại game nhập vai kiếm hiệp kinh điển trên web",
+    "copyright": "Tài nguyên trò chơi thuộc bản quyền của Kingsoft (Tây Sơn Cư). Chỉ dùng để trình diễn, không dùng cho mục đích thương mại.",
+    "hint": "Nhấn để di chuyển · Giữ Shift để chạy · Alt+nhấn để dùng khinh công",
+    "loading": "Đang tải trò chơi...",
+    "fullscreen": "Toàn màn hình",
+    "tabs": {
+      "sword1": "Tân Kiếm Hiệp Tình Duyên",
+      "yuying": "Nguyệt Ảnh Truyền Thuyết",
+      "sword2": "Kiếm Hiệp Tình Duyên 2"
+    }
+  },
+  "mobile": {
+    "badge": "Hỗ trợ gốc",
+    "title": "Hỗ trợ di động gốc",
+    "subtitle": "Tối ưu hoàn hảo cho điện thoại và máy tính bảng với cần điều khiển ảo và điều khiển cảm ứng – chơi kiếm hiệp kinh điển mọi lúc, mọi nơi",
+    "playing": "Đang chơi",
+    "hint": "Mở trang web trên điện thoại là chơi được ngay – không cần tải về",
+    "features": {
+      "joystick": {
+        "title": "Cần điều khiển ảo",
+        "desc": "Di chuyển nhân vật chính xác bằng cần điều khiển ảo ở góc dưới bên trái, nhạy như game gốc"
+      },
+      "touch": {
+        "title": "Tương tác tối ưu cho cảm ứng",
+        "desc": "Chạm để di chuyển, nói chuyện với NPC, dùng vật phẩm – mọi thao tác chỉ cần một chạm"
+      },
+      "responsive": {
+        "title": "Giao diện thích ứng",
+        "desc": "Giao diện tự động thích ứng mọi kích thước màn hình, hiển thị hoàn hảo từ điện thoại nhỏ đến máy tính bảng lớn"
+      }
+    }
+  },
+  "techStack": {
+    "editor": "Trình chỉnh sửa game",
+    "aiAgent": "Chế tác bởi AI Agent",
+    "scriptEngine": "Engine kịch bản",
+    "asyncLoading": "Tải bất đồng bộ"
+  },
+  "feature": {
+    "map": {
+      "title": "Hệ thống bản đồ & thời tiết",
+      "desc": "Bản đồ ô nhiều lớp, phát hiện va chạm, tìm đường A*, bẫy bản đồ, thời tiết động như mưa, tuyết, sương mù và chu kỳ ngày đêm"
+    },
+    "character": {
+      "title": "Hệ thống nhân vật & đồng hành",
+      "desc": "Hệ thống nhân vật chính, NPC và đồng hành hoàn chỉnh với hoạt ảnh máy trạng thái, kết xuất sprite, cấu hình nạp nóng"
+    },
+    "script": {
+      "title": "Engine kịch bản mạnh mẽ",
+      "desc": "Lệnh kịch bản phong phú cho hội thoại, rẽ nhánh, kích hoạt, hệ thống biến – dễ dàng viết cốt truyện phức tạp"
+    },
+    "magic": {
+      "title": "Hệ thống võ công & chiến đấu",
+      "desc": "Kỹ năng chủ động/bị động, chiến đấu thời gian thực, hiệu ứng, hồi chiêu và tính sát thương cho những trận đấu hấp dẫn"
+    },
+    "ui": {
+      "title": "Thành phần giao diện phong phú",
+      "desc": "Túi đồ, trang bị, võ công, hội thoại, cửa hàng – bộ thành phần giao diện dùng ngay"
+    },
+    "audio": {
+      "title": "Âm thanh Web Audio",
+      "desc": "Nhạc nền, âm thanh môi trường, hiệu ứng kỹ năng – âm thanh sống động nhờ Web Audio API"
+    },
+    "items": {
+      "title": "Hệ thống vật phẩm",
+      "desc": "Quản lý vật phẩm hoàn chỉnh với trang bị, đồ tiêu hao, kéo thả – xây dựng lối chơi túi đồ của bạn"
+    },
+    "save": {
+      "title": "Hệ thống lưu game",
+      "desc": "Lưu toàn bộ trạng thái game với nhiều ô lưu và tự động lưu – tiếp tục phiêu lưu bất cứ lúc nào"
+    },
+    "debug": {
+      "title": "Công cụ gỡ lỗi",
+      "desc": "Bảng gỡ lỗi tích hợp với thống kê hiệu năng, hiển thị va chạm, xem biến – người bạn đồng hành khi phát triển"
+    }
+  },
+  "asyncLoading": {
+    "badge": "Đa nền tảng · Chơi ngay",
+    "title": "Không cần tải về, chơi ngay",
+    "subtitle": "Game cũ được làm cho Windows 98/XP và không chạy được trên hệ điều hành hiện đại. Bản web của chúng tôi chạy đa nền tảng – chỉ cần mở trình duyệt là chơi. Chỉ cần 5MB để bắt đầu trong tổng số 2GB tài nguyên.",
+    "comparison": {
+      "title": "So sánh trải nghiệm"
+    },
+    "demo": {
+      "errorTitle": "Lỗi ứng dụng",
+      "win11Error": "Chương trình này không tương thích với Windows 11. Vui lòng chạy trên Windows XP",
+      "macError": "Không thể khởi động: không tìm thấy thành phần DirectX. Chỉ hỗ trợ Windows",
+      "linuxError": "Lỗi: hệ điều hành không được hỗ trợ. Yêu cầu Windows 98/XP",
+      "cpuError": "Bộ xử lý không tương thích: yêu cầu CPU x86 32-bit",
+      "mobileError": "Chương trình này không chạy được trên thiết bị di động",
+      "ok": "OK",
+      "legacyClient": "Bản cài đặt cũ",
+      "developedFor": "Làm cho Windows 98/XP",
+      "webVersion": "Bản web",
+      "anyDevice": "Mọi thiết bị, chơi ngay",
+      "loading": "Đang tải",
+      "playing": "ĐANG CHƠI",
+      "player": "Người chơi"
+    },
+    "platforms": {
+      "title": "Khả năng tương thích nền tảng",
+      "legacy": "Bản cài đặt cũ",
+      "web": "Bản web"
+    },
+    "table": {
+      "feature": "So sánh",
+      "platforms": "Nền tảng hỗ trợ",
+      "platformsDesc": "Hệ điều hành được hỗ trợ",
+      "startSpeed": "Tốc độ khởi động",
+      "startSpeedDesc": "Từ lúc nhấn đến lúc chơi",
+      "downloadFirst": "Phải tải trọn bộ cài đặt",
+      "instantStart": "Chơi ngay",
+      "initialLoad": "Tải ban đầu",
+      "initialLoadDesc": "Dữ liệu cần để bắt đầu",
+      "fullDownload": "Phải tải toàn bộ",
+      "minimalLoad": "Chỉ tài nguyên cần thiết",
+      "resourceLoad": "Cách tải tài nguyên",
+      "resourceLoadDesc": "Tài nguyên được lấy thế nào",
+      "preDownload": "Tải trước",
+      "allAtOnce": "Tải tất cả từ đầu",
+      "onDemand": "Theo nhu cầu",
+      "asNeeded": "Tải dần khi khám phá",
+      "storage": "Dung lượng lưu trữ",
+      "storageDesc": "Dung lượng thiết bị cần",
+      "permanentSpace": "Chiếm ổ đĩa vĩnh viễn",
+      "browserCache": "Chỉ dùng bộ nhớ đệm trình duyệt",
+      "crossPlatform": "Đa nền tảng"
+    },
+    "status": {
+      "outdated": "Lỗi thời",
+      "recommended": "Khuyên dùng"
+    },
+    "legacy": {
+      "windowsOnly": "Chỉ Windows",
+      "noMac": "Không hỗ trợ Mac",
+      "noLinux": "Không hỗ trợ Linux",
+      "noMobile": "Không hỗ trợ di động"
+    },
+    "web": {
+      "mobileOptimized": "Tối ưu cho di động"
+    },
+    "highlight": {
+      "smart": "Thông minh",
+      "zeroStorage": "Không tốn dung lượng"
+    },
+    "browserSupport": "Hỗ trợ mọi trình duyệt hiện đại",
+    "onDemand": {
+      "title": "Tải theo nhu cầu thông minh",
+      "desc": "Tài nguyên được tải khi người chơi khám phá. Không phải chờ tải toàn bộ – vừa chơi vừa tải, tiết kiệm hơn 90% băng thông."
+    },
+    "stats": {
+      "total": "Tổng",
+      "loaded": "Đã tải",
+      "saved": "Tiết kiệm"
+    },
+    "features": {
+      "feature1.title": "Khởi động tức thì",
+      "feature1.desc": "Tải ban đầu dưới 5MB, game khởi động trong 3 giây",
+      "feature2.title": "Tải theo nhu cầu",
+      "feature2.desc": "Tài nguyên tự động tải khi khám phá",
+      "feature3.title": "Bộ nhớ đệm thông minh",
+      "feature3.desc": "Tài nguyên đã tải được lưu đệm, quay lại không phải chờ",
+      "feature4.title": "Tải tiếp khi gián đoạn",
+      "feature4.desc": "Tự động thử lại khi mạng lỗi, đảm bảo toàn vẹn dữ liệu"
+    }
+  },
+  "cta": {
+    "title": "Bắt đầu hành trình nhập vai của bạn",
+    "subtitle": "Tham gia cùng chúng tôi, phát triển game với lập trình hỗ trợ bởi AI",
+    "startGame": "Bắt đầu chơi",
+    "github": "Xem trên GitHub",
+    "docs": "Đọc tài liệu"
+  },
+  "hero": {
+    "title": "Engine Miu2D",
+    "slogan": "Hỗ trợ bởi AI, tạo game nhập vai web trong 5 phút, chia sẻ với cả thế giới",
+    "webglBadge": "⚡ Kết xuất WebGL hiệu năng cao",
+    "nativeBadge": "🔧 Không phụ thuộc · Thuần tự viết",
+    "mobileBadge": "📱 Hỗ trợ di động gốc · Chơi mọi nơi",
+    "cta": {
+      "start": "Bắt đầu",
+      "demo": "Chơi thử"
+    },
+    "badge": "🎨 Dự án Vibe Coding"
+  },
+  "highlights": {
+    "title": "Điểm nổi bật",
+    "subtitle": "Việc từng cần cả một đội ngũ, nay chỉ mất vài phút để tạo game nhập vai trực tuyến",
+    "ai": {
+      "title": "Tạo nội dung bằng AI",
+      "desc": "Dùng AI agent để tự động tạo kịch bản, hội thoại và bố cục bản đồ. Từ dàn ý cốt truyện đến kịch bản hoàn chỉnh, AI hiểu ý tưởng và hiện thực hoá nó.",
+      "stat1Label": "Hỗ trợ",
+      "stat2Label": "Khả năng",
+      "stat3Label": "Nhanh hơn",
+      "demo": {
+        "generatingScript": "Đang tạo kịch bản...",
+        "creatingMap": "Đang tạo bố cục bản đồ...",
+        "configuringNpc": "Đang cấu hình hành vi NPC...",
+        "complete": "Tạo xong",
+        "scenes": "cảnh",
+        "dialogues": "hội thoại",
+        "triggers": "kích hoạt"
+      }
+    },
+    "scripting": {
+      "title": "Engine kịch bản đa năng",
+      "desc": "Viết logic game bằng ngôn ngữ bạn thích. Hỗ trợ đầy đủ WASM, Python, Lua và JavaScript với nạp nóng và công cụ gỡ lỗi mạnh mẽ."
+    },
+    "debug": {
+      "title": "Gỡ lỗi kịch bản mạnh mẽ",
+      "desc": "Bảng gỡ lỗi trực quan tích hợp hiển thị trạng thái game, biến và vị trí NPC theo thời gian thực. Hỗ trợ điểm dừng, chạy từng bước và nạp nóng, giúp phát triển game hiệu quả gấp đôi."
+    },
+    "collision": {
+      "title": "Hệ thống va chạm nâng cao",
+      "desc": "Phát hiện va chạm sprite và võ công chính xác với hitbox tuỳ chỉnh, lọc theo lớp và phân vùng không gian hiệu quả cho các trận chiến lớn."
+    },
+    "trap": {
+      "title": "Bẫy & chướng ngại bản đồ",
+      "desc": "Tạo tương tác bản đồ động với bẫy, vùng chướng ngại, lối đi bí mật và sự kiện kịch bản phản hồi hành động người chơi."
+    },
+    "performance": {
+      "title": "Thống kê hiệu năng & tải trước thông minh",
+      "desc": "Theo dõi hiệu năng thời gian thực: FPS, bộ nhớ và thời gian kết xuất. Hệ thống tải trước thông minh nạp tài nguyên dựa trên vị trí người chơi để game mượt mà.",
+      "stat1Label": "FPS",
+      "stat2Label": "Tải ban đầu",
+      "stat3Label": "Trực quan"
+    },
+    "mapEditor": {
+      "title": "Trình chỉnh sửa bản đồ trực quan",
+      "desc": "Trình chỉnh sửa bản đồ tích hợp để tạo và sửa bản đồ game. Duyệt tệp bản đồ, xem các lớp ô, vùng va chạm và cổng dịch chuyển. Xem trước thời gian thực, di chuyển mượt mà."
+    },
+    "asfEditor": {
+      "title": "Trình chỉnh sửa sprite ASF",
+      "desc": "Trình xem và gỡ lỗi hoạt ảnh sprite chuyên nghiệp. Duyệt tệp ASF, xem từng khung hình, chỉnh tốc độ phát và hiển thị sprite sheet cho nhân vật và hiệu ứng."
+    }
+  },
+  "features": {
+    "title": "Tính năng engine mạnh mẽ",
+    "subtitle": "Engine nhập vai 2D hiện đại xây dựng bằng TypeScript + React + WebGL"
+  },
+  "tech": {
+    "title": "Công nghệ hiện đại",
+    "subtitle": "Xây dựng bằng công nghệ web mới nhất cho trải nghiệm phát triển mượt mà"
+  }
+}

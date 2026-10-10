@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const UserSettingsSchema = z.object({
   avatarUrl: z.string().nullable().optional(),
-  langMode: z.enum(["auto", "zh", "en"]).optional(),
+  langMode: z.enum(["auto", "vi", "zh", "en"]).optional(),
   themeMode: z.enum(["auto", "light", "dark"]).optional(),
 });
 

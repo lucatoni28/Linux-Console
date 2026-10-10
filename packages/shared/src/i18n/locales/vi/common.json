@@ -1,0 +1,126 @@
+{
+  "pwa": {
+    "updateMessage": "Engine trò chơi đã được cập nhật. Tải lại để dùng phiên bản mới nhất.",
+    "updateButton": "Tải lại ngay",
+    "dismissButton": "Bỏ qua",
+    "installMessage": "Thêm vào màn hình chính để mở nhanh!",
+    "installButton": "Thêm vào màn hình chính"
+  },
+  "lang": {
+    "zh": "简体中文",
+    "en": "English",
+    "ja": "日本語",
+    "vi": "Tiếng Việt"
+  },
+  "settings": {
+    "title": "Cài đặt tài khoản",
+    "profile": "Hồ sơ",
+    "avatar": "Ảnh đại diện",
+    "name": "Tên",
+    "email": "Email",
+    "save": "Lưu",
+    "saving": "Đang lưu...",
+    "saved": "Đã lưu",
+    "cancel": "Huỷ",
+    "changePassword": "Đổi mật khẩu",
+    "currentPassword": "Mật khẩu hiện tại",
+    "newPassword": "Mật khẩu mới",
+    "confirmNewPassword": "Xác nhận mật khẩu mới",
+    "passwordChanged": "Đổi mật khẩu thành công",
+    "language": "Ngôn ngữ",
+    "theme": "Giao diện",
+    "themeLight": "Sáng",
+    "themeDark": "Tối",
+    "themeAuto": "Theo hệ thống",
+    "langAuto": "Theo hệ thống",
+    "dangerZone": "Vùng nguy hiểm",
+    "deleteAvatar": "Xoá ảnh đại diện",
+    "deleteAvatarConfirm": "Xoá ảnh đại diện của bạn?",
+    "namePlaceholder": "Nhập tên của bạn",
+    "emailPlaceholder": "Nhập email của bạn",
+    "passwordPlaceholder": "Ít nhất 4 ký tự"
+  },
+  "nav": {
+    "features": "Tính năng",
+    "demo": "Chơi thử",
+    "docs": "Tài liệu",
+    "github": "GitHub",
+    "login": "Đăng nhập",
+    "register": "Đăng ký"
+  },
+  "auth": {
+    "login": {
+      "title": "Đăng nhập Miu2D",
+      "subtitle": "Chào mừng trở lại, tiếp tục cuộc phiêu lưu của bạn",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "submit": "Đăng nhập",
+      "loading": "Đang đăng nhập...",
+      "noAccount": "Chưa có tài khoản?",
+      "forgotPassword": "Quên mật khẩu?",
+      "toRegister": "Đăng ký"
+    },
+    "register": {
+      "title": "Đăng ký Miu2D",
+      "subtitle": "Tham gia và bắt đầu hành trình giang hồ của bạn",
+      "name": "Tên người dùng",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "submit": "Đăng ký",
+      "loading": "Đang đăng ký...",
+      "hasAccount": "Đã có tài khoản?",
+      "toLogin": "Đăng nhập"
+    },
+    "forgot": {
+      "title": "Quên mật khẩu",
+      "subtitle": "Nhập email, chúng tôi sẽ gửi liên kết đặt lại mật khẩu",
+      "email": "Email",
+      "submit": "Gửi liên kết đặt lại",
+      "loading": "Đang gửi...",
+      "sentHint": "Nếu email này đã đăng ký, thư đặt lại mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư (cả thư rác). Liên kết có hiệu lực trong 1 giờ.",
+      "backToLogin": "Quay lại đăng nhập"
+    },
+    "reset": {
+      "title": "Đặt lại mật khẩu",
+      "subtitle": "Đặt mật khẩu mới cho tài khoản của bạn",
+      "newPassword": "Mật khẩu mới",
+      "confirmPassword": "Xác nhận mật khẩu mới",
+      "submit": "Đặt lại mật khẩu",
+      "loading": "Đang gửi...",
+      "successHint": "Đặt lại mật khẩu thành công. Đang chuyển đến trang đăng nhập...",
+      "invalidLink": "Liên kết đặt lại không hợp lệ hoặc bị thiếu.",
+      "requestAgain": "Yêu cầu liên kết mới",
+      "backToLogin": "Quay lại đăng nhập"
+    },
+    "logout": "Đăng xuất"
+  },
+  "errors": {
+    "auth": {
+      "invalidCredentials": "Email hoặc mật khẩu không đúng",
+      "emailAlreadyRegistered": "Email đã được đăng ký",
+      "passwordMismatch": "Mật khẩu không khớp"
+    },
+    "common": {
+      "unauthorized": "Vui lòng đăng nhập trước",
+      "forbidden": "Bạn không có quyền thực hiện thao tác này",
+      "notFound": "Không tìm thấy tài nguyên",
+      "badRequest": "Tham số yêu cầu không hợp lệ",
+      "serverError": "Lỗi máy chủ, vui lòng thử lại sau",
+      "networkError": "Kết nối mạng thất bại, vui lòng kiểm tra mạng",
+      "unknownError": "Đã xảy ra lỗi không xác định",
+      "operationFailed": "Thao tác thất bại"
+    }
+  },
+  "notFound": {
+    "title": "Không tìm thấy trang",
+    "desc": "Trang bạn tìm không tồn tại hoặc đã bị chuyển đi"
+  },
+  "footer": {
+    "desc": "Engine game nhập vai 2D trên web, hỗ trợ bởi AI",
+    "links": "Liên kết",
+    "resources": "Tài nguyên",
+    "community": "Cộng đồng",
+    "license": "Mã nguồn mở theo giấy phép MIT"
+  }
+}

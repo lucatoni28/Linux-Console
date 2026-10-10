@@ -348,8 +348,9 @@ function PreferencesTab({
 
   const handleLocaleChange = (newLocale: Locale) => {
     setLocale(newLocale);
-    // langMode only supports "auto" | "zh" | "en" in UserSettings
-    const langMode = newLocale === "zh" || newLocale === "en" ? newLocale : undefined;
+    // langMode only supports "auto" | "vi" | "zh" | "en" in UserSettings
+    const langMode =
+      newLocale === "vi" || newLocale === "zh" || newLocale === "en" ? newLocale : undefined;
     if (langMode) {
       updateMutation.mutate({
         settings: { langMode },

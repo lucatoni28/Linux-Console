@@ -14,13 +14,16 @@ import enCommon from "./locales/en/common.json";
 import enLanding from "./locales/en/landing.json";
 import jaCommon from "./locales/ja/common.json";
 import jaLanding from "./locales/ja/landing.json";
+import viCommon from "./locales/vi/common.json";
+import viLanding from "./locales/vi/landing.json";
 import zhCommon from "./locales/zh/common.json";
 import zhLanding from "./locales/zh/landing.json";
 
-export const supportedLanguages = ["zh", "en", "ja"] as const;
+export const supportedLanguages = ["vi", "zh", "en", "ja"] as const;
 export type Locale = (typeof supportedLanguages)[number];
 
 const resources = {
+  vi: { translation: { ...viCommon, ...viLanding } },
   zh: { translation: { ...zhCommon, ...zhLanding } },
   en: { translation: { ...enCommon, ...enLanding } },
   ja: { translation: { ...jaCommon, ...jaLanding } },
@@ -31,7 +34,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: "zh",
+    fallbackLng: "vi",
     supportedLngs: supportedLanguages,
 
     detection: {

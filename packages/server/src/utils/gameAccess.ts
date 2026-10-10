@@ -15,7 +15,7 @@ import { getMessage } from "../i18n";
 export async function verifyGameAccess(
   gameId: string,
   userId: string,
-  language: Language = "zh"
+  language: Language = "vi"
 ): Promise<void> {
   const member = await db.gameMember.findFirst({
     where: { gameId, userId },
@@ -36,7 +36,7 @@ export async function verifyGameAccess(
 export async function verifyGameOwnerAccess(
   gameId: string,
   userId: string,
-  language: Language = "zh"
+  language: Language = "vi"
 ): Promise<void> {
   const member = await db.gameMember.findFirst({
     where: { gameId, userId },
