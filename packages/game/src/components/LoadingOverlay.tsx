@@ -2,6 +2,8 @@
  * LoadingOverlay - Loading screen component
  * Extracted from Game.tsx for better code organization
  */
+
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 
 interface LoadingOverlayProps {
@@ -21,7 +23,7 @@ interface LoadingOverlayProps {
 export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   isLoading,
   progress,
-  text = "加载中...",
+  text = tr("加载中..."),
   error,
   gameName,
 }) => {
@@ -35,7 +37,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
     return (
       <div style={overlayStyle}>
         <div style={{ fontSize: 48, marginBottom: 20 }}>⚠️</div>
-        <div style={{ fontSize: 24, marginBottom: 12, color: "#ff6b6b" }}>加载失败</div>
+        <div style={{ fontSize: 24, marginBottom: 12, color: "#ff6b6b" }}>{tr("加载失败")}</div>
         <div
           style={{
             fontSize: 16,
@@ -54,7 +56,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
           }}
           style={buttonStyle}
         >
-          返回首页
+          {tr("返回首页")}
         </button>
       </div>
     );

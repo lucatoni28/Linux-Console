@@ -191,7 +191,7 @@ export function DemoSection() {
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center text-zinc-500">
                   <div className="text-6xl mb-4">🎮</div>
-                  <p>滚动以加载游戏</p>
+                  <p>{t("demo.scrollToLoad")}</p>
                 </div>
               )}
             </div>

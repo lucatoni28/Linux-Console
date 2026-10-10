@@ -5,6 +5,7 @@
 
 import type { Vector2 } from "@miu2d/engine/core/types";
 import type { MiuMapData } from "@miu2d/engine/map/types";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { HiOutlineMap, HiOutlineXMark } from "react-icons/hi2";
@@ -211,7 +212,7 @@ export const LittleMap: React.FC<LittleMapProps> = ({
             gap: 4,
           }}
         >
-          <HiOutlineMap style={iconStyle} /> {mapDisplayName || mapName || "小地图"}
+          <HiOutlineMap style={iconStyle} /> {trc(mapDisplayName) || mapName || tr("小地图")}
         </span>
         <button
           onClick={onClose}
@@ -239,7 +240,7 @@ export const LittleMap: React.FC<LittleMapProps> = ({
           textAlign: "center",
         }}
       >
-        坐标: {Math.round(playerPosition.x)}, {Math.round(playerPosition.y)}
+        {tr("坐标: {x}, {y}", { x: Math.round(playerPosition.x), y: Math.round(playerPosition.y) })}
       </div>
 
       {/* 地图画布 */}

@@ -4,6 +4,7 @@
  * 当用户从武功面板长按技能开始拖拽时，显示一个跟随手指的浮动图标
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { memo, useEffect, useState } from "react";
 import { HiOutlineArchiveBox } from "react-icons/hi2";
 import { useTouchDrag } from "../../contexts";
@@ -56,7 +57,7 @@ export const TouchDragIndicator = memo(function TouchDragIndicator() {
     dragData.type === "magic"
       ? (dragData.magicInfo?.magic?.icon ?? dragData.magicInfo?.magic?.image)
       : dragData.iconPath;
-  const name = dragData.displayName || (dragData.type === "magic" ? "技能" : "物品");
+  const name = dragData.displayName || (dragData.type === "magic" ? tr("技能") : tr("物品"));
 
   return (
     <div
@@ -118,7 +119,7 @@ export const TouchDragIndicator = memo(function TouchDragIndicator() {
         className="absolute left-1/2 transform -translate-x-1/2 text-white/60 text-[10px] whitespace-nowrap"
         style={{ bottom: -35 }}
       >
-        拖到目标槽位上
+        {tr("拖到目标槽位上")}
       </div>
     </div>
   );

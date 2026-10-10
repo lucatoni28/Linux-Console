@@ -13,9 +13,9 @@
 
 import type { Vector2 } from "@miu2d/engine/core/types";
 import { pixelToTile } from "@miu2d/engine/utils/coordinate";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-
 import type { CharacterMarker } from "../classic/LittleMapGui";
 import { GlassPanel, PanelHeader } from "./components";
 import { modernColors, spacing, typography, zIndex } from "./theme";
@@ -348,7 +348,7 @@ export const NewMinimap: React.FC<NewMinimapProps> = ({
             tile.y < mapData.mapRowCounts
           ) {
             setTooltipPos({ x: e.clientX, y: e.clientY });
-            setTooltipText(`坐标: (${tile.x}, ${tile.y})`);
+            setTooltipText(tr("坐标: ({x}, {y})", { x: tile.x, y: tile.y }));
           } else {
             setTooltipText(null);
           }
@@ -433,7 +433,7 @@ export const NewMinimap: React.FC<NewMinimapProps> = ({
           height: CANVAS_H + 36 + 24, // 36 = header, 24 = bottom hint bar
         }}
       >
-        <PanelHeader title={mapDisplayName} onClose={onClose} />
+        <PanelHeader title={trc(mapDisplayName)} onClose={onClose} />
 
         <canvas
           ref={canvasRef}
@@ -467,7 +467,7 @@ export const NewMinimap: React.FC<NewMinimapProps> = ({
             userSelect: "none",
           }}
         >
-          💡 如果卡住，按住 Ctrl 点击地图可瞬移
+          {tr("💡 如果卡住，按住 Ctrl 点击地图可瞬移")}
         </div>
 
       </GlassPanel>

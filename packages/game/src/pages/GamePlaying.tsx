@@ -15,6 +15,7 @@ import { setUiTheme, type UiTheme } from "@miu2d/engine/gui/ui-settings";
 import { resourceLoader } from "@miu2d/engine/resource/resource-loader";
 import type { SaveData } from "@miu2d/engine/storage";
 import { useAuth } from "@miu2d/shared";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -396,28 +397,28 @@ export function GamePlaying({
       {
         id: "debug",
         icon: <HiOutlineWrenchScrewdriver className="text-white" style={{ strokeWidth: 2.2 }} />,
-        tooltip: "调试",
+        tooltip: tr("调试"),
         onClick: toggleDebug,
         active: showDebug,
       },
       {
         id: "entitylist",
         icon: <HiOutlineUsers className="text-white" style={{ strokeWidth: 2.2 }} />,
-        tooltip: "场景列表",
+        tooltip: tr("场景列表"),
         onClick: () => setShowEntityDetail((v) => !v),
         active: showEntityDetail,
       },
       {
         id: "saveload",
         icon: <HiOutlineDocumentArrowDown className="text-white" style={{ strokeWidth: 2.2 }} />,
-        tooltip: "存档",
+        tooltip: tr("存档"),
         onClick: handleSaveClick,
         active: activePanel === "menu" && menuTab === "save",
       },
       {
         id: "settings",
         icon: <HiOutlineCog6Tooth className="text-white" style={{ strokeWidth: 2.2 }} />,
-        tooltip: "设置",
+        tooltip: tr("设置"),
         onClick: () => {
           setMenuTab("settings");
           setActivePanel(activePanel === "menu" && menuTab === "settings" ? "none" : "menu");
@@ -427,7 +428,7 @@ export function GamePlaying({
       {
         id: "screenshot",
         icon: <HiOutlineCamera className="text-white" style={{ strokeWidth: 2.2 }} />,
-        tooltip: "截图",
+        tooltip: tr("截图"),
         onClick: takeScreenshot,
       },
       {
@@ -463,7 +464,7 @@ export function GamePlaying({
           panelId="debug"
           visible={showDebug}
           onClose={() => setShowDebug(false)}
-          title="调试面板"
+          title={tr("调试面板")}
           defaultWidth={420}
           onWidthChange={setDebugPanelWidth}
         >
@@ -612,7 +613,7 @@ export function GamePlaying({
                 />
               ) : (
                 <div className="flex items-center justify-center w-full h-full text-gray-400">
-                  加载游戏数据...
+                  {tr("加载游戏数据...")}
                 </div>
               )}
             </div>
@@ -646,7 +647,7 @@ export function GamePlaying({
         canSave={true}
         saveBlockedReason={
           engine?.getGameManager()?.guiManager?.isScriptRunning()
-            ? "剧情脚本运行中，请等待结束后再存档"
+            ? tr("剧情脚本运行中，请等待结束后再存档")
             : undefined
         }
         onCollectSaveData={collectSaveData}

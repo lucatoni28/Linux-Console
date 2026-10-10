@@ -15,6 +15,7 @@
  */
 
 import type { Npc } from "@miu2d/engine/npc";
+import { trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useNpcInfoShowConfig } from "./useUISettings";
 
@@ -185,7 +186,7 @@ export const NpcLifeBar: React.FC<NpcLifeBarProps> = ({ npc, screenWidth }) => {
             textOverflow: "ellipsis",
           }}
         >
-          {npc.name}
+          {trc(npc.name)}
         </div>
       )}
       {/* Lv + HP info below the bar */}

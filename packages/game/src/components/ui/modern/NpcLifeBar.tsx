@@ -10,6 +10,7 @@
  */
 
 import type { Npc } from "@miu2d/engine/npc";
+import { trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useMemo } from "react";
 import { borderRadius, typography } from "./theme";
@@ -126,7 +127,7 @@ export const NpcLifeBar: React.FC<NpcLifeBarProps> = ({ npc, screenWidth }) => {
           whiteSpace: "nowrap",
         }}
       >
-        {npc.name}
+        {trc(npc.name)}
       </div>
 
       {/* 血条容器 */}

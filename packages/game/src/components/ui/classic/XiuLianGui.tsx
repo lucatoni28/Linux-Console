@@ -12,6 +12,7 @@
 import type { MagicItemInfo } from "@miu2d/engine/magic";
 import { MAGIC_LIST_CONFIG } from "@miu2d/engine/player/magic/magic-list-config";
 import { useDevice } from "@miu2d/shared";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo } from "react";
 import type { TouchDragData } from "../../../contexts";
@@ -84,8 +85,8 @@ export const XiuLianGui: React.FC<XiuLianGuiProps> = ({
   const displayLevel = magicInfo?.level ?? magic?.level ?? 0;
   const displayExp = magicInfo?.exp ?? magic?.exp ?? 0;
   const displayLevelUpExp = displayMagic?.levelupExp ?? magic?.levelUpExp ?? 0;
-  const displayName = displayMagic?.name ?? magic?.name ?? "";
-  const displayIntro = displayMagic?.intro ?? magic?.intro ?? "";
+  const displayName = trc(displayMagic?.name ?? magic?.name ?? "");
+  const displayIntro = trc(displayMagic?.intro ?? magic?.intro ?? "");
   const iconPath = displayMagic?.icon ?? displayMagic?.image ?? magic?.iconPath ?? null;
   const hasMagic = !!(displayMagic || magic);
 
@@ -186,7 +187,7 @@ export const XiuLianGui: React.FC<XiuLianGuiProps> = ({
       {panelImage.dataUrl && (
         <img
           src={panelImage.dataUrl}
-          alt="修炼面板"
+          alt={tr("修炼面板")}
           style={{
             position: "absolute",
             left: 0,

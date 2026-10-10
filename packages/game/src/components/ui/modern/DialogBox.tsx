@@ -4,6 +4,7 @@
  */
 
 import type { DialogGuiState } from "@miu2d/engine/gui/ui-types";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import { HiOutlineChatBubbleBottomCenterText } from "react-icons/hi2";
@@ -382,7 +383,7 @@ export const DialogBox: React.FC<DialogBoxProps> = ({ state, onClose, onSelectio
                 gap: 4,
               }}
             >
-              点击继续
+              {tr("点击继续")}
               <span style={{ animation: "bounce 1s infinite" }}>▼</span>
             </div>
           )}

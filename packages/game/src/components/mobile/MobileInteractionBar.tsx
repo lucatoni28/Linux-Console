@@ -12,6 +12,7 @@ import type { Npc } from "@miu2d/engine/npc";
 import { type Obj, ObjState } from "@miu2d/engine/obj/obj";
 import type { GameEngine } from "@miu2d/engine/runtime/game-engine";
 import { getViewTileDistance } from "@miu2d/engine/utils";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { HiOutlineArchiveBox, HiOutlineUser } from "react-icons/hi2";
 import { AsfAnimatedSprite } from "../ui/classic/AsfAnimatedSprite";
@@ -149,7 +150,7 @@ export const MobileInteractionBar = memo(function MobileInteractionBar({
         targets.push({
           type: "obj",
           target: obj,
-          name: obj.objName || "物品",
+          name: obj.objName || tr("物品"),
           distance: dist,
           asfPath: getObjAsfPath(obj),
         });
@@ -341,12 +342,13 @@ const InteractionButton = memo(function InteractionButton({
 
       {/* 名称 */}
       <span className="text-white text-sm font-medium truncate flex-1 text-left">
-        {target.name}
+        {trc(target.name)}
       </span>
 
       {/* 交互提示 */}
       <span className="text-white/50 text-xs flex-shrink-0">
-        点击{target.type === "npc" ? "对话" : "交互"}
+        {tr("点击")}
+        {target.type === "npc" ? tr("对话") : tr("交互")}
       </span>
     </button>
   );

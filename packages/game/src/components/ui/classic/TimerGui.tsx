@@ -7,6 +7,7 @@
  */
 
 import type { TimerState } from "@miu2d/engine/runtime/timer-manager";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useMemo } from "react";
 import { useAsfImage } from "./hooks";
@@ -79,7 +80,10 @@ export const TimerGui: React.FC<TimerGuiProps> = ({ timerState, screenWidth = 80
   // string.Format("{0: 00;-00}", _seconds / 60) + "分" + string.Format("{0: 00;-00}", _seconds % 60) + "秒"
   const minutes = Math.floor(timerState.seconds / 60);
   const seconds = timerState.seconds % 60;
-  const timeText = `${minutes.toString().padStart(2, "0")}分${seconds.toString().padStart(2, "0")}秒`;
+  const timeText = tr("{minutes}分{seconds}秒", {
+    minutes: minutes.toString().padStart(2, "0"),
+    seconds: seconds.toString().padStart(2, "0"),
+  });
 
   return (
     <div style={panelStyle}>

@@ -14,6 +14,7 @@
 import type { MagicItemInfo } from "@miu2d/engine/magic/types";
 import { magicNeedsDirectionPointer } from "@miu2d/engine/magic/types";
 import type { GoodsItemInfo } from "@miu2d/engine/player/goods/goods-list-manager";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { HiOutlineBars3 } from "react-icons/hi2";
 import { AsfAnimatedSprite } from "../ui/classic/AsfAnimatedSprite";
@@ -379,7 +380,7 @@ const ItemButton = memo(function ItemButton({
       {hasItem && itemIcon.dataUrl && (
         <img
           src={itemIcon.dataUrl}
-          alt={goodsInfo?.good?.name ?? "物品"}
+          alt={goodsInfo?.good?.name ?? tr("物品")}
           style={{
             position: "absolute",
             left: "50%",

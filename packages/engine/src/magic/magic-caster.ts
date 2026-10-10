@@ -5,6 +5,7 @@
  * MagicManager.UseMagic
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type { EngineContext } from "../core/engine-context";
 import { getEngineContext } from "../core/engine-context";
 import { logger } from "../core/logger";
@@ -75,13 +76,13 @@ export class MagicCaster {
     const canUse = player.canUseMagic(magicInfo.magic);
 
     if (!canUse.canUse) {
-      guiManager.showMessage(canUse.reason || "无法使用武功");
+      guiManager.showMessage(canUse.reason || tr("无法使用武功"));
       return;
     }
 
     // Check cooldown
     if (magicInfo.remainColdMilliseconds > 0) {
-      guiManager.showMessage("武功冷却中");
+      guiManager.showMessage(tr("武功冷却中"));
       return;
     }
 
@@ -135,7 +136,7 @@ export class MagicCaster {
       magicInfo.magic.bodyRadius > 0 &&
       (hoverTarget.type !== "npc" || !hoverTarget.npc.isEnemy)
     ) {
-      guiManager.showMessage("无有效目标");
+      guiManager.showMessage(tr("无有效目标"));
       return;
     }
 
@@ -144,7 +145,7 @@ export class MagicCaster {
     // else if (CurrentMagicInUse.TheMagic.MoveKind == 21 && Globals.OutEdgeNpc == null)
     // { GuiManager.ShowMessage("无目标"); }
     if (magicInfo.magic.moveKind === 21 && hoverTarget.type !== "npc") {
-      guiManager.showMessage("无目标");
+      guiManager.showMessage(tr("无目标"));
       return;
     }
 
@@ -328,7 +329,7 @@ export class MagicCaster {
     if (success) {
       logger.log(`[Magic] Bound store index ${storeIndex} to first empty bottom slot`);
     } else {
-      guiManager.showMessage("快捷栏已满");
+      guiManager.showMessage(tr("快捷栏已满"));
     }
   }
 }

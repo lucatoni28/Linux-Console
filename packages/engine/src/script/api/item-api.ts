@@ -2,6 +2,7 @@
  * Item APIs - Good, Magic, Memo implementations
  */
 
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import { logger } from "../../core/logger";
 import { getShopsData } from "../../data/game-data-api";
 import { getNeighbors, tileToPixel } from "../../utils";
@@ -25,7 +26,7 @@ export function createGoodsAPI(ctx: ScriptCommandContext, resolver: BlockingReso
         }
       }
       if (addedGood) {
-        guiManager.showMessage(`你获得了${addedGood.name}`);
+        guiManager.showMessage(tr("你获得了{name}", { name: trc(addedGood.name) }));
       }
     },
     remove: (goodsName, count) => {
@@ -63,7 +64,7 @@ export function createGoodsAPI(ctx: ScriptCommandContext, resolver: BlockingReso
         const randomItem = shop.items[Math.floor(Math.random() * shop.items.length)];
         const result = goodsListManager.addGoodToList(randomItem.goodsKey);
         if (result.success && result.good) {
-          guiManager.showMessage(`你获得了${result.good.name}`);
+          guiManager.showMessage(tr("你获得了{name}", { name: trc(result.good.name) }));
         }
       } catch (error) {
         logger.error(`[GameAPI.goods] addRandom error:`, error);

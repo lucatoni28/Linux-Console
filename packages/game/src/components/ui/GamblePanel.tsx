@@ -4,6 +4,7 @@
  * 7 种玩法，倍数下注，玩法说明，浮夸胜负动画。
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { HiOutlineQuestionMarkCircle, HiOutlineXMark } from "react-icons/hi2";
@@ -41,13 +42,13 @@ const BET_OPTIONS: {
   key: BetChoice; label: string; desc: string; odds: string; oddsNum: number;
   color: string; hover: string; border: string;
 }[] = [
-  { key: "small",      label: "小",   desc: "6-20",    odds: "2倍",   oddsNum: 2,   color: "bg-blue-600/80",    hover: "hover:bg-blue-500/80",    border: "border-blue-400/30" },
-  { key: "big",        label: "大",   desc: "21-36",   odds: "2倍",   oddsNum: 2,   color: "bg-red-600/80",     hover: "hover:bg-red-500/80",     border: "border-red-400/30" },
-  { key: "odd",        label: "单",   desc: "奇数",    odds: "2倍",   oddsNum: 2,   color: "bg-emerald-600/80", hover: "hover:bg-emerald-500/80", border: "border-emerald-400/30" },
-  { key: "even",       label: "双",   desc: "偶数",    odds: "2倍",   oddsNum: 2,   color: "bg-purple-600/80",  hover: "hover:bg-purple-500/80",  border: "border-purple-400/30" },
-  { key: "fourKind",   label: "四条", desc: "4+个相同", odds: "10倍",  oddsNum: 10,  color: "bg-amber-600/80",   hover: "hover:bg-amber-500/80",   border: "border-amber-400/30" },
-  { key: "threePairs", label: "三对", desc: "3组对子",  odds: "25倍",  oddsNum: 25,  color: "bg-cyan-600/80",    hover: "hover:bg-cyan-500/80",    border: "border-cyan-400/30" },
-  { key: "sextuple",   label: "通杀", desc: "6个全同",  odds: "100倍", oddsNum: 100, color: "bg-yellow-500/80",  hover: "hover:bg-yellow-400/80",  border: "border-yellow-300/40" },
+  { key: "small",      label: tr("小"),   desc: "6-20",    odds: tr("2倍"),   oddsNum: 2,   color: "bg-blue-600/80",    hover: "hover:bg-blue-500/80",    border: "border-blue-400/30" },
+  { key: "big",        label: tr("大"),   desc: "21-36",   odds: tr("2倍"),   oddsNum: 2,   color: "bg-red-600/80",     hover: "hover:bg-red-500/80",     border: "border-red-400/30" },
+  { key: "odd",        label: tr("单"),   desc: tr("奇数"),    odds: tr("2倍"),   oddsNum: 2,   color: "bg-emerald-600/80", hover: "hover:bg-emerald-500/80", border: "border-emerald-400/30" },
+  { key: "even",       label: tr("双"),   desc: tr("偶数"),    odds: tr("2倍"),   oddsNum: 2,   color: "bg-purple-600/80",  hover: "hover:bg-purple-500/80",  border: "border-purple-400/30" },
+  { key: "fourKind",   label: tr("四条"), desc: tr("4+个相同"), odds: tr("10倍"),  oddsNum: 10,  color: "bg-amber-600/80",   hover: "hover:bg-amber-500/80",   border: "border-amber-400/30" },
+  { key: "threePairs", label: tr("三对"), desc: tr("3组对子"),  odds: tr("25倍"),  oddsNum: 25,  color: "bg-cyan-600/80",    hover: "hover:bg-cyan-500/80",    border: "border-cyan-400/30" },
+  { key: "sextuple",   label: tr("通杀"), desc: tr("6个全同"),  odds: tr("100倍"), oddsNum: 100, color: "bg-yellow-500/80",  hover: "hover:bg-yellow-400/80",  border: "border-yellow-300/40" },
 ];
 
 const MULTIPLIERS = [1, 2, 3, 5, 10, 20, 50, 100, 1000];
@@ -67,12 +68,12 @@ function getWinTier(netGain: number): WinTier {
 }
 
 const TIER_META: Record<WinTier, { label: string; subtitle: string; flash: string }> = {
-  small:     { label: "赢了！",     subtitle: "",              flash: "flash-gold" },
-  medium:    { label: "赢了！",     subtitle: "",              flash: "flash-gold" },
-  big:       { label: "大赢！",     subtitle: "",              flash: "flash-gold-bright" },
-  huge:      { label: "超级大赢！", subtitle: "",              flash: "flash-gold-bright" },
-  mega:      { label: "巨额奖金！", subtitle: "运气爆棚！",     flash: "flash-white" },
-  legendary: { label: "传 奇 ！",   subtitle: "天选之人！",     flash: "flash-white" },
+  small:     { label: tr("赢了！"),     subtitle: "",              flash: "flash-gold" },
+  medium:    { label: tr("赢了！"),     subtitle: "",              flash: "flash-gold" },
+  big:       { label: tr("大赢！"),     subtitle: "",              flash: "flash-gold-bright" },
+  huge:      { label: tr("超级大赢！"), subtitle: "",              flash: "flash-gold-bright" },
+  mega:      { label: tr("巨额奖金！"), subtitle: tr("运气爆棚！"),     flash: "flash-white" },
+  legendary: { label: tr("传 奇 ！"),   subtitle: tr("天选之人！"),     flash: "flash-white" },
 };
 
 // ============= Particles =============
@@ -233,9 +234,9 @@ function WinText({ tier, netGain, randomBonus, bonusText, comboBonus, comboBonus
     <div className={`win-text-wrap tier-${tier}`}>
       {meta.label && <div className="win-label">{meta.label}</div>}
       {meta.subtitle && <div className="win-subtitle">{meta.subtitle}</div>}
-      <div className="win-amount">+{netGain} 两</div>
-      {randomBonus > 1 && bonusText && <div className="win-bonus">🎲 {bonusText}（×{randomBonus}）</div>}
-      {comboBonus && <div className="win-combo">{comboBonus} +{comboBonusAmount} 两</div>}
+      <div className="win-amount">{tr("+{totalWin} 两", { totalWin: netGain })}</div>
+      {randomBonus > 1 && bonusText && <div className="win-bonus">🎲 {bonusText} (×{randomBonus})</div>}
+      {comboBonus && <div className="win-combo">{comboBonus} {tr("+{totalWin} 两", { totalWin: comboBonusAmount })}</div>}
     </div>
   );
 }
@@ -265,10 +266,10 @@ function LoseText({ netGain, betAmount, specialEvent, randomPenalty, penaltyText
   const isBigLoss = betAmount >= 500;
   return (
     <div className="lose-text-wrap">
-      <div className={`lose-amount ${isBigLoss ? "lose-big" : ""}`}>{netGain} 两</div>
-      {randomPenalty > 1 && penaltyText && <div className="lose-penalty">💀 {penaltyText}（×{randomPenalty}）</div>}
+      <div className={`lose-amount ${isBigLoss ? "lose-big" : ""}`}>{tr("{amount} 两", { amount: netGain })}</div>
+      {randomPenalty > 1 && penaltyText && <div className="lose-penalty">💀 {penaltyText} (×{randomPenalty})</div>}
       {specialEvent && <div className="lose-event">{specialEvent}</div>}
-      {isBigLoss && !specialEvent && !(randomPenalty > 1) && <div className="lose-hint">血本无归...</div>}
+      {isBigLoss && !specialEvent && !(randomPenalty > 1) && <div className="lose-hint">{tr("血本无归...")}</div>}
     </div>
   );
 }
@@ -305,25 +306,25 @@ function RulesPanel({ onClose }: { onClose: () => void }) {
     <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/70 rounded-2xl" onClick={onClose}>
       <div className="w-[520px] bg-stone-900/95 backdrop-blur-xl border border-amber-700/40 rounded-xl p-5 text-sm leading-relaxed max-h-[80%] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-bold text-amber-100">📜 玩法说明</h3>
+          <h3 className="text-base font-bold text-amber-100">{tr("📜 玩法说明")}</h3>
           <button onClick={onClose} className="text-amber-400/60 hover:text-amber-200"><HiOutlineXMark size={20} /></button>
         </div>
         <div className="space-y-3 text-amber-300/90">
-          <p>6 个骰子，总和 <b className="text-amber-100">6 ~ 36</b>。</p>
+          <p>{tr("6 个骰子，总和")} <b className="text-amber-100">6 ~ 36</b>{tr("。")}</p>
           <div className="border-t border-amber-800/30 pt-2">
-            <p className="font-semibold text-amber-200 mb-1">基本玩法</p>
-            <p><b className="text-blue-400">小</b>（6-20）/ <b className="text-red-400">大</b>（21-36）· <b className="text-emerald-400">单</b> / <b className="text-purple-400">双</b>（奇偶）</p>
-            <p className="text-amber-500/50 text-xs">出现四条以上算庄家赢（~9%）</p>
+            <p className="font-semibold text-amber-200 mb-1">{tr("基本玩法")}</p>
+            <p><b className="text-blue-400">{tr("小")}</b>{tr("（6-20）/")} <b className="text-red-400">{tr("大")}</b>{tr("（21-36）·")} <b className="text-emerald-400">{tr("单")}</b> / <b className="text-purple-400">{tr("双")}</b>{tr("（奇偶）")}</p>
+            <p className="text-amber-500/50 text-xs">{tr("出现四条以上算庄家赢（~9%）")}</p>
           </div>
           <div className="border-t border-amber-800/30 pt-2">
-            <p className="font-semibold text-amber-200 mb-1">特殊玩法</p>
-            <p><b className="text-amber-400">四条</b> 10倍 · 4+个相同（~9%）</p>
-            <p><b className="text-cyan-400">三对</b> 25倍 · 恰好3组对子（~3.9%）</p>
-            <p><b className="text-yellow-400">通杀</b> 100倍 · 6个全同（~0.013%）</p>
+            <p className="font-semibold text-amber-200 mb-1">{tr("特殊玩法")}</p>
+            <p><b className="text-amber-400">{tr("四条")}</b> {tr("10倍 · 4+个相同（~9%）")}</p>
+            <p><b className="text-cyan-400">{tr("三对")}</b> {tr("25倍 · 恰好3组对子（~3.9%）")}</p>
+            <p><b className="text-yellow-400">{tr("通杀")}</b> {tr("100倍 · 6个全同（~0.013%）")}</p>
           </div>
           <div className="border-t border-amber-800/30 pt-2">
-            <p className="font-semibold text-amber-200 mb-1">倍数下注</p>
-            <p>1x ~ 1000x，下注 = 基础注 × 倍数。倍数越高，赢了越刺激！</p>
+            <p className="font-semibold text-amber-200 mb-1">{tr("倍数下注")}</p>
+            <p>{tr("1x ~ 1000x，下注 = 基础注 × 倍数。倍数越高，赢了越刺激！")}</p>
           </div>
         </div>
       </div>
@@ -388,18 +389,18 @@ function GamblePanelInner({
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-3 border-b border-amber-700/30 bg-amber-900/20 rounded-t-2xl">
-          <h2 className="text-lg font-bold text-amber-200 tracking-wide">🎲 骰子赌坊</h2>
+          <h2 className="text-lg font-bold text-amber-200 tracking-wide">{tr("🎲 骰子赌坊")}</h2>
           <div className="flex items-center gap-2">
-            <button onClick={() => setShowRules(true)} className="w-8 h-8 flex items-center justify-center rounded-lg text-amber-400/60 hover:text-amber-200 hover:bg-amber-800/30 transition-colors" title="玩法说明"><HiOutlineQuestionMarkCircle style={{ strokeWidth: 2.2 }} /></button>
+            <button onClick={() => setShowRules(true)} className="w-8 h-8 flex items-center justify-center rounded-lg text-amber-400/60 hover:text-amber-200 hover:bg-amber-800/30 transition-colors" title={tr("玩法说明")}><HiOutlineQuestionMarkCircle style={{ strokeWidth: 2.2 }} /></button>
             <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-amber-400/60 hover:text-amber-200 hover:bg-amber-800/30 transition-colors"><HiOutlineXMark style={{ strokeWidth: 2.2 }} /></button>
           </div>
         </div>
 
         {/* Money + Multiplier */}
         <div className="px-6 py-3 flex items-center justify-between bg-stone-900/30">
-          <div className="text-amber-300 text-sm">银两：<span className="text-xl font-bold text-amber-100">{money}</span></div>
+          <div className="text-amber-300 text-sm">{tr("银两：")}<span className="text-xl font-bold text-amber-100">{money}</span></div>
           <div className="flex items-center gap-2">
-            <span className="text-amber-400/70 text-sm">倍数：</span>
+            <span className="text-amber-400/70 text-sm">{tr("倍数：")}</span>
             <div className="flex gap-1 flex-wrap justify-end">
               {MULTIPLIERS.map((m) => (
                 <button key={m} onClick={() => setMultiplier(m)}
@@ -413,8 +414,8 @@ function GamblePanelInner({
         </div>
 
         <div className="px-6 py-1 text-center text-amber-500/50 text-xs">
-          本注：<span className="text-amber-300 font-semibold">{totalBet}</span> 两
-          {multiplier > 1 && <span className="ml-1">（{baseBet} × {multiplier}）</span>}
+          {tr("本注：")}<span className="text-amber-300 font-semibold">{totalBet}</span> {tr("两")}
+          {multiplier > 1 && <span className="ml-1">({baseBet} × {multiplier})</span>}
         </div>
 
         {/* Dice */}
@@ -429,7 +430,7 @@ function GamblePanelInner({
               <div className="ml-2 text-amber-300 text-lg font-bold">= {lastResult.sum}</div>
             </div>
           ) : (
-            <div className="text-amber-500/30 text-base">选择玩法开始下注</div>
+            <div className="text-amber-500/30 text-base">{tr("选择玩法开始下注")}</div>
           )}
         </div>
 
@@ -473,7 +474,7 @@ function GamblePanelInner({
         </div>
 
         <div className="px-6 py-2 text-center text-amber-500/30 text-xs border-t border-amber-800/20 rounded-b-2xl">
-          {money < baseBet ? "银两不足，即将关闭..." : "点击 ? 查看详细规则 · ESC 关闭"}
+          {money < baseBet ? tr("银两不足，即将关闭...") : tr("点击 ? 查看详细规则 · ESC 关闭")}
         </div>
 
         {showRules && <RulesPanel onClose={() => setShowRules(false)} />}

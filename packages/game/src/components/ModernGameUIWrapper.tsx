@@ -5,10 +5,12 @@
  * 使用 useGameUILogic 获取状态和回调，渲染 modern UI 组件
  */
 
+import type { BetChoice, DiceResult } from "@miu2d/engine";
 import { logger } from "@miu2d/engine/core/logger";
 import type { UIGoodData } from "@miu2d/engine/gui/ui-types";
 import type { Npc } from "@miu2d/engine/npc/npc";
 import { EquipPosition, GoodKind } from "@miu2d/engine/player/goods/good";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { GameUIContext } from "../contexts";
@@ -16,12 +18,11 @@ import { EngineWatermark } from "./common/EngineWatermark";
 import type { BottomMagicDragData, GameUILogic, MagicDragData } from "./hooks";
 import { useBuildGameUIContextValue, useTouchDropHandlers } from "./hooks";
 import type { GoodItemData } from "./ui/classic";
+import type { EquipSlots, EquipSlotType } from "./ui/classic/EquipGui";
+import { slotTypeToEquipPosition } from "./ui/classic/EquipGui";
 import { FogOfWarMap } from "./ui/classic/FogOfWarMap";
-import { NewMinimap } from "./ui/modern/NewMinimap";
-import { GamblePanel } from "./ui/GamblePanel";
-import { SlotPanel } from "./ui/SlotPanel";
 import { DoudizhuPanel } from "./ui/DoudizhuPanel";
-import type { BetChoice, DiceResult } from "@miu2d/engine";
+import { GamblePanel } from "./ui/GamblePanel";
 // 视频播放器是全屏组件，与 UI 风格无关，复用 classic 版本
 // 导入现代UI组件
 import {
@@ -37,8 +38,8 @@ import {
   MemoPanel,
   MessageBox,
   NpcLifeBar,
-  PartnerPanel,
   type PartnerDisplayData,
+  PartnerPanel,
   PartnerPortraits,
   SelectionMultipleUI,
   SelectionUI,
@@ -47,8 +48,8 @@ import {
   TopBar,
   XiuLianPanel,
 } from "./ui/modern";
-import type { EquipSlotType, EquipSlots } from "./ui/classic/EquipGui";
-import { slotTypeToEquipPosition } from "./ui/classic/EquipGui";
+import { NewMinimap } from "./ui/modern/NewMinimap";
+import { SlotPanel } from "./ui/SlotPanel";
 
 interface ModernGameUIWrapperProps {
   logic: GameUILogic;
@@ -650,7 +651,7 @@ export const ModernGameUIWrapper: React.FC<ModernGameUIWrapperProps> = ({
         {multiSelection?.isVisible && (
           <SelectionMultipleUI
             isVisible={multiSelection.isVisible}
-            title={multiSelection.message ?? "请选择"}
+            title={multiSelection.message ?? tr("请选择")}
             options={multiSelection.options.map((o) => o.text)}
             onConfirm={(indices) => {
               // 循环 toggle 选中的项

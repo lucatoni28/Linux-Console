@@ -5,6 +5,8 @@
  * loads button images from UI_Settings.ini [Top_*_Btn]
  * Resources: asf/ui/top/*.asf
  */
+
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import { useGameUIContext } from "../../../contexts";
@@ -22,13 +24,13 @@ export const BUTTON_IDS = [
   "system",
 ] as const;
 export const BUTTON_TITLES = [
-  "状态 (F1/T)",
-  "装备 (F2/E)",
-  "修炼 (F3)",
-  "物品 (F5/I)",
-  "武功 (F6/M)",
-  "任务 (F7)",
-  "系统 (ESC)",
+  tr("状态 (F1/T)"),
+  tr("装备 (F2/E)"),
+  tr("修炼 (F3)"),
+  tr("物品 (F5/I)"),
+  tr("武功 (F6/M)"),
+  tr("任务 (F7)"),
+  tr("系统 (ESC)"),
 ];
 
 // Props removed — screenWidth and panel callbacks are read from GameUIContext
@@ -183,7 +185,7 @@ export const TopGui: React.FC = () => {
       {panelImage.dataUrl && (
         <img
           src={panelImage.dataUrl}
-          alt="顶部按钮栏"
+          alt={tr("顶部按钮栏")}
           style={{
             position: "absolute",
             left: 0,

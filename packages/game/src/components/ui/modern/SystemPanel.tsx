@@ -2,6 +2,8 @@
  * Modern SystemPanel - 系统面板
  * 位置与经典UI一致
  */
+
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
@@ -104,7 +106,7 @@ export const SystemPanel: React.FC<SystemPanelProps> = ({
 
   return (
     <div style={panelStyle} onClick={(e) => e.stopPropagation()}>
-      <PanelHeader title="系统菜单" onClose={onReturn} />
+      <PanelHeader title={tr("系统菜单")} onClose={onReturn} />
 
       <div
         style={{
@@ -115,14 +117,23 @@ export const SystemPanel: React.FC<SystemPanelProps> = ({
           gap: spacing.md,
         }}
       >
-        <MenuButton icon={<HiOutlineDocumentArrowDown />} label="存档/读档" onClick={onSaveLoad} />
-        <MenuButton icon={<HiOutlineCog6Tooth />} label="游戏设置" onClick={onOption} />
+        <MenuButton
+          icon={<HiOutlineDocumentArrowDown />}
+          label={tr("存档/读档")}
+          onClick={onSaveLoad}
+        />
+        <MenuButton icon={<HiOutlineCog6Tooth />} label={tr("游戏设置")} onClick={onOption} />
 
         <div style={{ flex: 1 }} />
 
         <Divider />
 
-        <MenuButton icon="🚪" label="退出游戏" onClick={onExit} color={modernColors.stats.hp} />
+        <MenuButton
+          icon="🚪"
+          label={tr("退出游戏")}
+          onClick={onExit}
+          color={modernColors.stats.hp}
+        />
       </div>
     </div>
   );

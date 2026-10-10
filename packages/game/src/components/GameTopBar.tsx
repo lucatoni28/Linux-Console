@@ -5,6 +5,7 @@
  */
 
 import { isPWA, useAuth } from "@miu2d/shared";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 
 export interface ToolbarButton {
   id: string;
@@ -73,7 +74,7 @@ export function GameTopBar({ gameName, logoUrl, toolbarButtons, onLoginClick }: 
             onClick={onLoginClick}
             className="px-3 py-1 text-xs text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
           >
-            登录
+            {tr("登录")}
           </button>
         )}
       </div>

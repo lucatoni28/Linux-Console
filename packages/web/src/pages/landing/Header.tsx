@@ -10,9 +10,9 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 const GAMES = [
-  { slug: "demo", name: "月影传说", logo: "/screenshot/logo-yuying.webp" },
-  { slug: "sword1", name: "新剑侠情缘", logo: "/screenshot/logo-new-swords.png" },
-  { slug: "sword2", name: "剑侠情缘2", logo: "/screenshot/logo-sword2.png" },
+  { slug: "demo", nameKey: "demo.tabs.yuying", logo: "/screenshot/logo-yuying.webp" },
+  { slug: "sword1", nameKey: "demo.tabs.sword1", logo: "/screenshot/logo-new-swords.png" },
+  { slug: "sword2", nameKey: "demo.tabs.sword2", logo: "/screenshot/logo-sword2.png" },
 ] as const;
 
 function GameNavLink({ slug, name, logo }: { slug: string; name: string; logo: string }) {
@@ -90,7 +90,7 @@ export function Header() {
 
             {/* 直接展示各游戏链接 */}
             {GAMES.map((g) => (
-              <GameNavLink key={g.slug} slug={g.slug} name={g.name} logo={g.logo} />
+              <GameNavLink key={g.slug} slug={g.slug} name={t(g.nameKey)} logo={g.logo} />
             ))}
           </nav>
 

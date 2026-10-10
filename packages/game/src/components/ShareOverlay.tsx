@@ -5,6 +5,7 @@
  * 说明谁分享的什么存档，3秒后自动消失
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { useEffect, useState } from "react";
 
 export interface ShareOverlayProps {
@@ -41,7 +42,7 @@ export function ShareOverlay({ sharedSave, error, onDone }: ShareOverlayProps) {
     return (
       <div className="fixed top-1/3 left-1/2 -translate-x-1/2 z-[1300]">
         <div className="px-8 py-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl text-center min-w-[320px]">
-          <div className="text-white/60 text-lg">加载分享存档...</div>
+          <div className="text-white/60 text-lg">{tr("加载分享存档...")}</div>
         </div>
       </div>
     );
@@ -65,7 +66,7 @@ export function ShareOverlay({ sharedSave, error, onDone }: ShareOverlayProps) {
       className={`fixed top-1/3 left-1/2 -translate-x-1/2 z-[1300] transition-opacity duration-500 ${fadeOut ? "opacity-0" : "opacity-100"}`}
     >
       <div className="px-8 py-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl text-center min-w-[320px]">
-        <div className="text-white/50 text-sm mb-2">来自玩家的分享</div>
+        <div className="text-white/50 text-sm mb-2">{tr("来自玩家的分享")}</div>
         <div className="text-white text-lg font-semibold mb-1">{sharedSave!.userName}</div>
         <div className="text-white/70 text-base mb-3">{sharedSave!.saveName}</div>
         <div className="flex items-center justify-center gap-4 text-white/40 text-sm">

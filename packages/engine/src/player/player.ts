@@ -11,6 +11,7 @@
  * - 本文件包含状态机、存档/加载、等级、遮挡等 (~800行)
  */
 
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type { Player as PlayerType } from "@miu2d/types";
 import type { Character } from "../character";
 import { applyFlatDataToCharacter } from "../character/character-config";
@@ -417,7 +418,7 @@ export class Player extends PlayerCombat {
     // 此功能待实现
 
     // 显示升级消息
-    this.guiManager.showMessage(`武功 ${newMagic.name} 升级了`);
+    this.guiManager.showMessage(tr("武功 {name} 升级了", { name: trc(newMagic.name) }));
     logger.log(`[Player] Magic "${newMagic.name}" leveled up - stats added`);
   }
 
@@ -647,12 +648,12 @@ export class Player extends PlayerCombat {
     if (Number.isNaN(amount)) return;
     if (amount > 0) {
       this._money += amount;
-      this.guiManager.showMessage(`你得到了 ${amount} 两银子。`);
+      this.guiManager.showMessage(tr("你得到了 {amount} 两银子。", { amount }));
       this._onMoneyChange?.();
     } else if (amount < 0) {
       this._money += amount;
       if (this._money < 0) this._money = 0;
-      this.guiManager.showMessage(`你失去了 ${-amount} 两银子。`);
+      this.guiManager.showMessage(tr("你失去了 {amount} 两银子。", { amount: -amount }));
       this._onMoneyChange?.();
     }
   }

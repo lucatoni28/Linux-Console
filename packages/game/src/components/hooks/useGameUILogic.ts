@@ -20,6 +20,7 @@ import { GoodKind } from "@miu2d/engine/player/goods";
 import { MAGIC_LIST_CONFIG } from "@miu2d/engine/player/magic/magic-list-config";
 import type { GameEngine } from "@miu2d/engine/runtime/game-engine";
 import type { TimerState } from "@miu2d/engine/runtime/timer-manager";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MagicHoverData, PanelType, PlayerVitals } from "../../contexts";
 import { useUIBridge } from "../adapters";
@@ -500,7 +501,7 @@ export function useGameUILogic({ engine }: UseGameUILogicOptions) {
       const npcManager = engine.npcManager;
       const mapName = engine.getCurrentMapName();
 
-      const mapDisplayName = mapName ?? "无名地图";
+      const mapDisplayName = mapName ?? tr("无名地图");
 
       const characters: CharacterMarker[] = [];
       if (npcManager) {
@@ -651,7 +652,7 @@ export function useGameUILogic({ engine }: UseGameUILogicOptions) {
       if (!dragData) return;
 
       if (dragData.good.kind !== GoodKind.Drug) {
-        dispatch({ type: "SHOW_MESSAGE", text: "只有药品可以放到快捷栏" });
+        dispatch({ type: "SHOW_MESSAGE", text: tr("只有药品可以放到快捷栏") });
         setDragData(null);
         return;
       }

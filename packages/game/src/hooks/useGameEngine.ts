@@ -22,6 +22,7 @@ import {
 import type { GameEngine, GameEngineState } from "@miu2d/engine/runtime/game-engine";
 import { createGameEngine } from "@miu2d/engine/runtime/game-engine";
 import type { SaveData } from "@miu2d/engine/storage";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { useEffect, useRef, useState } from "react";
 
 export interface UseGameEngineOptions {
@@ -121,7 +122,7 @@ export function useGameEngine(options: UseGameEngineOptions): UseGameEngineResul
             await engine.initializeAndStartNewGame();
           }
         } catch (e) {
-          const errorMessage = e instanceof Error ? e.message : "加载失败";
+          const errorMessage = e instanceof Error ? e.message : tr("加载失败");
           logger.error("[useGameEngine] Load failed:", errorMessage);
           setError(errorMessage);
           setState("uninitialized");

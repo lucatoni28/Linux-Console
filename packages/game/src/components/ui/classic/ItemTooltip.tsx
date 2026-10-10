@@ -13,6 +13,7 @@ function solidColor(c: UiColorRGBA): string {
 }
 
 import type { UIGoodData } from "@miu2d/engine/gui/ui-types";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useAsfImage } from "./hooks";
@@ -61,9 +62,9 @@ const ItemTooltipType1: React.FC<ItemTooltipProps> = ({
   }, [good]);
 
   const priceText = useMemo(() => {
-    if (!good) return "价格： 0";
+    if (!good) return tr("价格： 0");
     const price = isRecycle ? good.sellPrice : shopPrice != null ? shopPrice : good.cost;
-    return (isRecycle ? "回收价格： " : "价格： ") + price;
+    return (isRecycle ? tr("回收价格： ") : tr("价格： ")) + price;
   }, [good, isRecycle, shopPrice]);
 
   if (!isVisible || !good) return null;
@@ -152,7 +153,7 @@ const ItemTooltipType1: React.FC<ItemTooltipProps> = ({
           overflow: "hidden",
         }}
       >
-        {good.name || "无名称"}
+        {trc(good.name) || tr("无名称")}
       </div>
 
       {/* Price */}
@@ -207,7 +208,7 @@ const ItemTooltipType1: React.FC<ItemTooltipProps> = ({
           overflow: "hidden",
         }}
       >
-        {good.intro || "无简介"}
+        {trc(good.intro) || tr("无简介")}
       </div>
     </div>
   );
@@ -231,9 +232,9 @@ const ItemTooltipType2: React.FC<ItemTooltipProps> = ({
   }, [good]);
 
   const priceText = useMemo(() => {
-    if (!good) return "价格： 0";
+    if (!good) return tr("价格： 0");
     const price = isRecycle ? good.sellPrice : shopPrice != null ? shopPrice : good.cost;
-    return (isRecycle ? "回收价格： " : "价格： ") + price;
+    return (isRecycle ? tr("回收价格： ") : tr("价格： ")) + price;
   }, [good, isRecycle, shopPrice]);
 
   // Measure actual tooltip height and adjust position to stay within viewport
@@ -296,7 +297,7 @@ const ItemTooltipType2: React.FC<ItemTooltipProps> = ({
           overflow: "hidden",
         }}
       >
-        {good.name || "无名称"}
+        {trc(good.name) || tr("无名称")}
       </div>
 
       {/* Divider */}
@@ -347,7 +348,7 @@ const ItemTooltipType2: React.FC<ItemTooltipProps> = ({
             wordBreak: "break-word",
           }}
         >
-          {good.intro}
+          {trc(good.intro)}
         </div>
       )}
     </div>

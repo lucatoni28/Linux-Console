@@ -548,7 +548,7 @@ export function CrossPlatformSection() {
                 legacyNote: t("asyncLoading.table.allAtOnce"),
                 web: t("asyncLoading.table.onDemand"),
                 webNote: t("asyncLoading.table.asNeeded"),
-                highlight: "智能",
+                highlight: t("asyncLoading.highlight.smart"),
                 color: "cyan",
               },
               {
@@ -558,7 +558,7 @@ export function CrossPlatformSection() {
                 legacyNote: t("asyncLoading.table.permanentSpace"),
                 web: "0",
                 webNote: t("asyncLoading.table.browserCache"),
-                highlight: "零占用",
+                highlight: t("asyncLoading.highlight.zeroStorage"),
                 color: "purple",
               },
             ].map((item, index) => (
@@ -631,7 +631,7 @@ export function CrossPlatformSection() {
           >
             <div className="flex items-center gap-4">
               <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                传统客户端
+                {t("asyncLoading.platforms.legacy")}
               </span>
               <div className="flex gap-1.5">
                 {[
@@ -651,7 +651,9 @@ export function CrossPlatformSection() {
             </div>
             <div className="w-px h-6 bg-slate-200 dark:bg-slate-700" />
             <div className="flex items-center gap-4">
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">网页版</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                {t("asyncLoading.platforms.web")}
+              </span>
               <div className="flex gap-1.5">
                 {[
                   { icon: <FaWindows className="text-emerald-500" /> },

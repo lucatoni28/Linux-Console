@@ -5,6 +5,8 @@
  * shows level, exp, life, thew, mana, attack, defend, evade
  * Resources loaded from UI_Settings.ini
  */
+
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useMemo } from "react";
 import { useAsfImage } from "./hooks";
@@ -143,7 +145,7 @@ export const StateGui: React.FC<StateGuiProps> = ({
       {panelImage.dataUrl && (
         <img
           src={panelImage.dataUrl}
-          alt="状态面板"
+          alt={tr("状态面板")}
           style={{
             position: "absolute",
             left: 0,

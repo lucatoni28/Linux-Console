@@ -8,6 +8,7 @@
  */
 
 import { LOG_LEVELS, type LogLevel, logger } from "@miu2d/engine/core/logger";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { useEffect, useState } from "react";
 import {
   HiOutlineBuildingLibrary,
@@ -16,8 +17,8 @@ import {
   HiOutlineGlobeAlt,
   HiOutlineMusicalNote,
   HiOutlinePaintBrush,
-  HiOutlineSpeakerWave,
   HiOutlineSparkles,
+  HiOutlineSpeakerWave,
   HiOutlineXMark,
 } from "react-icons/hi2";
 import type { UITheme } from "../ui";
@@ -101,8 +102,8 @@ export interface SettingsPanelProps {
 
 // 预设分辨率选项（0x0 表示自适应）
 const RESOLUTION_PRESETS = [
-  { width: 0, height: 0, label: "自适应" },
-  { width: 800, height: 600, label: "800×600 (原版)" },
+  { width: 0, height: 0, label: tr("自适应") },
+  { width: 800, height: 600, label: tr("800×600 (原版)") },
   { width: 1024, height: 768, label: "1024×768" },
   { width: 1280, height: 720, label: "1280×720 (720p)" },
   { width: 1280, height: 960, label: "1280×960" },
@@ -222,12 +223,12 @@ export function SettingsPanel({
       <div className="flex-1 overflow-y-auto p-4 space-y-5">
         {/* 音频设置 */}
         <div>
-          <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider mb-3">音频</h3>
+          <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider mb-3">{tr("音频")}</h3>
 
           {/* 音乐音量 */}
           <div className="mb-3">
             <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-1.5 text-xs text-white/50"><HiOutlineMusicalNote className="w-3.5 h-3.5 flex-shrink-0" style={{ strokeWidth: 2.2 }} /> 音乐音量</div>
+              <div className="flex items-center gap-1.5 text-xs text-white/50"><HiOutlineMusicalNote className="w-3.5 h-3.5 flex-shrink-0" style={{ strokeWidth: 2.2 }} /> {tr("音乐音量")}</div>
               <span className="text-xs text-white/30">{Math.round(musicVolume * 100)}%</span>
             </div>
             <input
@@ -244,7 +245,7 @@ export function SettingsPanel({
           {/* 音效音量 */}
           <div className="mb-3">
             <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-1.5 text-xs text-white/50"><HiOutlineSpeakerWave className="w-3.5 h-3.5 flex-shrink-0" style={{ strokeWidth: 2.2 }} /> 音效音量</div>
+              <div className="flex items-center gap-1.5 text-xs text-white/50"><HiOutlineSpeakerWave className="w-3.5 h-3.5 flex-shrink-0" style={{ strokeWidth: 2.2 }} /> {tr("音效音量")}</div>
               <span className="text-xs text-white/30">{Math.round(soundVolume * 100)}%</span>
             </div>
             <input
@@ -261,7 +262,7 @@ export function SettingsPanel({
           {/* 环境音音量 */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-1.5 text-xs text-white/50"><HiOutlineGlobeAlt className="w-3.5 h-3.5 flex-shrink-0" style={{ strokeWidth: 2.2 }} /> 环境音音量</div>
+              <div className="flex items-center gap-1.5 text-xs text-white/50"><HiOutlineGlobeAlt className="w-3.5 h-3.5 flex-shrink-0" style={{ strokeWidth: 2.2 }} /> {tr("环境音音量")}</div>
               <span className="text-xs text-white/30">{Math.round(ambientVolume * 100)}%</span>
             </div>
             <input
@@ -278,14 +279,14 @@ export function SettingsPanel({
 
         {/* 显示设置 */}
         <div>
-          <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider mb-3">显示</h3>
+          <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider mb-3">{tr("显示")}</h3>
 
           {/* UI 主题切换 */}
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-1.5 text-xs text-white/50"><HiOutlinePaintBrush className="w-3.5 h-3.5 flex-shrink-0" style={{ strokeWidth: 2.2 }} /> 界面风格</div>
+              <div className="flex items-center gap-1.5 text-xs text-white/50"><HiOutlinePaintBrush className="w-3.5 h-3.5 flex-shrink-0" style={{ strokeWidth: 2.2 }} /> {tr("界面风格")}</div>
               <span className="text-xs text-white/30">
-                {uiTheme === "classic" ? "经典" : "现代"}
+                {uiTheme === "classic" ? tr("经典") : tr("现代")}
               </span>
             </div>
             <div className="flex gap-2">
@@ -298,7 +299,7 @@ export function SettingsPanel({
                 }`}
               >
                 <HiOutlineBuildingLibrary className="w-3.5 h-3.5 flex-shrink-0" style={{ strokeWidth: 2.2 }} />
-                <span>经典风格</span>
+                <span>{tr("经典风格")}</span>
               </button>
               <button
                 onClick={() => handleThemeChange("modern")}
@@ -309,26 +310,26 @@ export function SettingsPanel({
                 }`}
               >
                 <HiOutlineSparkles className="w-3.5 h-3.5 flex-shrink-0" style={{ strokeWidth: 2.2 }} />
-                <span>现代风格</span>
+                <span>{tr("现代风格")}</span>
               </button>
             </div>
             <div className="text-xs text-white/25 mt-1">
               {uiTheme === "classic"
-                ? "复古像素风，还原经典游戏体验"
-                : "毛玻璃效果，清新简洁的视觉设计"}
+                ? tr("复古像素风，还原经典游戏体验")
+                : tr("毛玻璃效果，清新简洁的视觉设计")}
             </div>
           </div>
 
           {/* 分辨率选择 */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-1.5 text-xs text-white/50"><HiOutlineComputerDesktop className="w-3.5 h-3.5 flex-shrink-0" style={{ strokeWidth: 2.2 }} /> 分辨率</div>
+              <div className="flex items-center gap-1.5 text-xs text-white/50"><HiOutlineComputerDesktop className="w-3.5 h-3.5 flex-shrink-0" style={{ strokeWidth: 2.2 }} /> {tr("分辨率")}</div>
               <span className="text-xs text-white/30">
                 {currentResolution
                   ? currentResolution.width === 0
-                    ? "自适应"
+                    ? tr("自适应")
                     : `${currentResolution.width}×${currentResolution.height}`
-                  : "自适应"}
+                  : tr("自适应")}
               </span>
             </div>
             <select
@@ -346,20 +347,20 @@ export function SettingsPanel({
                 </option>
               ))}
             </select>
-            <div className="text-xs text-white/25 mt-1">调整游戏画面大小</div>
+            <div className="text-xs text-white/25 mt-1">{tr("调整游戏画面大小")}</div>
           </div>
         </div>
 
         {/* 开发者设置 */}
         <div>
           <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider mb-3">
-            开发者
+            {tr("开发者")}
           </h3>
 
           {/* 日志级别选择 */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-1.5 text-xs text-white/50"><HiOutlineClipboardDocumentList className="w-3.5 h-3.5 flex-shrink-0" style={{ strokeWidth: 2.2 }} /> 日志级别</div>
+              <div className="flex items-center gap-1.5 text-xs text-white/50"><HiOutlineClipboardDocumentList className="w-3.5 h-3.5 flex-shrink-0" style={{ strokeWidth: 2.2 }} /> {tr("日志级别")}</div>
               <span className="text-xs text-white/30">{logLevel.toUpperCase()}</span>
             </div>
             <select
@@ -372,16 +373,16 @@ export function SettingsPanel({
                 <option key={level} value={level}>
                   {level.toUpperCase()} -{" "}
                   {level === "debug"
-                    ? "显示所有日志"
+                    ? tr("显示所有日志")
                     : level === "info"
-                      ? "隐藏调试日志"
+                      ? tr("隐藏调试日志")
                       : level === "warn"
-                        ? "仅警告和错误"
-                        : "仅错误"}
+                        ? tr("仅警告和错误")
+                        : tr("仅错误")}
                 </option>
               ))}
             </select>
-            <div className="text-xs text-white/25 mt-1">控制控制台日志输出级别</div>
+            <div className="text-xs text-white/25 mt-1">{tr("控制控制台日志输出级别")}</div>
           </div>
         </div>
       </div>

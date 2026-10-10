@@ -5,6 +5,7 @@
  * 继承链: Character → PlayerBase → PlayerCombat → Player
  */
 
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import { Character } from "../../character";
 import { logger } from "../../core/logger";
 import type { Vector2 } from "../../core/types";
@@ -539,7 +540,7 @@ export abstract class PlayerBase extends Character {
     }
 
     if (this.thew < THEW_USE_AMOUNT_WHEN_JUMP) {
-      this.guiManager.showMessage("体力不足!");
+      this.guiManager.showMessage(tr("体力不足!"));
       return false;
     }
 
@@ -729,7 +730,7 @@ export abstract class PlayerBase extends Character {
     if (isNew && index !== -1 && magic) {
       // 新学会武功
       // Reference: GuiManager.ShowMessage("你学会了" + magic.Name);
-      this.showMessage(`你学会了${magic.name}`);
+      this.showMessage(tr("你学会了{name}", { name: trc(magic.name) }));
       logger.debug(`[Player] Learned new magic: ${magic.name}`);
       return true;
     }
@@ -738,7 +739,7 @@ export abstract class PlayerBase extends Character {
       // 武功已存在
       // Reference: GuiManager.ShowMessage("你已经学会了" + magic.Name);
       if (magic) {
-        this.showMessage(`你已经学会了${magic.name}`);
+        this.showMessage(tr("你已经学会了{name}", { name: trc(magic.name) }));
       }
       logger.debug(`[Player] Magic already exists: ${magicFile}`);
       return true;
@@ -749,7 +750,7 @@ export abstract class PlayerBase extends Character {
     if (magic === null) {
       logger.warn(`[Player] Failed to load magic: ${magicFile}`);
     } else {
-      this.showMessage("武功栏已满");
+      this.showMessage(tr("武功栏已满"));
     }
     return false;
   }

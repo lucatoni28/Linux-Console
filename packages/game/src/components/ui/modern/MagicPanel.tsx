@@ -5,6 +5,7 @@
 
 import type { MagicItemInfo } from "@miu2d/engine/magic";
 import { MAGIC_LIST_CONFIG } from "@miu2d/engine/player/magic/magic-list-config";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import { HiOutlineShieldCheck, HiOutlineXMark } from "react-icons/hi2";
@@ -146,7 +147,7 @@ const MagicSlot: React.FC<MagicSlotProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const iconPath = magicInfo?.magic?.icon ?? magicInfo?.magic?.image ?? magic?.iconPath ?? null;
-  const displayName = magicInfo?.magic?.name ?? magic?.name ?? "";
+  const displayName = trc(magicInfo?.magic?.name ?? magic?.name ?? "");
   const level = magicInfo?.level ?? magic?.level ?? 0;
   const hasMagic = !!(magicInfo?.magic || magic);
 
@@ -513,7 +514,7 @@ export const MagicPanel: React.FC<MagicPanelProps> = ({
                 marginBottom: spacing.xs,
               }}
             >
-              武功秘籍
+              {tr("武功秘籍")}
             </div>
             <div
               style={{
@@ -521,11 +522,11 @@ export const MagicPanel: React.FC<MagicPanelProps> = ({
                 color: modernColors.text.secondary,
               }}
             >
-              已习得{" "}
+              {tr("已习得")}{" "}
               <span style={{ color: wuxiaAccent.gold, fontWeight: typography.fontWeight.semibold }}>
                 {magicCount}
               </span>{" "}
-              种武学
+              {tr("种武学")}
             </div>
           </div>
         </div>
@@ -533,7 +534,7 @@ export const MagicPanel: React.FC<MagicPanelProps> = ({
 
       {/* 武功列表区域 */}
       <div style={{ padding: `${spacing.md}px ${spacing.lg}px` }}>
-        <SectionTitle title="招式列表" />
+        <SectionTitle title={tr("招式列表")} />
 
         {/* 蜂窝状武功网格 */}
         <div
@@ -666,11 +667,11 @@ export const MagicPanel: React.FC<MagicPanelProps> = ({
         }}
       >
         <span style={{ fontSize: typography.fontSize.xs, color: modernColors.text.muted }}>
-          <span style={{ color: wuxiaAccent.azure }}>右键</span> 添加快捷栏
+          <span style={{ color: wuxiaAccent.azure }}>{tr("右键")}</span> {tr("添加快捷栏")}
         </span>
         <span style={{ color: modernColors.border.glass }}>|</span>
         <span style={{ fontSize: typography.fontSize.xs, color: modernColors.text.muted }}>
-          <span style={{ color: wuxiaAccent.azure }}>拖拽</span> 交换位置
+          <span style={{ color: wuxiaAccent.azure }}>{tr("拖拽")}</span> {tr("交换位置")}
         </span>
       </div>
 

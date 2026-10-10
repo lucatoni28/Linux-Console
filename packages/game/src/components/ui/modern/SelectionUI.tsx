@@ -4,6 +4,7 @@
  */
 
 import type { SelectionGuiState } from "@miu2d/engine/gui/ui-types";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useMemo, useState } from "react";
 import { useGameUIContext } from "../../../contexts";
@@ -58,7 +59,7 @@ export const SelectionUI: React.FC<SelectionUIProps> = ({ state, onSelect }) => 
             color: modernColors.text.primary,
           }}
         >
-          {message || "请选择"}
+          {message || tr("请选择")}
         </span>
       </div>
 

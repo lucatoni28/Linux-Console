@@ -11,6 +11,7 @@
  */
 
 import type { MultiSelectionGuiState } from "@miu2d/engine/gui/ui-types";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import { useAsfImage } from "./hooks";
@@ -181,7 +182,7 @@ export const SelectionMultipleUI: React.FC<SelectionMultipleUIProps> = ({
               color: "rgba(255, 255, 255, 0.6)",
             }}
           >
-            (请选择 {state.selectionCount} 项)
+            {tr("(请选择 {selectionCount} 项)", { selectionCount: state.selectionCount })}
           </span>
         </div>
       )}
@@ -231,7 +232,10 @@ export const SelectionMultipleUI: React.FC<SelectionMultipleUIProps> = ({
           userSelect: "none",
         }}
       >
-        已选择 {state.selectedIndices.length} / {state.selectionCount}
+        {tr("已选择 {selectedIndices} / {selectionCount}", {
+          selectedIndices: state.selectedIndices.length,
+          selectionCount: state.selectionCount,
+        })}
       </div>
     </div>
   );

@@ -9,6 +9,7 @@
  */
 
 import { getS3Url, trpc, useAuth } from "@miu2d/shared";
+import { gameDateLocale, tr } from "@miu2d/shared/lib/game-i18n";
 import type { SaveSlot } from "@miu2d/types";
 import { useCallback, useEffect, useState } from "react";
 import { HiOutlineXMark } from "react-icons/hi2";
@@ -89,7 +90,7 @@ export function WebSaveLoadPanel({
       utils.save.list.invalidate({ gameSlug });
       // invalidate 对应存档的详情缓存，避免立即读档时命中旧缓存
       utils.save.get.invalidate({ saveId: data.id });
-      setMessage({ text: "存档成功", type: "success" });
+      setMessage({ text: tr("存档成功"), type: "success" });
       setSaveName("");
     },
     onError: (e) => setMessage({ text: e.message, type: "error" }),
@@ -98,7 +99,7 @@ export function WebSaveLoadPanel({
   const deleteMutation = trpc.save.delete.useMutation({
     onSuccess: () => {
       utils.save.list.invalidate({ gameSlug });
-      setMessage({ text: "删除成功", type: "success" });
+      setMessage({ text: tr("删除成功"), type: "success" });
     },
     onError: (e) => setMessage({ text: e.message, type: "error" }),
   });
@@ -107,9 +108,9 @@ export function WebSaveLoadPanel({
     onSuccess: (data) => {
       utils.save.list.invalidate({ gameSlug });
       if (data.isShared && data.shareCode) {
-        setMessage({ text: "已开启分享", type: "success" });
+        setMessage({ text: tr("已开启分享"), type: "success" });
       } else {
-        setMessage({ text: "已取消分享", type: "info" });
+        setMessage({ text: tr("已取消分享"), type: "info" });
       }
     },
     onError: (e) => setMessage({ text: e.message, type: "error" }),
@@ -139,11 +140,12 @@ export function WebSaveLoadPanel({
   const handleNewSave = useCallback(() => {
     const collected = onCollectSaveData();
     if (!collected) {
-      setMessage({ text: "无法获取游戏状态", type: "error" });
+      setMessage({ text: tr("无法获取游戏状态"), type: "error" });
       return;
     }
 
-    const name = saveName.trim() || `存档 ${new Date().toLocaleString("zh-CN")}`;
+    const name =
+      saveName.trim() || tr("存档 {time}", { time: new Date().toLocaleString(gameDateLocale()) });
 
     upsertMutation.mutate({
       gameSlug,
@@ -160,7 +162,7 @@ export function WebSaveLoadPanel({
     (saveId: string) => {
       const collected = onCollectSaveData();
       if (!collected) {
-        setMessage({ text: "无法获取游戏状态", type: "error" });
+        setMessage({ text: tr("无法获取游戏状态"), type: "error" });
         return;
       }
 
@@ -168,7 +170,8 @@ export function WebSaveLoadPanel({
       upsertMutation.mutate({
         gameSlug,
         saveId,
-        name: save?.name ?? `存档 ${new Date().toLocaleString("zh-CN")}`,
+        name:
+          save?.name ?? tr("存档 {time}", { time: new Date().toLocaleString(gameDateLocale()) }),
         mapName: collected.mapName,
         level: collected.level,
         playerName: collected.playerName,
@@ -190,14 +193,14 @@ export function WebSaveLoadPanel({
         if (result?.data) {
           const success = await onLoadSaveData(result.data as Record<string, unknown>);
           if (success) {
-            setMessage({ text: "读档成功", type: "success" });
+            setMessage({ text: tr("读档成功"), type: "success" });
             setTimeout(onClose, 500);
           } else {
-            setMessage({ text: "读档失败", type: "error" });
+            setMessage({ text: tr("读档失败"), type: "error" });
           }
         }
       } catch {
-        setMessage({ text: "读档失败", type: "error" });
+        setMessage({ text: tr("读档失败"), type: "error" });
       } finally {
         setOperatingId(null);
       }
@@ -248,7 +251,7 @@ export function WebSaveLoadPanel({
                   type="text"
                   value={saveName}
                   onChange={(e) => setSaveName(e.target.value)}
-                  placeholder="输入存档名称（可选）"
+                  placeholder={tr("输入存档名称（可选）")}
                   disabled={!!saveBlockedReason}
                   className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white
                       placeholder-white/30 focus:outline-none focus:border-white/30 disabled:opacity-40 disabled:cursor-not-allowed"
@@ -260,7 +263,7 @@ export function WebSaveLoadPanel({
                   className="px-4 py-2 bg-blue-500/60 hover:bg-blue-500/80 disabled:opacity-40 disabled:cursor-not-allowed
                       text-white text-sm rounded-lg transition-colors whitespace-nowrap"
                 >
-                  {upsertMutation.isPending ? "保存中..." : "新建存档"}
+                  {upsertMutation.isPending ? tr("保存中...") : tr("新建存档")}
                 </button>
               </div>
             </div>
@@ -269,9 +272,9 @@ export function WebSaveLoadPanel({
           {/* 存档列表 */}
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
             {savesQuery.isLoading ? (
-              <div className="text-center text-white/40 py-8">加载中...</div>
+              <div className="text-center text-white/40 py-8">{tr("加载中...")}</div>
             ) : saves.length === 0 ? (
-              <div className="text-center text-white/40 py-8">暂无存档</div>
+              <div className="text-center text-white/40 py-8">{tr("暂无存档")}</div>
             ) : (
               saves.map((save) => (
                 <SaveSlotCard
@@ -350,7 +353,7 @@ export function WebSaveLoadPanel({
       >
         {/* 头部 */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-          <h2 className="text-lg font-semibold text-white/90">存档管理</h2>
+          <h2 className="text-lg font-semibold text-white/90">{tr("存档管理")}</h2>
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors"
@@ -379,24 +382,24 @@ function ConfirmDialog({
 }) {
   const meta = {
     load: {
-      title: "读取存档",
-      desc: "将用此存档覆盖当前游戏进度，确定要读档吗？",
+      title: tr("读取存档"),
+      desc: tr("将用此存档覆盖当前游戏进度，确定要读档吗？"),
       confirmCls: "bg-green-500/70 hover:bg-green-500/90",
-      label: "确认读档",
+      label: tr("确认读档"),
       icon: <span className="text-blue-300 text-lg leading-none">ℹ️</span>,
     },
     save: {
-      title: "覆盖存档",
-      desc: "将用当前游戏状态覆盖此存档，此操作无法撤销。",
+      title: tr("覆盖存档"),
+      desc: tr("将用当前游戏状态覆盖此存档，此操作无法撤销。"),
       confirmCls: "bg-blue-500/60 hover:bg-blue-500/80",
-      label: "确认覆盖",
+      label: tr("确认覆盖"),
       icon: <span className="text-lg leading-none">⚠️</span>,
     },
     delete: {
-      title: "删除存档",
-      desc: "删除后无法恢复，确定要删除吗？",
+      title: tr("删除存档"),
+      desc: tr("删除后无法恢复，确定要删除吗？"),
       confirmCls: "bg-red-500/60  hover:bg-red-500/80",
-      label: "确认删除",
+      label: tr("确认删除"),
       icon: <span className="text-lg leading-none">🗑️</span>,
     },
   }[action];
@@ -415,14 +418,18 @@ function ConfirmDialog({
           {meta.icon}
           {meta.title}
         </h3>
-        {saveName && <p className="text-xs text-white/40 mb-3 truncate">「{saveName}」</p>}
+        {saveName && (
+          <p className="text-xs text-white/40 mb-3 truncate">
+            {tr("「{saveName}」", { saveName })}
+          </p>
+        )}
         <p className="text-sm text-white/60 mb-5">{meta.desc}</p>
         <div className="flex gap-2 justify-end">
           <button
             onClick={onCancel}
             className="px-4 py-2 text-sm bg-white/10 text-white/60 rounded-lg hover:bg-white/20 transition-colors"
           >
-            取消
+            {tr("取消")}
           </button>
           <button
             onClick={onConfirm}
@@ -460,7 +467,7 @@ function SaveSlotCard({
   const formatDate = (dateStr: string) => {
     try {
       const d = new Date(dateStr);
-      return d.toLocaleString("zh-CN", {
+      return d.toLocaleString(gameDateLocale(), {
         month: "2-digit",
         day: "2-digit",
         hour: "2-digit",
@@ -488,7 +495,7 @@ function SaveSlotCard({
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-white/20 text-xs">
-              空
+              {tr("空")}
             </div>
           )}
           {save.isShared && (
@@ -537,7 +544,7 @@ function SaveSlotCard({
 
             {/* 操作按钮 - 始终可见 */}
             {isOperating ? (
-              <span className="text-[11px] text-white/30 flex-shrink-0">处理中...</span>
+              <span className="text-[11px] text-white/30 flex-shrink-0">{tr("处理中...")}</span>
             ) : (
               <div className="flex items-center gap-1 flex-shrink-0">
                 <button
@@ -545,7 +552,7 @@ function SaveSlotCard({
                   disabled={!!saveBlockedReason}
                   className="px-1.5 py-0.5 text-[11px] rounded bg-green-500/20 text-green-300 hover:bg-green-500/35 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 >
-                  读档
+                  {tr("读档")}
                 </button>
                 {canSave && (
                   <button
@@ -553,7 +560,7 @@ function SaveSlotCard({
                     disabled={!!saveBlockedReason}
                     className="px-1.5 py-0.5 text-[11px] rounded bg-blue-500/20 text-blue-300 hover:bg-blue-500/35 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   >
-                    覆盖
+                    {tr("覆盖")}
                   </button>
                 )}
                 <button
@@ -563,14 +570,14 @@ function SaveSlotCard({
                       ? "bg-green-500/20 text-green-300 hover:bg-green-500/35"
                       : "bg-white/5 text-white/30 hover:bg-white/15 hover:text-white/50"
                   }`}
-                  title={save.isShared ? "取消分享" : "分享"}
+                  title={save.isShared ? tr("取消分享") : tr("分享")}
                 >
                   🔗
                 </button>
                 <button
                   onClick={onDelete}
                   className="w-6 h-5 flex items-center justify-center text-[11px] rounded bg-white/5 text-white/25 hover:bg-red-500/25 hover:text-red-300 transition-colors"
-                  title="删除"
+                  title={tr("删除")}
                 >
                   🗑
                 </button>
@@ -597,7 +604,7 @@ function SaveSlotCard({
             }}
             className="px-2 py-1 bg-white/10 hover:bg-white/20 text-white/50 text-[11px] rounded transition-colors flex-shrink-0"
           >
-            复制
+            {tr("复制")}
           </button>
         </div>
       )}
@@ -644,7 +651,7 @@ function InlineAuthForm() {
 
     if (mode === "register") {
       if (password !== confirmPassword) {
-        setError("两次输入的密码不一致");
+        setError(tr("两次输入的密码不一致"));
         return;
       }
       registerMutation.mutate({ name, email, password });
@@ -661,7 +668,7 @@ function InlineAuthForm() {
   return (
     <div className="px-6 py-6">
       <p className="text-white/60 text-sm text-center mb-4">
-        {mode === "login" ? "登录后即可使用云存档功能" : "注册账号即可使用云存档功能"}
+        {mode === "login" ? tr("登录后即可使用云存档功能") : tr("注册账号即可使用云存档功能")}
       </p>
       <form onSubmit={handleSubmit} className="space-y-3">
         {mode === "register" && (
@@ -669,7 +676,7 @@ function InlineAuthForm() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="昵称"
+            placeholder={tr("昵称")}
             required
             className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white
               placeholder-white/30 focus:outline-none focus:border-white/30"
@@ -679,7 +686,7 @@ function InlineAuthForm() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="邮箱"
+          placeholder={tr("邮箱")}
           required
           className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white
             placeholder-white/30 focus:outline-none focus:border-white/30"
@@ -688,7 +695,7 @@ function InlineAuthForm() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="密码"
+          placeholder={tr("密码")}
           required
           minLength={4}
           className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white
@@ -699,7 +706,7 @@ function InlineAuthForm() {
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="确认密码"
+            placeholder={tr("确认密码")}
             required
             minLength={4}
             className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white
@@ -715,11 +722,11 @@ function InlineAuthForm() {
         >
           {isPending
             ? mode === "login"
-              ? "登录中..."
-              : "注册中..."
+              ? tr("登录中...")
+              : tr("注册中...")
             : mode === "login"
-              ? "登录"
-              : "注册"}
+              ? tr("登录")
+              : tr("注册")}
         </button>
       </form>
       <p className="text-center mt-3">
@@ -728,16 +735,16 @@ function InlineAuthForm() {
           onClick={switchMode}
           className="text-blue-400/70 hover:text-blue-400 text-xs transition-colors"
         >
-          {mode === "login" ? "没有账号？点此注册" : "已有账号？点此登录"}
+          {mode === "login" ? tr("没有账号？点此注册") : tr("已有账号？点此登录")}
         </button>
       </p>
 
       {/* 遇到问题反馈 */}
       <div className="mt-4 pt-3 border-t border-white/5 text-center group">
-        <p className="text-white/30 text-xs mb-2">遇到问题、剧情走不下去？微信扫码反馈</p>
+        <p className="text-white/30 text-xs mb-2">{tr("遇到问题、剧情走不下去？微信扫码反馈")}</p>
         <img
           src="https://williamchan.me/assets/qrcode.jpg"
-          alt="微信反馈二维码"
+          alt={tr("微信反馈二维码")}
           className="mx-auto w-20 h-auto rounded-md opacity-60 group-hover:opacity-100 transition-opacity"
           loading="lazy"
         />

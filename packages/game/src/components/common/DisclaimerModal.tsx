@@ -6,6 +6,7 @@
  */
 
 import { useAnimatedVisibility } from "@miu2d/shared";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 
 export const DISCLAIMER_STORAGE_KEY = "jxqy_disclaimer_accepted";
@@ -47,16 +48,16 @@ export const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ visible, onCon
       >
         {/* 头部 */}
         <div className="px-6 py-5 border-b border-white/10">
-          <h2 className="text-base font-semibold text-white/90 tracking-wide">版权声明</h2>
+          <h2 className="text-base font-semibold text-white/90 tracking-wide">{tr("版权声明")}</h2>
         </div>
 
         {/* 内容 */}
         <div className="px-6 py-6 space-y-4 text-sm leading-relaxed text-white/70">
-          <p>本网站为个人非商业项目，仅用于技术研究与交流学习。</p>
+          <p>{tr("本网站为个人非商业项目，仅用于技术研究与交流学习。")}</p>
           <p className="text-white/90 font-medium">
-            游戏资源版权归原作者所有，如您介意请联系我删除，本项目仅用于交流学习。
+            {tr("游戏资源版权归原作者所有，如您介意请联系我删除，本项目仅用于交流学习。")}
           </p>
-          <p>继续使用即表示您已知悉上述声明。</p>
+          <p>{tr("继续使用即表示您已知悉上述声明。")}</p>
         </div>
 
         {/* 操作按钮 */}
@@ -69,7 +70,7 @@ export const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ visible, onCon
               hover:border-white/30 focus:outline-none focus-visible:ring-2
               focus-visible:ring-white/40"
           >
-            我已了解，继续游览
+            {tr("我已了解，继续游览")}
           </button>
         </div>
       </div>

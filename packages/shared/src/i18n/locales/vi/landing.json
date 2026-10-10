@@ -10,7 +10,8 @@
       "sword1": "Tân Kiếm Hiệp Tình Duyên",
       "yuying": "Nguyệt Ảnh Truyền Thuyết",
       "sword2": "Kiếm Hiệp Tình Duyên 2"
-    }
+    },
+    "scrollToLoad": "Cuộn xuống để tải game"
   },
   "mobile": {
     "badge": "Hỗ trợ gốc",
@@ -235,7 +236,8 @@
     "asfEditor": {
       "title": "Trình chỉnh sửa sprite ASF",
       "desc": "Trình xem và gỡ lỗi hoạt ảnh sprite chuyên nghiệp. Duyệt tệp ASF, xem từng khung hình, chỉnh tốc độ phát và hiển thị sprite sheet cho nhân vật và hiệu ứng."
-    }
+    },
+    "clickToZoom": "Nhấn để phóng to"
   },
   "features": {
     "title": "Tính năng engine mạnh mẽ",

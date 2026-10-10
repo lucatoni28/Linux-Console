@@ -5,6 +5,8 @@
  * shows text with scroll bar
  * Resources loaded from UI_Settings.ini
  */
+
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAsfImage } from "./hooks";
@@ -84,7 +86,7 @@ export const MemoGui: React.FC<MemoGuiProps> = ({ isVisible, memos, screenWidth 
       {panelImage.dataUrl && (
         <img
           src={panelImage.dataUrl}
-          alt="任务面板"
+          alt={tr("任务面板")}
           style={{
             position: "absolute",
             left: 0,
@@ -146,7 +148,7 @@ export const MemoGui: React.FC<MemoGuiProps> = ({ isVisible, memos, screenWidth 
                 wordBreak: "break-all",
               }}
             >
-              {memo}
+              {trc(memo)}
             </div>
           ))}
         </div>
@@ -160,7 +162,7 @@ export const MemoGui: React.FC<MemoGuiProps> = ({ isVisible, memos, screenWidth 
               marginTop: 60,
             }}
           >
-            暂无任务记录
+            {tr("暂无任务记录")}
           </div>
         )}
       </div>

@@ -8,6 +8,8 @@
  * - Position: x=5, y=5 (hardcoded)
  * - Width/Height: from ASF texture (item.BaseTexture.Width/Height)
  */
+
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback } from "react";
 import { useAsfImage } from "./hooks";
@@ -68,7 +70,7 @@ const PartnerHeadItem: React.FC<PartnerHeadItemProps> = ({ partner, onClick, onH
       onClick={handleClick}
       onMouseEnter={() => onHover?.(true)}
       onMouseLeave={() => onHover?.(false)}
-      title={partner.canEquip ? `${partner.name} - 点击打开装备` : partner.name}
+      title={partner.canEquip ? tr("{name} - 点击打开装备", { name: trc(partner.name) }) : trc(partner.name)}
     >
       {/* 头像图片 */}
       <img

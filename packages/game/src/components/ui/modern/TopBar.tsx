@@ -2,6 +2,8 @@
  * Modern TopBar - 顶部按钮栏
  * 位置与经典UI一致
  */
+
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
@@ -74,50 +76,50 @@ export const TopBar: React.FC = () => {
     () => [
       {
         id: "state",
-        label: "状态",
+        label: tr("状态"),
         icon: <HiOutlineChartBar />,
         shortcut: "F1/T",
         onClick: () => togglePanel("state"),
       },
       {
         id: "equip",
-        label: "装备",
+        label: tr("装备"),
         icon: <HiOutlineShieldCheck />,
         shortcut: "F2/E",
         onClick: () => togglePanel("equip"),
       },
       {
         id: "partner",
-        label: "伙伴",
+        label: tr("伙伴"),
         icon: <HiOutlineUserGroup />,
         shortcut: "F4",
         onClick: () => togglePanel("npcEquip"),
       },
       {
         id: "xiulian",
-        label: "修炼",
+        label: tr("修炼"),
         icon: <HiOutlineAcademicCap />,
         shortcut: "F3",
         onClick: () => togglePanel("xiulian"),
       },
       {
         id: "goods",
-        label: "物品",
+        label: tr("物品"),
         icon: <HiOutlineShoppingBag />,
         shortcut: "F5/I",
         onClick: () => togglePanel("goods"),
       },
       {
         id: "magic",
-        label: "武功",
+        label: tr("武功"),
         icon: <HiOutlineSparkles />,
         shortcut: "F6/M",
         onClick: () => togglePanel("magic"),
       },
-      { id: "memo", label: "任务", icon: <HiOutlineDocumentText />, shortcut: "F7", onClick: () => togglePanel("memo") },
+      { id: "memo", label: tr("任务"), icon: <HiOutlineDocumentText />, shortcut: "F7", onClick: () => togglePanel("memo") },
       {
         id: "system",
-        label: "系统",
+        label: tr("系统"),
         icon: <HiOutlineCog6Tooth />,
         shortcut: "ESC",
         onClick: () => togglePanel("system"),

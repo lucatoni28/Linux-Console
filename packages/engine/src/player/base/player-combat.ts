@@ -5,6 +5,7 @@
  * 继承链: Character → PlayerBase → PlayerCombat → Player
  */
 
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type { Character } from "../../character";
 import type { CharacterBase } from "../../character/base";
 import { parseMagicListNoDistance } from "../../character/modules";
@@ -34,7 +35,7 @@ export abstract class PlayerCombat extends PlayerBase {
   protected canAttack(): boolean {
     // if (Thew < ThewUseAmountWhenAttack) { GuiManager.ShowMessage("体力不足!"); return false; }
     if (this.thew < THEW_USE_AMOUNT_WHEN_ATTACK) {
-      this.guiManager.showMessage("体力不足!");
+      this.guiManager.showMessage(tr("体力不足!"));
       return false;
     }
 
@@ -504,21 +505,21 @@ export abstract class PlayerCombat extends PlayerBase {
     disableUse: number;
   }): { canUse: boolean; reason?: string } {
     if (magic.disableUse !== 0) {
-      return { canUse: false, reason: "该武功不能使用" };
+      return { canUse: false, reason: tr("该武功不能使用") };
     }
 
     if (magic.lifeFullToUse !== 0 && this.life < this.lifeMax) {
-      return { canUse: false, reason: "需要满血才能使用此武功" };
+      return { canUse: false, reason: tr("需要满血才能使用此武功") };
     }
 
     // 无敌模式下跳过内力和体力检查
     if (!this.engine.debugManager.isGodMode()) {
       if (this.mana < magic.manaCost || this._manaLimit) {
-        return { canUse: false, reason: "没有足够的内力使用这种武功" };
+        return { canUse: false, reason: tr("没有足够的内力使用这种武功") };
       }
 
       if (this.thew < magic.thewCost) {
-        return { canUse: false, reason: "没有足够的体力使用这种武功" };
+        return { canUse: false, reason: tr("没有足够的体力使用这种武功") };
       }
     }
 
@@ -603,7 +604,7 @@ export abstract class PlayerCombat extends PlayerBase {
         // 取消隐藏
         const info = this._magicInventory.setMagicHide(magicFileName, false);
         if (isHide && info) {
-          this.showMessage(`武功${info.magic?.name}已可使用`);
+          this.showMessage(tr("武功{name}已可使用", { name: trc(info.magic?.name) }));
         }
       } else {
         // 添加新武功
@@ -613,7 +614,7 @@ export abstract class PlayerCombat extends PlayerBase {
       // 卸下时隐藏武功
       const info = this._magicInventory.setMagicHide(magicFileName, true);
       if (info && info.hideCount === 0) {
-        this.showMessage(`武功${info.magic?.name}已不可使用`);
+        this.showMessage(tr("武功{name}已不可使用", { name: trc(info.magic?.name) }));
         // 处理修炼武功和当前使用武功
         this.onDeleteMagicFromEquip(info);
       }
@@ -661,7 +662,9 @@ export abstract class PlayerCombat extends PlayerBase {
     if (!equip) return;
 
     if (!justEffectType && equip.magicIniWhenUse) {
-      this.showMessage(`获得武功：${equip.magicIniWhenUse}`);
+      this.showMessage(
+        tr("获得武功：{magicIniWhenUse}", { magicIniWhenUse: equip.magicIniWhenUse })
+      );
     }
 
     const effectType = equip.theEffectType;
@@ -710,7 +713,7 @@ export abstract class PlayerCombat extends PlayerBase {
     if (!equip) return;
 
     if (!justEffectType && equip.magicIniWhenUse) {
-      this.showMessage(`武功已不可使用`);
+      this.showMessage(tr("武功已不可使用"));
     }
 
     const effectType = equip.theEffectType;

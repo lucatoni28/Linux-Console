@@ -4,6 +4,7 @@
  * 8 种符号、8 条赔付线、3/4/5 连阶梯赔率、百搭替代、免费旋转、大奖系统
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { HiOutlineQuestionMarkCircle, HiOutlineXMark } from "react-icons/hi2";
@@ -41,32 +42,32 @@ export interface SlotPanelProps {
 // ============= Config =============
 
 const SYMBOL_CONFIG: Record<SlotSymbol, { emoji: string; label: string; color: string; bgColor: string; borderColor: string }> = {
-  coin:     { emoji: "🪙", label: "铜钱", color: "text-yellow-400",   bgColor: "bg-yellow-900/30",  borderColor: "border-yellow-600/30" },
-  envelope: { emoji: "🧧", label: "红包", color: "text-red-400",     bgColor: "bg-red-900/30",     borderColor: "border-red-600/30" },
-  koi:      { emoji: "🐟", label: "锦鲤", color: "text-orange-400",  bgColor: "bg-orange-900/30",  borderColor: "border-orange-600/30" },
-  dragon:   { emoji: "🐉", label: "金龙", color: "text-amber-300",   bgColor: "bg-amber-900/40",   borderColor: "border-amber-500/40" },
-  lucky7:   { emoji: "7️⃣",  label: "幸运7", color: "text-yellow-200",  bgColor: "bg-yellow-900/50",  borderColor: "border-yellow-400/50" },
+  coin:     { emoji: "🪙", label: tr("铜钱"), color: "text-yellow-400",   bgColor: "bg-yellow-900/30",  borderColor: "border-yellow-600/30" },
+  envelope: { emoji: "🧧", label: tr("红包"), color: "text-red-400",     bgColor: "bg-red-900/30",     borderColor: "border-red-600/30" },
+  koi:      { emoji: "🐟", label: tr("锦鲤"), color: "text-orange-400",  bgColor: "bg-orange-900/30",  borderColor: "border-orange-600/30" },
+  dragon:   { emoji: "🐉", label: tr("金龙"), color: "text-amber-300",   bgColor: "bg-amber-900/40",   borderColor: "border-amber-500/40" },
+  lucky7:   { emoji: "7️⃣",  label: tr("幸运7"), color: "text-yellow-200",  bgColor: "bg-yellow-900/50",  borderColor: "border-yellow-400/50" },
   bar:      { emoji: "🎰", label: "BAR",  color: "text-purple-400",  bgColor: "bg-purple-900/30",  borderColor: "border-purple-600/30" },
-  wild:     { emoji: "⭐", label: "百搭", color: "text-cyan-300",    bgColor: "bg-cyan-900/40",    borderColor: "border-cyan-400/40" },
-  scatter:  { emoji: "💎", label: "散宝", color: "text-emerald-300", bgColor: "bg-emerald-900/40", borderColor: "border-emerald-400/40" },
+  wild:     { emoji: "⭐", label: tr("百搭"), color: "text-cyan-300",    bgColor: "bg-cyan-900/40",    borderColor: "border-cyan-400/40" },
+  scatter:  { emoji: "💎", label: tr("散宝"), color: "text-emerald-300", bgColor: "bg-emerald-900/40", borderColor: "border-emerald-400/40" },
 };
 
 const ALL_SYMBOLS: SlotSymbol[] = ["coin", "envelope", "koi", "dragon", "lucky7", "bar", "wild", "scatter"];
 
 const PAYOUT_TABLE: { symbol: SlotSymbol; label: string; three: string; four: string; five: string }[] = [
-  { symbol: "lucky7",   label: "幸运7", three: "10x", four: "25x",  five: "80x" },
-  { symbol: "dragon",   label: "金龙",  three: "8x",  four: "18x",  five: "50x" },
-  { symbol: "koi",      label: "锦鲤",  three: "5x",  four: "12x",  five: "30x" },
+  { symbol: "lucky7",   label: tr("幸运7"), three: "10x", four: "25x",  five: "80x" },
+  { symbol: "dragon",   label: tr("金龙"),  three: "8x",  four: "18x",  five: "50x" },
+  { symbol: "koi",      label: tr("锦鲤"),  three: "5x",  four: "12x",  five: "30x" },
   { symbol: "bar",      label: "BAR",   three: "4x",  four: "10x",  five: "25x" },
-  { symbol: "envelope", label: "红包",  three: "2x",  four: "5x",   five: "12x" },
-  { symbol: "coin",     label: "铜钱",  three: "1x",  four: "3x",   five: "8x" },
-  { symbol: "wild",     label: "百搭",  three: "替代", four: "替代",  five: "替代" },
-  { symbol: "scatter",  label: "散宝",  three: "免费", four: "免费",  five: "免费" },
+  { symbol: "envelope", label: tr("红包"),  three: "2x",  four: "5x",   five: "12x" },
+  { symbol: "coin",     label: tr("铜钱"),  three: "1x",  four: "3x",   five: "8x" },
+  { symbol: "wild",     label: tr("百搭"),  three: tr("替代"), four: tr("替代"),  five: tr("替代") },
+  { symbol: "scatter",  label: tr("散宝"),  three: tr("免费"), four: tr("免费"),  five: tr("免费") },
 ];
 
 const MULTIPLIERS = [1, 2, 3, 5, 10, 20, 50, 100, 1000];
 const PAYLINE_COLORS = ["#ff6b6b", "#4ecdc4", "#45b7d1", "#f9ca24", "#a55eea", "#ff9f43", "#00d2d3", "#fc5c65"];
-const PAYLINE_NAMES = ["第2行", "中心行", "第4行", "中列", "↘对角", "↗对角", "V形", "倒V"];
+const PAYLINE_NAMES = [tr("第2行"), tr("中心行"), tr("第4行"), tr("中列"), tr("↘对角"), tr("↗对角"), tr("V形"), tr("倒V")];
 
 // ============= Particles =============
 
@@ -164,12 +165,12 @@ function getWinTier(totalWin: number): WinTier {
 }
 
 const TIER_META: Record<WinTier, { label: string; flash: string }> = {
-  small:     { label: "赢了！",     flash: "tier-flash-gold" },
-  medium:    { label: "赢了！",     flash: "tier-flash-gold" },
-  big:       { label: "大赢！",     flash: "tier-flash-bright" },
-  huge:      { label: "超级大赢！", flash: "tier-flash-bright" },
-  mega:      { label: "巨额奖金！", flash: "tier-flash-white" },
-  legendary: { label: "传 奇 ！",   flash: "tier-flash-white" },
+  small:     { label: tr("赢了！"),     flash: "tier-flash-gold" },
+  medium:    { label: tr("赢了！"),     flash: "tier-flash-gold" },
+  big:       { label: tr("大赢！"),     flash: "tier-flash-bright" },
+  huge:      { label: tr("超级大赢！"), flash: "tier-flash-bright" },
+  mega:      { label: tr("巨额奖金！"), flash: "tier-flash-white" },
+  legendary: { label: tr("传 奇 ！"),   flash: "tier-flash-white" },
 };
 
 const TIER_RANGES: Record<WinTier, { confetti: [number,number]; stars: [number,number]; rings: [number,number]; coins: [number,number] }> = {
@@ -460,9 +461,9 @@ export function SlotPanel({ isVisible, money, betAmount, onSpin, onClose }: Slot
               <div className="jackpot-flash absolute inset-0 bg-yellow-500/30 rounded-2xl" />
               <div className="jackpot-txt text-center">
                 <div className="text-5xl font-black text-yellow-300" style={{ textShadow: "0 0 30px rgba(255,215,0,0.8)" }}>
-                  🎰 大奖 🎰
+                  {tr("🎰 大奖 🎰")}
                 </div>
-                <div className="text-2xl font-bold text-yellow-200 mt-1">+{result?.totalWin} 两</div>
+                <div className="text-2xl font-bold text-yellow-200 mt-1">{tr("+{totalWin} 两", { totalWin: result?.totalWin })}</div>
               </div>
             </div>
           )}
@@ -471,10 +472,10 @@ export function SlotPanel({ isVisible, money, betAmount, onSpin, onClose }: Slot
           <div className="flex items-center justify-between px-5 py-2.5 border-b border-amber-800/30">
             <div className="flex items-center gap-2">
               <span className="text-xl">🎰</span>
-              <h2 className="text-lg font-bold text-amber-200 tracking-wider">老虎机</h2>
+              <h2 className="text-lg font-bold text-amber-200 tracking-wider">{tr("老虎机")}</h2>
               {freeSpins > 0 && (
                 <span className="fs-badge ml-2 px-2.5 py-0.5 rounded-full bg-emerald-600/80 text-white text-xs font-bold">
-                  🎁 免费 ×{freeSpins}
+                  {tr("🎁 免费 ×{freeSpins}", { freeSpins })}
                 </span>
               )}
             </div>
@@ -492,9 +493,9 @@ export function SlotPanel({ isVisible, money, betAmount, onSpin, onClose }: Slot
 
           {/* Money + Multiplier */}
           <div className="px-5 py-2 flex items-center justify-between bg-stone-900/50">
-            <div className="text-amber-300 text-sm">银两：<span className="text-lg font-bold text-amber-100">{money.toLocaleString()}</span></div>
+            <div className="text-amber-300 text-sm">{tr("银两：")}<span className="text-lg font-bold text-amber-100">{money.toLocaleString()}</span></div>
             <div className="flex items-center gap-2">
-              <span className="text-amber-400/70 text-xs">倍数：</span>
+              <span className="text-amber-400/70 text-xs">{tr("倍数：")}</span>
               <div className="flex gap-1 flex-wrap justify-end">
                 {MULTIPLIERS.map((m) => (
                   <button key={m} onClick={() => setMultiplier(m)}
@@ -507,8 +508,8 @@ export function SlotPanel({ isVisible, money, betAmount, onSpin, onClose }: Slot
             </div>
           </div>
           <div className="px-5 py-0.5 text-center text-amber-500/50 text-xs bg-stone-900/30">
-            本注：<span className="text-amber-300 font-semibold">{totalBet}</span> 两
-            {multiplier > 1 && <span className="ml-1">（{betAmount} × {multiplier}）</span>}
+            {tr("本注：")}<span className="text-amber-300 font-semibold">{totalBet}</span> {tr("两")}
+            {multiplier > 1 && <span className="ml-1">({betAmount} × {multiplier})</span>}
           </div>
 
           {/* 5×5 Reel Grid */}
@@ -579,9 +580,9 @@ export function SlotPanel({ isVisible, money, betAmount, onSpin, onClose }: Slot
               <div className="text-center win-pop">
                 <span className="text-yellow-300 font-bold mr-2">{TIER_META[winTier].label}</span>
                 <span className="text-xl font-black text-yellow-200" style={{ textShadow: "0 0 15px rgba(255,215,0,0.5)" }}>
-                  +{result.totalWin} 两
+                  {tr("+{totalWin} 两", { totalWin: result.totalWin })}
                 </span>
-                {result.freeSpinTriggered && <span className="text-emerald-300 ml-2 text-sm">💎 免费旋转！</span>}
+                {result.freeSpinTriggered && <span className="text-emerald-300 ml-2 text-sm">{tr("💎 免费旋转！")}</span>}
                 {winLines.length > 0 && (
                   <div className="text-[11px] text-amber-400/50 mt-0.5">
                     {winLines.map(wl => `${PAYLINE_NAMES[wl.lineIndex]} ${SYMBOL_CONFIG[wl.symbol].label}×${wl.count}`).join(' | ')}
@@ -590,10 +591,10 @@ export function SlotPanel({ isVisible, money, betAmount, onSpin, onClose }: Slot
               </div>
             )}
             {result && !spinning && result.totalWin === 0 && (
-              <div className="text-stone-500 text-sm">未中奖 · 再试试手气</div>
+              <div className="text-stone-500 text-sm">{tr("未中奖 · 再试试手气")}</div>
             )}
             {spinning && (
-              <div className="text-amber-400/50 text-sm animate-pulse">转动中...</div>
+              <div className="text-amber-400/50 text-sm animate-pulse">{tr("转动中...")}</div>
             )}
           </div>
 
@@ -610,9 +611,9 @@ export function SlotPanel({ isVisible, money, betAmount, onSpin, onClose }: Slot
                 }
               `}
             >
-              {spinning ? '🎰 转动中...' :
-               freeSpins > 0 ? `🎁 免费旋转 (${freeSpins}次)` :
-               `🎰 旋转 (${totalBet} 两)`}
+              {spinning ? tr("🎰 转动中...") :
+               freeSpins > 0 ? tr("🎁 免费旋转 ({freeSpins}次)", { freeSpins }) :
+               tr("🎰 旋转 ({totalBet} 两)", { totalBet })}
             </button>
           </div>
 
@@ -631,16 +632,16 @@ export function SlotPanel({ isVisible, money, betAmount, onSpin, onClose }: Slot
           {showRules && (
             <div className="absolute inset-0 z-[300] bg-stone-950/95 rounded-2xl overflow-y-auto p-5">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-bold text-amber-200">🎰 老虎机规则</h3>
+                <h3 className="text-lg font-bold text-amber-200">{tr("🎰 老虎机规则")}</h3>
                 <button onClick={() => setShowRules(false)}
                   className="p-1 rounded-lg text-amber-400/60 hover:text-amber-300 hover:bg-amber-900/30">
                   <HiOutlineXMark className="w-5 h-5" />
                 </button>
               </div>
               <div className="space-y-2.5 text-sm text-amber-300/80">
-                <p><b className="text-amber-200">基本玩法：</b>5×5 转轴，8 条赔付线。从左到右连续匹配 3/4/5 个相同符号即中奖。</p>
+                <p><b className="text-amber-200">{tr("基本玩法：")}</b>{tr("5×5 转轴，8 条赔付线。从左到右连续匹配 3/4/5 个相同符号即中奖。")}</p>
                 <div>
-                  <b className="text-amber-200">赔付表（3/4/5连）：</b>
+                  <b className="text-amber-200">{tr("赔付表（3/4/5连）：")}</b>
                   <div className="mt-1 space-y-0.5">
                     {PAYOUT_TABLE.map(p => (
                       <div key={p.symbol} className="flex items-center gap-2">
@@ -651,9 +652,9 @@ export function SlotPanel({ isVisible, money, betAmount, onSpin, onClose }: Slot
                     ))}
                   </div>
                 </div>
-                <p><b className="text-amber-200">⭐ 百搭：</b>替代任意符号（散落宝除外）。</p>
-                <p><b className="text-amber-200">💎 免费旋转：</b>3个散落宝触发10次免费旋转，奖金×2。</p>
-                <p><b className="text-amber-200">🎰 大奖：</b>中心行5个幸运7 = 200倍！</p>
+                <p><b className="text-amber-200">{tr("⭐ 百搭：")}</b>{tr("替代任意符号（散落宝除外）。")}</p>
+                <p><b className="text-amber-200">{tr("💎 免费旋转：")}</b>{tr("3个散落宝触发10次免费旋转，奖金×2。")}</p>
+                <p><b className="text-amber-200">{tr("🎰 大奖：")}</b>{tr("中心行5个幸运7 = 200倍！")}</p>
               </div>
             </div>
           )}

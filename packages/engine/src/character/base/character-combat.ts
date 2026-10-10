@@ -5,6 +5,7 @@
  * 继承链: Sprite → CharacterBase → CharacterMovement → CharacterCombat → Character
  */
 
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import { getCharacterDeathExp } from "../../combat/effect-calc";
 import { logger } from "../../core/logger";
 import { CharacterState } from "../../core/types";
@@ -102,7 +103,7 @@ export abstract class CharacterCombat extends CharacterMovement {
     this.exp += amount;
     if (this.exp > this.levelUpExp) {
       const gui = this.engine.guiManager as { showMessage?: (msg: string) => void };
-      gui.showMessage?.(`${this.name}的等级提升了`);
+      gui.showMessage?.(tr("{name}的等级提升了", { name: trc(this.name) }));
       this.toLevelByExp(this.exp);
     }
   }

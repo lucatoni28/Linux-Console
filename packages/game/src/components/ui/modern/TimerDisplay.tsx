@@ -4,6 +4,7 @@
  */
 
 import type { TimerState } from "@miu2d/engine/runtime/timer-manager";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useMemo } from "react";
 import { HiOutlineClock } from "react-icons/hi2";
@@ -56,7 +57,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({ timerState }) => {
             marginBottom: 2,
           }}
         >
-          剩余时间
+          {tr("剩余时间")}
         </div>
         <div
           style={{

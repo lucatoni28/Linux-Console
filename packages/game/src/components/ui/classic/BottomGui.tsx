@@ -11,6 +11,7 @@
 
 import type { MagicItemInfo } from "@miu2d/engine/magic";
 import { useDevice } from "@miu2d/shared";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import type { TouchDragData } from "../../../contexts";
@@ -95,19 +96,21 @@ const Slot: React.FC<SlotProps> = ({
 
   // 确定图标路径 - 优先使用新数据
   let iconPath: string | null = null;
-  let displayName = isItemSlot ? `物品槽 ${index + 1}` : `武功槽 ${index - 2}`;
+  let displayName = isItemSlot
+    ? tr("物品槽 {index}", { index: index + 1 })
+    : tr("武功槽 {index}", { index: index - 2 });
   let count: number | undefined;
   let level: number | undefined;
 
   if (goodsData?.good) {
     iconPath = goodsData.good.iconPath || goodsData.good.imagePath || null;
-    displayName = goodsData.good.name;
+    displayName = trc(goodsData.good.name);
     count = goodsData.count;
   } else if (magicData?.magic) {
     // Use icon (small image) for BottomGui, fall back to image if no icon
     // uses magic.Icon
     iconPath = magicData.magic.icon ?? magicData.magic.image ?? null;
-    displayName = `${magicData.magic.name} Lv.${magicData.level}`;
+    displayName = `${trc(magicData.magic.name)} Lv.${magicData.level}`;
     level = magicData.level;
   }
 
@@ -127,7 +130,7 @@ const Slot: React.FC<SlotProps> = ({
           bottomSlot: index,
           source: "bottomGui",
           goodsInfo: goodsData.good,
-          displayName: goodsData.good.name,
+          displayName: trc(goodsData.good.name),
           iconPath: goodsData.good.iconPath || goodsData.good.imagePath,
         };
       }
@@ -137,7 +140,7 @@ const Slot: React.FC<SlotProps> = ({
           bottomSlot: index,
           source: "bottomGui",
           magicInfo: magicData,
-          displayName: magicData.magic.name,
+          displayName: trc(magicData.magic.name),
           iconPath: magicData.magic.icon ?? magicData.magic.image,
         };
       }
@@ -256,7 +259,7 @@ const Slot: React.FC<SlotProps> = ({
                 pointerEvents: "none",
               }}
             >
-              {magicData.magic.name?.slice(0, 2)}
+              {trc(magicData.magic.name)?.slice(0, 2)}
             </span>
           )}
           {/* ASF 动画图标 */}
@@ -421,7 +424,7 @@ export const BottomGui: React.FC<BottomGuiProps> = ({
       {panelImage.dataUrl && (
         <img
           src={panelImage.dataUrl}
-          alt="快捷栏"
+          alt={tr("快捷栏")}
           style={{
             position: "absolute",
             left: 0,

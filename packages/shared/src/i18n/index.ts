@@ -38,7 +38,7 @@ i18n
     supportedLngs: supportedLanguages,
 
     detection: {
-      order: ["localStorage", "navigator"],
+      order: ["localStorage"],
       caches: ["localStorage"],
       lookupLocalStorage: "Miu2D_locale",
     },

@@ -4,6 +4,7 @@
  */
 
 import type { UIGoodData } from "@miu2d/engine/gui/ui-types";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import { HiOutlineArchiveBox, HiOutlineCurrencyYen } from "react-icons/hi2";
@@ -138,7 +139,7 @@ const ShopItemRow: React.FC<ShopItemRowProps> = ({
             textOverflow: "ellipsis",
           }}
         >
-          {item?.good?.name || "空"}
+          {trc(item?.good?.name) || tr("空")}
         </div>
         {item && numberValid && (
           <div
@@ -147,7 +148,9 @@ const ShopItemRow: React.FC<ShopItemRowProps> = ({
               color: isSoldOut ? modernColors.stats.hp : modernColors.text.muted,
             }}
           >
-            {isSoldOut ? "已售罄" : `库存: ${item.count === -1 ? "∞" : item.count}`}
+            {isSoldOut
+              ? tr("已售罄")
+              : tr("库存: {count}", { count: item.count === -1 ? "∞" : item.count })}
           </div>
         )}
       </div>
@@ -235,7 +238,7 @@ export const BuyPanel: React.FC<BuyPanelProps> = ({
 
   return (
     <div style={panelStyle} onClick={(e) => e.stopPropagation()}>
-      <PanelHeader title="商店" onClose={onClose} />
+      <PanelHeader title={tr("商店")} onClose={onClose} />
 
       {/* 提示信息 */}
       <div
@@ -248,7 +251,7 @@ export const BuyPanel: React.FC<BuyPanelProps> = ({
           textAlign: "center",
         }}
       >
-        右键点击物品快速购买
+        {tr("右键点击物品快速购买")}
       </div>
 
       {/* 商品列表（原生滚动） */}
@@ -274,7 +277,7 @@ export const BuyPanel: React.FC<BuyPanelProps> = ({
               color: modernColors.text.muted,
             }}
           >
-            没有商品出售
+            {tr("没有商品出售")}
           </div>
         ) : (
           items.map((item, idx) => (

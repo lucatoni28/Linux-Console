@@ -8,6 +8,7 @@
 
 import type { UIGoodData } from "@miu2d/engine/gui/ui-types";
 import { useDevice } from "@miu2d/shared";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import type { TouchDragData } from "../../../contexts";
@@ -91,7 +92,7 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
             bagIndex: actualIndex,
             source: "goodsGui",
             goodsInfo: item.good,
-            displayName: item.good.name,
+            displayName: trc(item.good.name),
             iconPath: item.good.iconPath || item.good.imagePath,
           }
         : null,
@@ -134,7 +135,7 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
         boxShadow: "inset 0 0 0 1px rgba(100,80,30,0.4)",
         touchAction: isMobile ? "none" : undefined,
       }}
-      title={item?.good?.name || "空"}
+      title={trc(item?.good?.name) || tr("空")}
       draggable={!isMobile && !!item}
       onClick={onClick}
       onContextMenu={
@@ -338,7 +339,7 @@ export const GoodsGui: React.FC<GoodsGuiProps> = ({
       {panelImage.dataUrl && (
         <img
           src={panelImage.dataUrl}
-          alt="物品面板"
+          alt={tr("物品面板")}
           style={{
             position: "absolute",
             left: 0,

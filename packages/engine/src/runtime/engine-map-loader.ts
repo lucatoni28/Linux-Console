@@ -9,6 +9,7 @@
  * - Map MPC/MSF resource loading with progress reporting
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { logger } from "../core/logger";
 import { getGameSlug, loadSceneManifest, loadSceneMapMmf } from "../data/game-data-api";
 import type { TypedEventEmitter } from "../events/event-emitter";
@@ -89,9 +90,9 @@ export async function handleMapChange(
 
   if (wasRunning) {
     setState("loading");
-    emitLoadProgress(0, "加载地图...");
+    emitLoadProgress(0, tr("加载地图..."));
   } else if (progressCallback) {
-    progressCallback(0, "加载地图...");
+    progressCallback(0, tr("加载地图..."));
   }
 
   // 构建完整地图路径（MMF 格式）
@@ -151,9 +152,9 @@ export async function handleMapChange(
       await loadMapMpcs(mapRenderer, mapData, mapName, (progress) => {
         if (wasRunning) {
           const mappedProgress = Math.round(progress * 100);
-          emitLoadProgress(mappedProgress, "加载地图资源...");
+          emitLoadProgress(mappedProgress, tr("加载地图资源..."));
         } else if (progressCallback) {
-          progressCallback(progress, "加载地图资源...");
+          progressCallback(progress, tr("加载地图资源..."));
         }
       });
 
@@ -184,7 +185,7 @@ export async function handleMapChange(
 
       if (wasRunning) {
         setState("running");
-        emitLoadProgress(100, "地图加载完成");
+        emitLoadProgress(100, tr("地图加载完成"));
       }
 
       return mapData;

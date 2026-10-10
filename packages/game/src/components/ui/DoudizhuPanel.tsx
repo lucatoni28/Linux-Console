@@ -4,11 +4,12 @@
  * 牌面参照实体扑克（左上角点数+花色，右下角大花色），全新布局、发牌动画与特效。
  */
 
-import { analyzeCombo, findValidPlays } from "@miu2d/engine/gui/doudizhu/card-engine";
 import type { Card, ComboType, Move } from "@miu2d/engine/gui/doudizhu/card-engine";
+import { analyzeCombo, findValidPlays } from "@miu2d/engine/gui/doudizhu/card-engine";
 import type { GameState } from "@miu2d/engine/gui/doudizhu/doudizhu-manager";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   LuArrowDownWideNarrow,
@@ -86,19 +87,19 @@ function cardColor(card: Card): string {
 }
 
 const COMBO_NAME: Record<string, string> = {
-  single: "单张", pair: "对子", triple: "三条", triple_one: "三带一", triple_pair: "三带二",
-  straight: "顺子", straight_pair: "连对", plane: "飞机", plane_single: "飞机带单",
-  plane_pair: "飞机带对", four_two: "四带二", bomb: "炸弹", rocket: "火箭",
+  single: tr("单张"), pair: tr("对子"), triple: tr("三条"), triple_one: tr("三带一"), triple_pair: tr("三带二"),
+  straight: tr("顺子"), straight_pair: tr("连对"), plane: tr("飞机"), plane_single: tr("飞机带单"),
+  plane_pair: tr("飞机带对"), four_two: tr("四带二"), bomb: tr("炸弹"), rocket: tr("火箭"),
 };
 function comboName(type: ComboType): string {
   return type ? COMBO_NAME[type] ?? "" : "";
 }
 
 const BEAT_TEXTS = [
-  "压制！", "压死你！", "看招！", "拿下！", "碾压！", "谁与争锋！", "大力出奇迹！", "稳！",
-  "吃我一招！", "降维打击！", "不讲武德！", "秒了！", "绝杀！", "你也配？", "回去吧！",
-  "一锤定音！", "无人能挡！", "横扫千军！", "天下无敌！", "小场面！", "拿来吧你！",
-  "高端局！", "这就破防了？", "豪取一城！", "压你没商量！", "技高一筹！",
+  tr("压制！"), tr("压死你！"), tr("看招！"), tr("拿下！"), tr("碾压！"), tr("谁与争锋！"), tr("大力出奇迹！"), tr("稳！"),
+  tr("吃我一招！"), tr("降维打击！"), tr("不讲武德！"), tr("秒了！"), tr("绝杀！"), tr("你也配？"), tr("回去吧！"),
+  tr("一锤定音！"), tr("无人能挡！"), tr("横扫千军！"), tr("天下无敌！"), tr("小场面！"), tr("拿来吧你！"),
+  tr("高端局！"), tr("这就破防了？"), tr("豪取一城！"), tr("压你没商量！"), tr("技高一筹！"),
 ];
 
 const FX_PALETTE = ["#ffd24a", "#ff8a3d", "#ff5252", "#ffe08a", "#ff6b9d", "#5cffb0", "#5cc8ff"];
@@ -111,7 +112,7 @@ function FaceCard({ card, w, h }: { card: Card; w: number; h: number }) {
 
   if (card.suit === "joker") {
     const letters = ["J", "O", "K", "E", "R"];
-    const label = card.rank === 17 ? "大王" : "小王";
+    const label = card.rank === 17 ? tr("大王") : tr("小王");
     return (
       <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ display: "block" }}>
         <rect x="0.5" y="0.5" width={w - 1} height={h - 1} rx={r} ry={r} fill="#fff" stroke="#d4d9e0" strokeWidth="1" />
@@ -208,7 +209,7 @@ function Seat({
         <div className={`flex flex-col ${side === "right" ? "items-end" : "items-start"}`}>
           <span className="text-[13px] font-medium text-white/90 leading-tight">{name}</span>
           <span className={`mt-0.5 text-[11px] px-2 py-0.5 rounded-full ${isLandlord ? "bg-amber-400/15 text-amber-200 ring-1 ring-amber-300/25" : "bg-emerald-400/15 text-emerald-200 ring-1 ring-emerald-300/20"}`}>
-            {isLandlord ? "地主" : "农民"}
+            {isLandlord ? tr("地主") : tr("农民")}
           </span>
         </div>
       </div>
@@ -232,7 +233,7 @@ function Seat({
           </div>
           {active && thinking && (
             <span className="flex items-center gap-1 text-amber-200/80 text-[11px] animate-pulse">
-              <LuClock className="w-3 h-3" /> 思考中
+              <LuClock className="w-3 h-3" /> {tr("思考中")}
             </span>
           )}
         </div>
@@ -241,11 +242,11 @@ function Seat({
       {/* played / pass / bid bubble */}
       <div className="min-h-[64px] mt-1">
         {bidResult === true ? (
-          <span className="inline-block px-3 py-1.5 rounded-lg bg-amber-500/90 text-white text-sm font-bold ring-1 ring-amber-300/50 ddz-pop">叫地主</span>
+          <span className="inline-block px-3 py-1.5 rounded-lg bg-amber-500/90 text-white text-sm font-bold ring-1 ring-amber-300/50 ddz-pop">{tr("叫地主")}</span>
         ) : bidResult === false ? (
-          <span className="inline-block px-3 py-1 rounded-lg bg-black/50 text-white/60 text-sm font-medium ring-1 ring-white/10 ddz-pop">不叫</span>
+          <span className="inline-block px-3 py-1 rounded-lg bg-black/50 text-white/60 text-sm font-medium ring-1 ring-white/10 ddz-pop">{tr("不叫")}</span>
         ) : passed ? (
-          <span className="inline-block px-3 py-1 rounded-lg bg-black/50 text-white/80 text-sm font-medium ring-1 ring-white/10 ddz-pop">不出</span>
+          <span className="inline-block px-3 py-1 rounded-lg bg-black/50 text-white/80 text-sm font-medium ring-1 ring-white/10 ddz-pop">{tr("不出")}</span>
         ) : played.length > 0 ? (
           <div key={played.map((c) => c.id).join(",")} className="ddz-slam"><CardPile cards={played} size={0.62} /></div>
         ) : null}
@@ -400,7 +401,7 @@ function DealOverlay() {
         </div>
       ))}
       <div className="absolute left-1/2 -translate-x-1/2 z-[56]" style={{ top: 270 }}>
-        <span className="text-yellow-200 text-lg font-bold tracking-widest ddz-pop">发牌中…</span>
+        <span className="text-yellow-200 text-lg font-bold tracking-widest ddz-pop">{tr("发牌中…")}</span>
       </div>
     </div>
   );
@@ -641,16 +642,16 @@ export function DoudizhuPanel({
     type Fx = { kind: "bomb" | "rocket" | "combo" | "beat"; label: string; color?: string; intensity?: number; variant?: number };
     let fx: Fx | null = null;
     const randColor = () => FX_PALETTE[Math.floor(Math.random() * FX_PALETTE.length)];
-    if (lastMove.type === "rocket") { fx = { kind: "rocket", label: "火箭！×40" }; playBombBgm(); }
-    else if (lastMove.type === "bomb") { fx = { kind: "bomb", label: "炸弹！×4" }; playBombBgm(); }
+    if (lastMove.type === "rocket") { fx = { kind: "rocket", label: tr("火箭！×40") }; playBombBgm(); }
+    else if (lastMove.type === "bomb") { fx = { kind: "bomb", label: tr("炸弹！×4") }; playBombBgm(); }
     else if (prevMove && prevMove.player !== lastMovePlayer) {
       const byMe = lastMovePlayer === 0;
-      const seatName = lastMovePlayer === 1 ? "下家" : lastMovePlayer === 2 ? "上家" : "我方";
+      const seatName = lastMovePlayer === 1 ? tr("下家") : lastMovePlayer === 2 ? tr("上家") : tr("我方");
       const r = Math.random();
       const intensity = byMe ? (r < 0.2 ? 2 : r < 0.6 ? 1 : 0) : 0;
       fx = {
         kind: "beat",
-        label: byMe ? BEAT_TEXTS[Math.floor(Math.random() * BEAT_TEXTS.length)] : `${seatName}压制！`,
+        label: byMe ? BEAT_TEXTS[Math.floor(Math.random() * BEAT_TEXTS.length)] : tr("{seatName}压制！", { seatName }),
         color: byMe ? randColor() : "#9fb4c8",
         intensity,
         variant: Math.floor(Math.random() * 2),
@@ -750,17 +751,17 @@ export function DoudizhuPanel({
           {/* header */}
           <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-5 py-2.5 z-30">
             <div className="flex items-center gap-2.5">
-              <span className="text-base font-semibold text-white tracking-wide">斗地主</span>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-white/10 text-white/70">底注 {effectiveBet.toLocaleString()}</span>
+              <span className="text-base font-semibold text-white tracking-wide">{tr("斗地主")}</span>
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-white/10 text-white/70">{tr("底注 {bet}", { bet: effectiveBet.toLocaleString() })}</span>
               {multiplier > 1 && (
                 <span key={multiplier} className={`text-xs px-2.5 py-0.5 ${multPunch ? "ddz-pill-pulse" : "ddz-pop"} ${PILL_MULT}`}>
-                  ×{multiplier}{comboLabel ? ` ${comboLabel}` : ""} 倍
+                  ×{multiplier}{comboLabel ? ` ${comboLabel}` : ""} {tr("倍")}
                 </span>
               )}
             </div>
             <div className="flex items-center gap-2.5">
               <button type="button" onClick={onClose}
-                className="p-1.5 rounded-lg text-white/60 hover:text-red-300 hover:bg-black/30 transition-colors" aria-label="关闭">
+                className="p-1.5 rounded-lg text-white/60 hover:text-red-300 hover:bg-black/30 transition-colors" aria-label={tr("关闭")}>
                 <LuX className="w-5 h-5" />
               </button>
             </div>
@@ -769,7 +770,7 @@ export function DoudizhuPanel({
           {/* opponents */}
           <div className="absolute left-5 top-14 z-20">
             {seatLeft && (
-              <Seat name="上家" isLandlord={seatLeft.isLandlord} active={currentPlayer === 2 && phase === "playing"}
+              <Seat name={tr("上家")} isLandlord={seatLeft.isLandlord} active={currentPlayer === 2 && phase === "playing"}
                 count={dealing ? dealtCount : seatLeft.cardCount} side="left" played={playedCards[2] ?? []} passed={!!passFlags?.[2]}
                 thinking={currentPlayer === 2 && phase === "playing"}
                 bidResult={phase === "bidding" ? bidResults?.[2] : null}
@@ -778,7 +779,7 @@ export function DoudizhuPanel({
           </div>
           <div className="absolute right-5 top-14 z-20">
             {seatRight && (
-              <Seat name="下家" isLandlord={seatRight.isLandlord} active={currentPlayer === 1 && phase === "playing"}
+              <Seat name={tr("下家")} isLandlord={seatRight.isLandlord} active={currentPlayer === 1 && phase === "playing"}
                 count={dealing ? dealtCount : seatRight.cardCount} side="right" played={playedCards[1] ?? []} passed={!!passFlags?.[1]}
                 thinking={currentPlayer === 1 && phase === "playing"}
                 bidResult={phase === "bidding" ? bidResults?.[1] : null}
@@ -789,7 +790,7 @@ export function DoudizhuPanel({
           {/* 底牌 — 确认地主后显示在上方 */}
           {(phase === "playing" || phase === "finished") && landlordIndex >= 0 && landlordCards.length === 3 && (
             <div className="absolute top-12 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 ddz-pop">
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-400/15 text-amber-200 ring-1 ring-amber-300/25">底牌</span>
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-400/15 text-amber-200 ring-1 ring-amber-300/25">{tr("底牌")}</span>
               <div className="flex gap-1">
                 {landlordCards.map((c) => (
                   <div key={c.id} style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,.4))" }}>
@@ -803,11 +804,11 @@ export function DoudizhuPanel({
           {/* my played pile / pass / bid — 紧贴手牌上方 */}
           <div className="absolute left-1/2 -translate-x-1/2 bottom-[176px] z-20 grid place-items-center min-h-[70px]">
             {phase === "bidding" && bidResults?.[0] === true ? (
-              <span className="px-4 py-1.5 rounded-lg bg-amber-500/90 text-white text-sm font-bold ring-1 ring-amber-300/50 ddz-pop">叫地主</span>
+              <span className="px-4 py-1.5 rounded-lg bg-amber-500/90 text-white text-sm font-bold ring-1 ring-amber-300/50 ddz-pop">{tr("叫地主")}</span>
             ) : phase === "bidding" && bidResults?.[0] === false ? (
-              <span className="px-3 py-1 rounded-lg bg-black/50 text-white/60 text-sm font-medium ring-1 ring-white/10 ddz-pop">不叫</span>
+              <span className="px-3 py-1 rounded-lg bg-black/50 text-white/60 text-sm font-medium ring-1 ring-white/10 ddz-pop">{tr("不叫")}</span>
             ) : phase === "playing" && passFlags?.[0] ? (
-              <span className="px-3 py-1 rounded-lg bg-black/50 text-white/80 text-sm font-medium ring-1 ring-white/10 ddz-pop">不出</span>
+              <span className="px-3 py-1 rounded-lg bg-black/50 text-white/80 text-sm font-medium ring-1 ring-white/10 ddz-pop">{tr("不出")}</span>
             ) : (playedCards[0]?.length ?? 0) > 0 ? (
               <div key={playedCards[0].map((c) => c.id).join(",")} className="ddz-slam"><CardPile cards={playedCards[0]} size={0.82} /></div>
             ) : null}
@@ -833,7 +834,7 @@ export function DoudizhuPanel({
             <div className="absolute inset-0 z-[78] grid place-items-center pointer-events-none">
               <div className="ddz-mult flex flex-col items-center">
                 <span className="text-7xl font-black" style={{ color: "#ffd24a", textShadow: "0 0 32px rgba(255,200,60,.85), 0 4px 14px rgba(0,0,0,.6)" }}>×{multPunch}</span>
-                <span className="mt-1 text-xl font-bold tracking-[0.3em] text-amber-200">倍 数 翻 涨</span>
+                <span className="mt-1 text-xl font-bold tracking-[0.3em] text-amber-200">{tr("倍 数 翻 涨")}</span>
               </div>
             </div>
           )}
@@ -842,17 +843,17 @@ export function DoudizhuPanel({
           {phase === "ready" && (
             <div className="absolute inset-0 z-[75] grid place-items-center pointer-events-none">
               <div className="ddz-result flex flex-col items-center gap-5 pointer-events-auto">
-                <span className="text-4xl font-bold tracking-[0.28em] text-white" style={{ textShadow: "0 2px 18px rgba(0,0,0,.5)" }}>斗 地 主</span>
+                <span className="text-4xl font-bold tracking-[0.28em] text-white" style={{ textShadow: "0 2px 18px rgba(0,0,0,.5)" }}>{tr("斗 地 主")}</span>
                 <div className="flex flex-wrap justify-center gap-2 text-xs font-medium">
-                  <span className="px-2.5 py-1 rounded-full bg-white/10 text-white/80">底注 {effectiveBet.toLocaleString()}</span>
-                  <span className="px-2.5 py-1 rounded-full bg-rose-400/15 text-rose-200 ring-1 ring-rose-300/20">王炸 ×20</span>
-                  <span className="px-2.5 py-1 rounded-full bg-orange-400/15 text-orange-200 ring-1 ring-orange-300/20">炸弹 ×4</span>
-                  <span className="px-2.5 py-1 rounded-full bg-sky-400/15 text-sky-200 ring-1 ring-sky-300/20">超级牌型 ×2</span>
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-400/15 text-emerald-200 ring-1 ring-emerald-300/20">春天 ×4</span>
+                  <span className="px-2.5 py-1 rounded-full bg-white/10 text-white/80">{tr("底注 {bet}", { bet: effectiveBet.toLocaleString() })}</span>
+                  <span className="px-2.5 py-1 rounded-full bg-rose-400/15 text-rose-200 ring-1 ring-rose-300/20">{tr("王炸 ×20")}</span>
+                  <span className="px-2.5 py-1 rounded-full bg-orange-400/15 text-orange-200 ring-1 ring-orange-300/20">{tr("炸弹 ×4")}</span>
+                  <span className="px-2.5 py-1 rounded-full bg-sky-400/15 text-sky-200 ring-1 ring-sky-300/20">{tr("超级牌型 ×2")}</span>
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-400/15 text-emerald-200 ring-1 ring-emerald-300/20">{tr("春天 ×4")}</span>
                 </div>
                 <div className="flex gap-3 mt-1">
-                  <button type="button" onClick={handleStart} className={`px-12 py-2.5 text-base ${BTN_PRIMARY}`}>开始游戏</button>
-                  <button type="button" onClick={onClose} className={`px-7 py-2.5 text-base ${BTN_GHOST}`}>退出</button>
+                  <button type="button" onClick={handleStart} className={`px-12 py-2.5 text-base ${BTN_PRIMARY}`}>{tr("开始游戏")}</button>
+                  <button type="button" onClick={onClose} className={`px-7 py-2.5 text-base ${BTN_GHOST}`}>{tr("退出")}</button>
                 </div>
               </div>
             </div>
@@ -880,20 +881,20 @@ export function DoudizhuPanel({
                         ? "0 0 40px rgba(255,200,60,.7), 0 4px 16px rgba(0,0,0,.55)"
                         : "0 4px 30px rgba(251,113,133,.4)",
                     }}>
-                    {won ? "胜 利" : "惜 败"}
+                    {won ? tr("胜 利") : tr("惜 败")}
                   </span>
                   {multiplier > 1 && (
-                    <span className={`px-4 py-1 text-base ddz-pop ${PILL_MULT}`}>×{multiplier} 倍</span>
+                    <span className={`px-4 py-1 text-base ddz-pop ${PILL_MULT}`}>×{multiplier} {tr("倍")}</span>
                   )}
                   <span className="text-white/80 text-sm text-center max-w-[420px]">{message}</span>
                   <div className="flex gap-3 mt-2">
                     {onRestart && (
                       <button type="button" onClick={onRestart} className={`px-9 py-2.5 text-base ${BTN_PRIMARY}`}>
-                        再来一局
+                        {tr("再来一局")}
                       </button>
                     )}
                     <button type="button" onClick={onClose} className={`px-8 py-2.5 text-base ${BTN_GHOST}`}>
-                      退出
+                      {tr("退出")}
                     </button>
                   </div>
                 </div>
@@ -906,10 +907,10 @@ export function DoudizhuPanel({
             {phase === "bidding" && currentPlayer === 0 && !hasBid && (
               <>
                 <button type="button" onClick={() => handleBid(true)} className={`px-8 py-2 text-base ${BTN_DANGER}`}>
-                  叫地主
+                  {tr("叫地主")}
                 </button>
                 <button type="button" onClick={() => handleBid(false)} className={`px-8 py-2 text-base ${BTN_GHOST}`}>
-                  不叫
+                  {tr("不叫")}
                 </button>
               </>
             )}
@@ -917,15 +918,15 @@ export function DoudizhuPanel({
               <>
                 <button type="button" onClick={handleHint} disabled={!hasPlayable}
                   className={`px-4 py-2 text-sm flex items-center gap-1.5 ${BTN_ACCENT} disabled:opacity-40 disabled:cursor-not-allowed`}>
-                  <LuLightbulb className="w-4 h-4" /> {hasPlayable ? "提示" : "无牌可出"}
+                  <LuLightbulb className="w-4 h-4" /> {hasPlayable ? tr("提示") : tr("无牌可出")}
                 </button>
                 <button type="button" onClick={handlePlay} disabled={selectedCards.length === 0 || !canPlaySelected}
                   className={`px-7 py-2 text-base ${BTN_PRIMARY}`}>
-                  出牌{selectedCombo && canPlaySelected ? `（${comboName(selectedCombo.type)}）` : ""}
+                  {tr("出牌")}{selectedCombo && canPlaySelected ? tr("（{type}）", { type: comboName(selectedCombo.type) }) : ""}
                 </button>
                 <button type="button" onClick={handlePass} disabled={!lastMove || lastMovePlayer === 0}
                   className={`px-6 py-2 text-base ${BTN_GHOST}`}>
-                  不出
+                  {tr("不出")}
                 </button>
               </>
             )}
@@ -935,7 +936,7 @@ export function DoudizhuPanel({
           <div className="absolute left-5 bottom-[124px] z-30">
             <span className={`text-xs px-3 py-0.5 rounded-full font-medium ring-1
               ${me?.isLandlord ? "bg-amber-400/15 text-amber-200 ring-amber-300/25" : "bg-emerald-400/15 text-emerald-200 ring-emerald-300/20"}`}>
-              {me?.isLandlord ? "地主" : "农民"} · {myHand.length} 张
+              {me?.isLandlord ? tr("地主") : tr("农民")} · {tr("{count} 张", { count: myHand.length })}
             </span>
           </div>
 
@@ -951,7 +952,7 @@ export function DoudizhuPanel({
             <button type="button" onClick={() => setSortDesc((v) => !v)}
               className="flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white/80 ring-1 ring-white/15 transition-colors">
               {sortDesc ? <LuArrowDownWideNarrow className="w-3.5 h-3.5" /> : <LuArrowUpNarrowWide className="w-3.5 h-3.5" />}
-              {sortDesc ? "大→小" : "小→大"}
+              {sortDesc ? tr("大→小") : tr("小→大")}
             </button>
           </div>
 

@@ -10,7 +10,8 @@
       "sword1": "New Legend of the Swordsman",
       "yuying": "Legend of Moon Shadow",
       "sword2": "Swords of Legends 2"
-    }
+    },
+    "scrollToLoad": "Scroll to load the game"
   },
   "mobile": {
     "badge": "Native Support",
@@ -235,7 +236,8 @@
     "asfEditor": {
       "title": "ASF Sprite Editor",
       "desc": "Professional sprite animation viewer and debugger. Browse ASF files, preview animations frame by frame, adjust playback speed, and visualize sprite sheets for character and effect development."
-    }
+    },
+    "clickToZoom": "Click to zoom"
   },
   "features": {
     "title": "Powerful Engine Features",

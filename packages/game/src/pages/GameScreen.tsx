@@ -20,6 +20,7 @@ import { setUiTheme } from "@miu2d/engine/gui/ui-settings";
 import { getResourceUrl, ResourcePath, setResourcePaths } from "@miu2d/engine/resource";
 import type { SaveData } from "@miu2d/engine/storage";
 import { getResourceDomain, getS3Url, trpc, useMobile } from "@miu2d/shared";
+import { loadGameContentDict, tr, trc } from "@miu2d/shared/lib/game-i18n";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HiOutlineCog6Tooth } from "react-icons/hi2";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -78,6 +79,8 @@ type GamePhase = "loading" | "error" | "title" | "playing";
 
 // 移动端画面缩放比例
 const MOBILE_SCALE = 0.75;
+// 竖屏时保证逻辑画面宽度不小于原版分辨率宽度，避免界面面板被裁切
+const PORTRAIT_MIN_LOGICAL_WIDTH = 640;
 
 export default function GameScreen() {
   // ===== URL 参数 =====
@@ -232,7 +235,7 @@ export default function GameScreen() {
   useEffect(() => {
     if (!gameSlug) {
       setGamePhase("error");
-      setGameError("缺少游戏标识");
+      setGameError(tr("缺少游戏标识"));
       return;
     }
 
@@ -243,14 +246,16 @@ export default function GameScreen() {
     (async () => {
       try {
         // 1. 加载游戏配置（/api/config）—— 404 表示游戏不存在
-        await loadGameConfig(gameSlug, true);
+        //    同时加载越南语内容词典（/i18n/vi/{gameSlug}.json，缺失时使用原文）
+        await Promise.all([loadGameConfig(gameSlug, true), loadGameContentDict(gameSlug)]);
         if (cancelled) return;
 
         // 从 config 更新游戏名和 logo
         const config = getGameConfig();
         if (config?.gameName) {
-          setGameName(config.gameName);
-          document.title = config.gameName;
+          const displayGameName = trc(config.gameName);
+          setGameName(displayGameName);
+          document.title = displayGameName;
         }
         if (config?.logoUrl?.startsWith("games/")) {
           const logoUrl = getS3Url(`${config.logoUrl}_512`);
@@ -303,7 +308,7 @@ export default function GameScreen() {
         if (cancelled) return;
         logger.error(`[GameScreen] Failed to load game:`, error);
         setGamePhase("error");
-        setGameError(`游戏 "${gameSlug}" 不存在或未开放`);
+        setGameError(tr('游戏 "{gameSlug}" 不存在或未开放', { gameSlug }));
       }
     })();
 
@@ -347,7 +352,7 @@ export default function GameScreen() {
         const data = result.data as unknown as SaveData;
         setInitialSaveData(data);
         setShareNotification({
-          userName: result.userName ?? "未知用户",
+          userName: result.userName ?? tr("未知用户"),
           saveName: result.name,
           mapName: result.mapName,
           level: result.level,
@@ -368,7 +373,10 @@ export default function GameScreen() {
   const calculateWindowSize = useCallback(
     (resolution: { width: number; height: number }) => {
       if (isMobile) {
-        const scale = MOBILE_SCALE;
+        // 竖屏（如 iPhone Pro Max 430×932）：缩小比例，让逻辑宽度至少 640
+        const scale = isLandscape
+          ? MOBILE_SCALE
+          : Math.min(MOBILE_SCALE, screenWidth / PORTRAIT_MIN_LOGICAL_WIDTH);
         return {
           width: Math.floor(screenWidth / scale),
           height: Math.floor(screenHeight / scale),
@@ -387,7 +395,7 @@ export default function GameScreen() {
         scale: 1,
       };
     },
-    [isMobile, isEmbed, screenWidth, screenHeight]
+    [isMobile, isLandscape, isEmbed, screenWidth, screenHeight]
   );
 
   const [windowSize, setWindowSize] = useState(() => calculateWindowSize(gameResolution));
@@ -435,7 +443,7 @@ export default function GameScreen() {
       {
         id: "settings",
         icon: <HiOutlineCog6Tooth className="text-white" style={{ strokeWidth: 2.2 }} />,
-        tooltip: "设置",
+        tooltip: tr("设置"),
         onClick: handleTitleSettings,
       },
     ],
@@ -465,13 +473,6 @@ export default function GameScreen() {
   return (
     <TouchDragProvider>
       <div className="w-full h-full flex flex-col overflow-hidden">
-        {/* 移动端竖屏提示 */}
-        {isMobile && !isLandscape && (
-          <div className="mobile-landscape-hint">
-            <span>请将设备横屏游玩</span>
-          </div>
-        )}
-
         {/* 顶栏 */}
         {showTopBar && (
           <div
@@ -511,7 +512,7 @@ export default function GameScreen() {
             </div>
             <div className="relative z-10 flex flex-col items-center gap-3">
               <div className="text-white/40 text-sm tracking-[0.3em] uppercase animate-[pulse_2s_ease-in-out_infinite]">
-                正在连接
+                {tr("正在连接")}
               </div>
               <div className="flex gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-blue-400/60 animate-[bounce_1s_ease-in-out_infinite]" />
@@ -525,13 +526,13 @@ export default function GameScreen() {
         {/* ===== Error ===== */}
         {gamePhase === "error" && (
           <div className="w-full flex-1 flex flex-col items-center justify-center bg-black gap-4">
-            <div className="text-red-400 text-lg font-semibold">游戏不可用</div>
+            <div className="text-red-400 text-lg font-semibold">{tr("游戏不可用")}</div>
             <div className="text-white/50 text-sm">{gameError}</div>
             <a
               href="/"
               className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white/70 hover:text-white text-sm rounded-lg transition-colors"
             >
-              返回首页
+              {tr("返回首页")}
             </a>
           </div>
         )}
@@ -661,7 +662,7 @@ function ShareToast({
       }`}
     >
       <div className="px-6 py-4 rounded-xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl text-center min-w-[280px]">
-        <div className="text-white/50 text-xs mb-1">来自玩家的分享</div>
+        <div className="text-white/50 text-xs mb-1">{tr("来自玩家的分享")}</div>
         <div className="text-white text-sm font-semibold">
           {notification.userName} · {notification.saveName}
         </div>

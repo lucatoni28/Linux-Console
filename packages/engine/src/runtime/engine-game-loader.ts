@@ -6,6 +6,7 @@
  * 以及 loadProgress / loadingText 等加载状态。
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type { AudioManager } from "../audio";
 import { logger } from "../core/logger";
 import type { TypedEventEmitter } from "../events/event-emitter";
@@ -88,13 +89,13 @@ export class EngineGameLoader {
   async newGame(): Promise<void> {
     this.ensureInitialized();
     this.deps.setState("loading");
-    this.emitLoadProgress(10, "开始新游戏...");
+    this.emitLoadProgress(10, tr("开始新游戏..."));
     this.setupProgressMapping();
 
     try {
       await this.deps.getGameManager().newGame();
       this.deps.setState("running");
-      this.emitLoadProgress(100, "游戏开始");
+      this.emitLoadProgress(100, tr("游戏开始"));
       this.emitInitialized(true);
       logger.log("[GameEngine] New game started");
     } catch (error) {
@@ -110,13 +111,13 @@ export class EngineGameLoader {
   async loadGame(index: number): Promise<void> {
     this.ensureInitialized();
     this.deps.setState("loading");
-    this.emitLoadProgress(10, `读取存档 ${index}...`);
+    this.emitLoadProgress(10, tr("读取存档 {index}...", { index }));
     this.setupProgressMapping();
 
     try {
       await this.deps.getGameManager().loadGameSave(index);
       this.deps.setState("running");
-      this.emitLoadProgress(100, "存档加载完成");
+      this.emitLoadProgress(100, tr("存档加载完成"));
       logger.log(`[GameEngine] Game loaded from save ${index}`);
     } catch (error) {
       logger.error(`[GameEngine] Failed to load game ${index}:`, error);
@@ -130,13 +131,13 @@ export class EngineGameLoader {
   async loadGameFromJSON(data: SaveData): Promise<void> {
     this.ensureInitialized();
     this.deps.setState("loading");
-    this.emitLoadProgress(10, "加载存档...");
+    this.emitLoadProgress(10, tr("加载存档..."));
     this.setupProgressMapping();
 
     try {
       await this.deps.getGameManager().loadGameFromJSON(data);
       this.deps.setState("running");
-      this.emitLoadProgress(100, "加载完成");
+      this.emitLoadProgress(100, tr("加载完成"));
       this.emitInitialized(true);
       logger.log("[GameEngine] Game loaded from JSON save");
     } catch (error) {

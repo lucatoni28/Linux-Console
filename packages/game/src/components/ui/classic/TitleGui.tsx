@@ -10,6 +10,7 @@
 
 import type { ButtonConfig, TitleGuiConfig } from "@miu2d/engine/gui/ui-settings";
 import { getResourceRoot, getResourceUrl, ResourcePath } from "@miu2d/engine/resource";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useEffect, useInsertionEffect, useMemo, useRef, useState } from "react";
 import { EngineWatermark } from "../../common/EngineWatermark";
@@ -549,7 +550,8 @@ const ModernTitle: React.FC<TitleGuiProps> = ({ gameName, logoUrl, onNewGame, on
     return () => clearTimeout(t);
   }, []);
 
-  const displayName = gameName || "游戏";
+  const displayName = gameName || tr("游戏");
+  const isLongTitle = displayName.length > 8;
 
   return (
     <div
@@ -751,13 +753,16 @@ const ModernTitle: React.FC<TitleGuiProps> = ({ gameName, logoUrl, onNewGame, on
               style={{
                 margin: 0,
                 fontFamily: '"STKaiti", "楷体", "KaiTi", "SimKai", serif',
-                fontSize: "clamp(2.6rem, 5vw, 4rem)",
+                // 译名（如越南语）比中文长得多：缩小字号、收紧字距并允许换行
+                fontSize: isLongTitle ? "clamp(2rem, 4.5vw, 3.4rem)" : "clamp(2.6rem, 5vw, 4rem)",
                 fontWeight: 700,
-                letterSpacing: "0.18em",
+                letterSpacing: isLongTitle ? "0.04em" : "0.18em",
                 color: "rgba(255, 242, 210, 0.97)",
                 animation: "titleGlow 4s ease-in-out infinite",
                 lineHeight: 1.2,
-                whiteSpace: "nowrap",
+                whiteSpace: isLongTitle ? "normal" : "nowrap",
+                textAlign: "center",
+                padding: "0 16px",
               }}
             >
               {displayName}
@@ -797,8 +802,14 @@ const ModernTitle: React.FC<TitleGuiProps> = ({ gameName, logoUrl, onNewGame, on
 
         {/* 菜单按钮组 */}
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <MenuButton label="新的开始" sub="NEW GAME" onClick={onNewGame} primary delay={400} />
-          <MenuButton label="读档" sub="LOAD SAVE" onClick={onLoadGame} delay={550} />
+          <MenuButton
+            label={tr("新的开始")}
+            sub="NEW GAME"
+            onClick={onNewGame}
+            primary
+            delay={400}
+          />
+          <MenuButton label={tr("读档")} sub="LOAD SAVE" onClick={onLoadGame} delay={550} />
         </div>
       </div>
 

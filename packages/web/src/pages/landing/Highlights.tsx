@@ -399,6 +399,7 @@ function ClickToZoomImage({
   aspectRatio?: string;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const { t } = useTranslation();
 
   return (
     <>
@@ -415,7 +416,7 @@ function ClickToZoomImage({
         {/* 悬停提示 */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
           <span className="text-white/0 group-hover:text-white/90 transition-colors text-sm font-medium">
-            🔍 点击放大
+            🔍 {t("highlights.clickToZoom")}
           </span>
         </div>
       </div>

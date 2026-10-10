@@ -5,6 +5,7 @@
  * 右侧区域：攻击按钮、技能按钮、跳跃按钮等
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type { ReactNode } from "react";
 import { useCallback, useRef } from "react";
 import {
@@ -218,19 +219,19 @@ export function MobileSkillButtons({
       {/* 顶部快捷按钮 */}
       <div className="flex gap-2 mb-2">
         <QuickButton
-          label="地图"
+          label={tr("地图")}
           icon={<HiOutlineMap className="text-white" style={{ strokeWidth: 2.2 }} />}
           onPress={onOpenMinimap ?? (() => {})}
           disabled={disabled || !onOpenMinimap}
         />
         <QuickButton
-          label="背包"
+          label={tr("背包")}
           icon={<HiOutlineShoppingBag className="text-white" style={{ strokeWidth: 2.2 }} />}
           onPress={onOpenInventory ?? (() => {})}
           disabled={disabled || !onOpenInventory}
         />
         <QuickButton
-          label="菜单"
+          label={tr("菜单")}
           icon={<HiOutlineBars3 className="text-white" style={{ strokeWidth: 2.2 }} />}
           onPress={onOpenMenu ?? (() => {})}
           disabled={disabled || !onOpenMenu}
@@ -242,7 +243,7 @@ export function MobileSkillButtons({
         {/* 攻击按钮（右下角，最大） */}
         <div className="absolute" style={{ right: 0, bottom: 0 }}>
           <SkillButton
-            label="攻击"
+            label={tr("攻击")}
             icon={<HiOutlineShieldCheck className="text-white" style={{ strokeWidth: 2.2 }} />}
             color="rgba(255,80,80,0.8)"
             size="large"
@@ -254,7 +255,7 @@ export function MobileSkillButtons({
         {/* 跳跃按钮（攻击按钮左上方） */}
         <div className="absolute" style={{ right: 85, bottom: 50 }}>
           <SkillButton
-            label="跳"
+            label={tr("跳")}
             icon={<HiOutlineArrowUp className="text-white" style={{ strokeWidth: 2.2 }} />}
             color="rgba(100,180,255,0.8)"
             size="medium"
@@ -266,7 +267,7 @@ export function MobileSkillButtons({
         {/* 交互按钮（攻击按钮上方） */}
         <div className="absolute" style={{ right: 10, bottom: 90 }}>
           <SkillButton
-            label="互动"
+            label={tr("互动")}
             icon={<HiOutlineChatBubbleBottomCenterText className="text-white" style={{ strokeWidth: 2.2 }} />}
             color="rgba(100,255,150,0.8)"
             size="small"

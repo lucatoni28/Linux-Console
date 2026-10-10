@@ -8,6 +8,7 @@
 
 import type { UIGoodData } from "@miu2d/engine/gui/ui-types";
 import { useDevice } from "@miu2d/shared";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo } from "react";
 import type { TouchDragData } from "../../../contexts";
@@ -101,13 +102,13 @@ interface EquipGuiProps {
 
 // Slot names for display
 const slotNames: Record<EquipSlotType, string> = {
-  head: "头部",
-  neck: "项链",
-  body: "衣服",
-  back: "披风",
-  hand: "武器",
-  wrist: "护腕",
-  foot: "鞋子",
+  head: tr("头部"),
+  neck: tr("项链"),
+  body: tr("衣服"),
+  back: tr("披风"),
+  hand: tr("武器"),
+  wrist: tr("护腕"),
+  foot: tr("鞋子"),
 };
 
 /**
@@ -156,7 +157,7 @@ const EquipSlot: React.FC<EquipSlotProps> = ({
             equipSlot: slot,
             source: "equipGui",
             goodsInfo: item.good,
-            displayName: item.good.name,
+            displayName: trc(item.good.name),
             iconPath: item.good.iconPath || item.good.imagePath,
           }
         : null,
@@ -199,7 +200,7 @@ const EquipSlot: React.FC<EquipSlotProps> = ({
         boxShadow: "inset 0 0 0 1px rgba(100,80,30,0.4)",
         touchAction: isMobile ? "none" : undefined,
       }}
-      title={item?.good?.name || slotNames[slot]}
+      title={trc(item?.good?.name) || slotNames[slot]}
       onClick={onClick}
       onContextMenu={
         !isMobile
@@ -392,7 +393,7 @@ export const EquipGui: React.FC<EquipGuiProps> = ({
       {panelImage.dataUrl && (
         <img
           src={panelImage.dataUrl}
-          alt="装备面板"
+          alt={tr("装备面板")}
           style={{
             position: "absolute",
             left: 0,

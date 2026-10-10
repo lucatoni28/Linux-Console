@@ -12,6 +12,7 @@
  * - Distance checking: walk to target if too far
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type { Character } from "../character/character";
 import { getEngineContext } from "../core/engine-context";
 import { logger } from "../core/logger";
@@ -566,7 +567,7 @@ export class InputHandler {
       // 没有右键交互目标时，尝试使用武功
       // ControledCharacter == null - Can't use magic when controlling other character
       if (isControlling) {
-        guiManager.showMessage("控制角色时无法使用武功");
+        guiManager.showMessage(tr("控制角色时无法使用武功"));
         return;
       }
 

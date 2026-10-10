@@ -7,6 +7,7 @@
  */
 
 import type { ButtonConfig } from "@miu2d/engine/gui/ui-settings";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import { playUiSound, useAsfImage } from "./hooks";
@@ -121,7 +122,7 @@ export const SystemGui: React.FC<SystemGuiProps> = ({
       {panelImage.dataUrl && (
         <img
           src={panelImage.dataUrl}
-          alt="系统菜单"
+          alt={tr("系统菜单")}
           style={{
             position: "absolute",
             left: 0,

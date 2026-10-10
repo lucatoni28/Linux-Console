@@ -18,6 +18,7 @@
  */
 
 import type { UIGoodData } from "@miu2d/engine/gui/ui-types";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import { AsfAnimatedSprite } from "./AsfAnimatedSprite";
@@ -83,7 +84,7 @@ const ShopItemSlot: React.FC<ShopItemSlotProps> = ({
         borderRadius: 2,
         opacity: isSoldOut ? 0.5 : 1,
       }}
-      title={item?.good?.name || "空"}
+      title={trc(item?.good?.name) || tr("空")}
       onClick={onClick}
       onContextMenu={(e) => {
         e.preventDefault();
@@ -121,7 +122,7 @@ const ShopItemSlot: React.FC<ShopItemSlotProps> = ({
                 pointerEvents: "none",
               }}
             >
-              {item.count <= 0 ? "售罄" : item.count}
+              {item.count <= 0 ? tr("售罄") : item.count}
             </span>
           )}
         </>
@@ -224,7 +225,7 @@ export const BuyGui: React.FC<BuyGuiProps> = ({
       {panelImage.dataUrl && (
         <img
           src={panelImage.dataUrl}
-          alt="商店面板"
+          alt={tr("商店面板")}
           style={{
             position: "absolute",
             left: 0,

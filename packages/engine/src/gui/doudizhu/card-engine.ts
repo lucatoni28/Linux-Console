@@ -1,3 +1,4 @@
+import { tr } from "@miu2d/shared/lib/game-i18n";
 /**
  * 斗地主牌型引擎
  *
@@ -44,7 +45,7 @@ const RANK_ORDER: Rank[] = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
 
 const RANK_NAME: Record<Rank, string> = {
   3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9", 10: "10",
-  11: "J", 12: "Q", 13: "K", 14: "A", 15: "2", 16: "小王", 17: "大王",
+  11: "J", 12: "Q", 13: "K", 14: "A", 15: "2", 16: tr("小王"), 17: tr("大王"),
 };
 
 const SUITS: Suit[] = ["♠", "♥", "♦", "♣"];
@@ -494,7 +495,7 @@ export function getRankName(rank: Rank): string {
 
 export function getCardDisplay(card: Card): string {
   if (card.suit === "joker") {
-    return card.rank === 17 ? "大王" : "小王";
+    return card.rank === 17 ? tr("大王") : tr("小王");
   }
   return `${card.suit}${RANK_NAME[card.rank]}`;
 }

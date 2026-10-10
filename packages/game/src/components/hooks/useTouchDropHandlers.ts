@@ -7,6 +7,7 @@
 
 import { GoodKind } from "@miu2d/engine/player/goods";
 import { MAGIC_LIST_CONFIG } from "@miu2d/engine/player/magic/magic-list-config";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { useCallback } from "react";
 import type { TouchDragData } from "../../contexts";
 import type { EquipSlotType } from "../ui/classic";
@@ -21,7 +22,7 @@ export function useTouchDropHandlers(logic: Pick<GameUILogic, "dispatch" | "engi
       if (touchData.type === "goods") {
         if (targetIndex < 3 && touchData.bagIndex !== undefined) {
           if (touchData.goodsInfo?.kind !== GoodKind.Drug) {
-            dispatch({ type: "SHOW_MESSAGE", text: "只有药品可以放到快捷栏" });
+            dispatch({ type: "SHOW_MESSAGE", text: tr("只有药品可以放到快捷栏") });
             return;
           }
           dispatch({

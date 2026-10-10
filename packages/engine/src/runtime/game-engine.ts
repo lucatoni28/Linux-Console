@@ -33,6 +33,7 @@
  * ================================================
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 // 子系统
 import { AudioManager } from "../audio";
 import { type EngineContext, setEngineContext } from "../core/engine-context";
@@ -42,11 +43,11 @@ import { DebugManager } from "../debug/debug-manager";
 import { TypedEventEmitter } from "../events/event-emitter";
 import { type GameEventMap, GameEvents } from "../events/game-events";
 import type { BuyManager } from "../gui/buy-manager";
-import type { GambleManager } from "../gui/gamble-manager";
-import type { SlotManager } from "../gui/slot-manager";
 import type { DoudizhuManager } from "../gui/doudizhu/doudizhu-manager";
+import type { GambleManager } from "../gui/gamble-manager";
 import type { GuiManager } from "../gui/gui-manager";
 import { MemoListManager } from "../gui/memo-list-manager";
+import type { SlotManager } from "../gui/slot-manager";
 import { TalkTextListManager } from "../gui/talk-text-list";
 import type { GuiManagerState, UIBridge } from "../gui/ui-types";
 import type { MagicItemInfo, MagicSpriteManager } from "../magic";
@@ -361,16 +362,16 @@ export class GameEngine implements EngineContext {
 
     this.state = "loading";
     this.gameLoader.reset();
-    this.gameLoader.emitLoadProgress(0, "初始化引擎...");
+    this.gameLoader.emitLoadProgress(0, tr("初始化引擎..."));
 
     try {
       // ========== 阶段1：加载全局资源（只加载一次）==========
-      this.gameLoader.emitLoadProgress(2, "加载全局资源...");
+      this.gameLoader.emitLoadProgress(2, tr("加载全局资源..."));
       await this.talkTextList.initialize();
       this.partnerList.initialize();
 
       // ========== 阶段2：创建渲染器 ==========
-      this.gameLoader.emitLoadProgress(5, "创建渲染器...");
+      this.gameLoader.emitLoadProgress(5, tr("创建渲染器..."));
       this.objRendererInstance = new ObjRenderer();
       this.mapRendererInstance = createMapRenderer();
       this.mapRendererInstance.camera = {
@@ -381,7 +382,7 @@ export class GameEngine implements EngineContext {
       };
 
       // ========== 阶段3：创建游戏管理器 ==========
-      this.gameLoader.emitLoadProgress(7, "创建游戏管理器...");
+      this.gameLoader.emitLoadProgress(7, tr("创建游戏管理器..."));
       this.gameManagerInstance = new GameManager(
         {
           events: this.events,
@@ -423,7 +424,7 @@ export class GameEngine implements EngineContext {
 
       // ========== 阶段4：创建 UI 桥接器 ==========
       this.uiBridgeInstance = this.createUIBridge();
-      this.gameLoader.emitLoadProgress(10, "引擎初始化完成");
+      this.gameLoader.emitLoadProgress(10, tr("引擎初始化完成"));
       logger.log("[GameEngine] Engine initialization completed (global resources loaded)");
 
       // 提前启动主循环

@@ -11,6 +11,7 @@
 
 import type { MagicItemInfo } from "@miu2d/engine/magic";
 import { useDevice } from "@miu2d/shared";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { type TouchDragData, useTouchDrag } from "../../../contexts";
@@ -101,7 +102,7 @@ const MagicSlot: React.FC<MagicSlotProps> = ({
   // 优先使用magicInfo
   const displayMagic = magicInfo?.magic;
   const iconPath = displayMagic?.icon ?? displayMagic?.image ?? magic?.iconPath ?? null;
-  const name = displayMagic?.name ?? magic?.name ?? "";
+  const name = trc(displayMagic?.name ?? magic?.name ?? "");
   const level = magicInfo?.level ?? magic?.level ?? 0;
   const hasMagic = !!(displayMagic || magic);
   const { isMobile } = useDevice();
@@ -453,7 +454,7 @@ export const MagicGui: React.FC<MagicGuiProps> = ({
       {panelImage.dataUrl && (
         <img
           src={panelImage.dataUrl}
-          alt="武功面板"
+          alt={tr("武功面板")}
           style={{
             position: "absolute",
             left: 0,

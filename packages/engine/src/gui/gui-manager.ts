@@ -2,6 +2,7 @@
  * GUI 管理器 - 事件驱动架构，通过 EventEmitter 发送状态变化事件
  */
 
+import { trc } from "@miu2d/shared/lib/game-i18n";
 import { getEngineContext } from "../core/engine-context";
 import { logger } from "../core/logger";
 import type { TypedEventEmitter } from "../events/event-emitter";
@@ -22,6 +23,11 @@ import {
 import type { MemoListManager } from "../gui/memo-list-manager";
 import type { GuiManagerState, SelectionOptionData } from "./ui-types";
 import { createDefaultGuiState } from "./ui-types";
+
+/** 翻译脚本传入的选项文本（不修改原数组，label/enabled 保持不变） */
+function translateOptions(options: SelectionOptionData[]): SelectionOptionData[] {
+  return options.map((opt) => ({ ...opt, text: trc(opt.text) }));
+}
 
 export class GuiManager {
   protected get engine() {
@@ -87,10 +93,10 @@ export class GuiManager {
     logger.log(`[GuiManager] showDialog: "${text.substring(0, 50)}..." portrait=${portraitIndex}`);
     this.state.dialog = {
       isVisible: true,
-      text,
+      text: trc(text),
       portraitIndex,
       portraitSide: "left",
-      nameText: name,
+      nameText: trc(name),
       textProgress: 0,
       isComplete: false,
       isInSelecting: false,
@@ -119,6 +125,9 @@ export class GuiManager {
 
   /** 在对话框面板上显示选择 (Choose/Select 命令) */
   showDialogSelection(message: string, selectA: string, selectB: string): void {
+    message = trc(message);
+    selectA = trc(selectA);
+    selectB = trc(selectB);
     this.state.dialog = {
       isVisible: true,
       text: message,
@@ -180,8 +189,8 @@ export class GuiManager {
   showSelection(options: SelectionOptionData[], message: string = ""): void {
     this.state.selection = {
       isVisible: true,
-      message,
-      options,
+      message: trc(message),
+      options: translateOptions(options),
       selectedIndex: 0,
       hoveredIndex: -1,
     };
@@ -258,8 +267,8 @@ export class GuiManager {
     }
     this.state.multiSelection = {
       isVisible: true,
-      message,
-      options,
+      message: trc(message),
+      options: translateOptions(options),
       columns,
       selectionCount,
       selectedIndices: [],
@@ -320,7 +329,7 @@ export class GuiManager {
 
   showMessage(text: string, duration: number = 3000): void {
     this.messageShowKey++;
-    this.state.hud.messageText = text;
+    this.state.hud.messageText = trc(text);
     this.state.hud.messageVisible = true;
     this.state.hud.messageTimer = duration;
     this.emitMessageChange();

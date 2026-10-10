@@ -13,6 +13,7 @@ import { getPortraitPathByIndex } from "../portraitUtils";
 const KAITI_FONT = '"STKaiti", "楷体", "KaiTi", "SimKai", serif';
 
 import type { DialogGuiState } from "@miu2d/engine/gui/ui-types";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { useAsfImage } from "./hooks";
 import { useDialogGuiConfig } from "./useUISettings";
 
@@ -173,7 +174,7 @@ const Portrait: React.FC<PortraitProps> = ({ portraitIndex, left, top }) => {
   return (
     <img
       src={portraitImage.dataUrl}
-      alt="对话头像"
+      alt={tr("对话头像")}
       style={{
         position: "absolute",
         left: left,
@@ -379,7 +380,7 @@ export const DialogUI: React.FC<DialogUIProps> = ({
         {panelImage.dataUrl && (
           <img
             src={panelImage.dataUrl}
-            alt="对话框"
+            alt={tr("对话框")}
             style={{
               position: "absolute",
               left: 0,

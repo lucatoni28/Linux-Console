@@ -11,6 +11,7 @@
  * - 本文件包含状态机、精灵加载、特殊动作等 (~800行)
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { getCharacterDeathExp } from "../combat/effect-calc";
 import { logger } from "../core/logger";
 import type { CharacterConfig, Vector2 } from "../core/types";
@@ -588,7 +589,7 @@ export abstract class Character extends CharacterCombat {
         this.statusEffects.controledMagicSprite !== null &&
         this.statusEffects.controledMagicSprite.belongCharacterId === "player";
       if (this.isPlayer || isControledByPlayer) {
-        this.showMessage("满血才能使用");
+        this.showMessage(tr("满血才能使用"));
       }
       return;
     }

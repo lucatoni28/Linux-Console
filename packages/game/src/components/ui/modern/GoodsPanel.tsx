@@ -5,6 +5,7 @@
 
 import type { UIGoodData } from "@miu2d/engine/gui/ui-types";
 import { GoodKind } from "@miu2d/engine/player/goods";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -33,10 +34,10 @@ interface FilterTab {
 }
 
 const filterTabs: FilterTab[] = [
-  { key: "all", label: "全部", icon: <HiOutlineArchiveBox /> },
-  { key: GoodKind.Drug, label: "药品", icon: <HiOutlineBeaker /> },
-  { key: GoodKind.Equipment, label: "装备", icon: <HiOutlineShieldCheck /> },
-  { key: GoodKind.Event, label: "任务", icon: <HiOutlineDocumentText /> },
+  { key: "all", label: tr("全部"), icon: <HiOutlineArchiveBox /> },
+  { key: GoodKind.Drug, label: tr("药品"), icon: <HiOutlineBeaker /> },
+  { key: GoodKind.Equipment, label: tr("装备"), icon: <HiOutlineShieldCheck /> },
+  { key: GoodKind.Event, label: tr("任务"), icon: <HiOutlineDocumentText /> },
 ];
 
 // 武侠风格配色
@@ -561,7 +562,7 @@ export const GoodsPanel: React.FC<GoodsPanelProps> = ({
                 marginBottom: spacing.xs,
               }}
             >
-              随身包裹
+              {tr("随身包裹")}
             </div>
             <div
               style={{
@@ -569,11 +570,11 @@ export const GoodsPanel: React.FC<GoodsPanelProps> = ({
                 color: modernColors.text.secondary,
               }}
             >
-              物品{" "}
+              {tr("物品")}{" "}
               <span style={{ color: wuxiaAccent.gold, fontWeight: typography.fontWeight.semibold }}>
                 {filterKind === "all" ? totalItemCount : filteredItemCount}
               </span>{" "}
-              / {totalItemCount} 件
+              {tr("/ {totalItemCount} 件", { totalItemCount })}
             </div>
           </div>
         </div>
@@ -740,7 +741,7 @@ export const GoodsPanel: React.FC<GoodsPanelProps> = ({
               color: modernColors.text.secondary,
             }}
           >
-            银两
+            {tr("银两")}
           </span>
         </div>
         <span

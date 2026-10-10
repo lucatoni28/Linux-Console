@@ -43,6 +43,7 @@ export enum GoodEffectType {
 
 // ============= 类型映射 =============
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type { EquipPosition as EquipPositionStr, GoodKind as GoodKindStr } from "@miu2d/types";
 
 /** 物品种类映射 */
@@ -255,18 +256,18 @@ export class Good {
   /** 效果条目（结构化），按显示顺序 */
   getEffectEntries(): { key: string; label: string; value: number }[] {
     const entries: { key: string; label: string; value: number }[] = [];
-    if (this.life !== 0) entries.push({ key: "life", label: "命", value: this.life });
-    if (this.thew !== 0) entries.push({ key: "thew", label: "体", value: this.thew });
-    if (this.mana !== 0) entries.push({ key: "mana", label: "气", value: this.mana });
-    if (this.attack !== 0) entries.push({ key: "attack", label: "攻", value: this.attack });
-    if (this.defend !== 0) entries.push({ key: "defend", label: "防", value: this.defend });
-    if (this.evade !== 0) entries.push({ key: "evade", label: "捷", value: this.evade });
+    if (this.life !== 0) entries.push({ key: "life", label: tr("命"), value: this.life });
+    if (this.thew !== 0) entries.push({ key: "thew", label: tr("体"), value: this.thew });
+    if (this.mana !== 0) entries.push({ key: "mana", label: tr("气"), value: this.mana });
+    if (this.attack !== 0) entries.push({ key: "attack", label: tr("攻"), value: this.attack });
+    if (this.defend !== 0) entries.push({ key: "defend", label: tr("防"), value: this.defend });
+    if (this.evade !== 0) entries.push({ key: "evade", label: tr("捷"), value: this.evade });
     if (this.lifeMax !== 0)
-      entries.push({ key: "lifeMax", label: "命上限", value: this.lifeMax });
+      entries.push({ key: "lifeMax", label: tr("命上限"), value: this.lifeMax });
     if (this.thewMax !== 0)
-      entries.push({ key: "thewMax", label: "体上限", value: this.thewMax });
+      entries.push({ key: "thewMax", label: tr("体上限"), value: this.thewMax });
     if (this.manaMax !== 0)
-      entries.push({ key: "manaMax", label: "气上限", value: this.manaMax });
+      entries.push({ key: "manaMax", label: tr("气上限"), value: this.manaMax });
     return entries;
   }
 

@@ -1,5 +1,6 @@
 /** 地图渲染器 - Canvas 基于的 JxqyMap 渲染 */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { logger } from "../core/logger";
 import type { Renderer } from "../renderer/renderer";
 import { loadMpc } from "../resource/format/mpc";
@@ -560,7 +561,7 @@ export function renderMapInterleaved(
       ctx.font = "24px Arial";
       ctx.textAlign = "center";
       ctx.fillText(
-        `加载中... ${Math.round(mapRenderer.loadProgress * 100)}%`,
+        tr("加载中... {loadProgress}%", { loadProgress: Math.round(mapRenderer.loadProgress * 100) }),
         camera.width / 2,
         camera.height / 2
       );
@@ -622,7 +623,7 @@ export function renderMap(renderer: Renderer, mapRenderer: MapRenderer): void {
       ctx.font = "24px Arial";
       ctx.textAlign = "center";
       ctx.fillText(
-        `加载中... ${Math.round(mapRenderer.loadProgress * 100)}%`,
+        tr("加载中... {loadProgress}%", { loadProgress: Math.round(mapRenderer.loadProgress * 100) }),
         camera.width / 2,
         camera.height / 2
       );

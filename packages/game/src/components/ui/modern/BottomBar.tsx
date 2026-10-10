@@ -2,6 +2,8 @@
  * Modern BottomBar - 底部快捷栏
  * 位置与经典UI一致
  */
+
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import type { MagicHoverData, TouchDragData } from "../../../contexts";
@@ -219,7 +221,7 @@ const BottomSlot: React.FC<SlotItemProps> = ({
                     lineHeight: 1.1,
                   }}
                 >
-                  {magicData.magic.name?.slice(0, 2)}
+                  {trc(magicData.magic.name)?.slice(0, 2)}
                 </span>
               </div>
             )}
@@ -360,7 +362,7 @@ export const BottomBar: React.FC<BottomBarProps> = ({
         {(
           [
             {
-              label: "命",
+              label: tr("命"),
               percent: lifePercent,
               cur: life,
               max: lifeMax,
@@ -368,7 +370,7 @@ export const BottomBar: React.FC<BottomBarProps> = ({
               dim: "rgba(220,80,80,0.4)",
             },
             {
-              label: "内",
+              label: tr("内"),
               percent: manaPercent,
               cur: mana,
               max: manaMax,
@@ -376,7 +378,7 @@ export const BottomBar: React.FC<BottomBarProps> = ({
               dim: "rgba(80,140,220,0.4)",
             },
             {
-              label: "体",
+              label: tr("体"),
               percent: thewPercent,
               cur: thew,
               max: thewMax,

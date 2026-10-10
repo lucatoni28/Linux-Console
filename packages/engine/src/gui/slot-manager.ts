@@ -1,3 +1,4 @@
+import { tr } from "@miu2d/shared/lib/game-i18n";
 /**
  * SlotManager - 老虎机小游戏（5×5 转轴）
  *
@@ -76,7 +77,7 @@ const PAYLINES: [number, number][][] = [
   [[4, 0], [3, 1], [2, 2], [3, 3], [4, 4]],  // 7: 倒 V
 ];
 
-const PAYLINE_NAMES = ["第2行", "中心行", "第4行", "中列", "↘对角", "↗对角", "V形", "倒V"];
+const PAYLINE_NAMES = [tr("第2行"), tr("中心行"), tr("第4行"), tr("中列"), tr("↘对角"), tr("↗对角"), tr("V形"), tr("倒V")];
 
 /** 散落触发免费旋转所需数量 */
 const SCATTER_TRIGGER_COUNT = 3;
@@ -90,29 +91,29 @@ const JACKPOT_MULTIPLIER = 200;
 // ============= 随机加倍/惩罚台词 =============
 
 const WIN_TEXTS = [
-  "财神爷赏脸，多给一倍！",
-  "手气爆棚，庄家哭了！",
-  "天降横财，挡都挡不住！",
-  "左眼跳财，今天准了！",
-  "踩到四叶草了，幸运加倍！",
-  "系统检测到你是天选之人！",
-  "命运之轮转到了金色区域！",
-  "量子力学说你必然会赢！",
-  "程序员在代码里埋了彩蛋给你！",
-  "财神转世，运气爆棚！",
+  tr("财神爷赏脸，多给一倍！"),
+  tr("手气爆棚，庄家哭了！"),
+  tr("天降横财，挡都挡不住！"),
+  tr("左眼跳财，今天准了！"),
+  tr("踩到四叶草了，幸运加倍！"),
+  tr("系统检测到你是天选之人！"),
+  tr("命运之轮转到了金色区域！"),
+  tr("量子力学说你必然会赢！"),
+  tr("程序员在代码里埋了彩蛋给你！"),
+  tr("财神转世，运气爆棚！"),
 ];
 
 const LOSE_TEXTS = [
-  "恶鬼降临，转轴叛变了！",
-  "穷神附体，越转越穷！",
-  "扫把星今天盯上你了！",
-  "今天不宜出行，更不宜赌博！",
-  "你的星座今天水逆！",
-  "银子觉得老板更帅，回去了！",
-  "系统检测到你是非酋本酋！",
-  "程序员在代码里埋了地雷给你！",
-  "墨菲定律：会输的一定会输！",
-  "骰子说它今天不想帮你！",
+  tr("恶鬼降临，转轴叛变了！"),
+  tr("穷神附体，越转越穷！"),
+  tr("扫把星今天盯上你了！"),
+  tr("今天不宜出行，更不宜赌博！"),
+  tr("你的星座今天水逆！"),
+  tr("银子觉得老板更帅，回去了！"),
+  tr("系统检测到你是非酋本酋！"),
+  tr("程序员在代码里埋了地雷给你！"),
+  tr("墨菲定律：会输的一定会输！"),
+  tr("骰子说它今天不想帮你！"),
 ];
 
 // ============= Utils =============
@@ -166,7 +167,7 @@ export class SlotManager {
     // 非免费旋转时扣钱
     if (!isFreeSpin) {
       if (this.playerRef.money < bet) {
-        this.onShowMessage?.("银两不足！");
+        this.onShowMessage?.(tr("银两不足！"));
         return null;
       }
       this.playerRef.money -= bet;
@@ -191,7 +192,7 @@ export class SlotManager {
         freeSpinTriggered = true;
         this._freeSpinsRemaining += FREE_SPIN_COUNT;
         this._freeSpinMultiplier = FREE_SPIN_MULTIPLIER;
-        this.onShowMessage?.(`💎 散落宝 ×${scatterCount}！触发 ${FREE_SPIN_COUNT} 次免费旋转！`);
+        this.onShowMessage?.(tr("💎 散落宝 ×{scatterCount}！触发 {FREE_SPIN_COUNT} 次免费旋转！", { scatterCount, FREE_SPIN_COUNT }));
       }
     }
 

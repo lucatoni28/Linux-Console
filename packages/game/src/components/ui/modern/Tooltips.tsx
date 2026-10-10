@@ -4,6 +4,7 @@
  */
 
 import type { UIGoodData, UIMagicData } from "@miu2d/engine/gui/ui-types";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { HiOutlineArchiveBox, HiOutlineCurrencyYen } from "react-icons/hi2";
@@ -144,7 +145,7 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
               color: getItemColor(good),
             }}
           >
-            {good.name}
+            {trc(good.name)}
           </div>
           <div style={{ fontSize: typography.fontSize.xs, color: modernColors.text.muted }}>
             {getItemTypeLabel(good.kind, good.part)}
@@ -182,7 +183,7 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
               lineHeight: 1.5,
             }}
           >
-            {good.intro}
+            {trc(good.intro)}
           </div>
         </>
       )}
@@ -289,7 +290,7 @@ export const MagicTooltip: React.FC<MagicTooltipProps> = ({ isVisible, magic, po
                 lineHeight: 1.1,
               }}
             >
-              {magic.name.slice(0, 2)}
+              {trc(magic.name).slice(0, 2)}
             </span>
           )}
         </div>
@@ -302,12 +303,12 @@ export const MagicTooltip: React.FC<MagicTooltipProps> = ({ isVisible, magic, po
               color: modernColors.primary,
             }}
           >
-            {magic.name}
+            {trc(magic.name)}
           </div>
           <div style={{ fontSize: typography.fontSize.xs, color: modernColors.text.muted }}>
             {magic.levelUpExp > 0
-              ? `第 ${magic.level} / ${magic.maxLevel} 层`
-              : `第 ${magic.level} 层（不可升级）`}
+              ? tr("第 {level} / {maxLevel} 层", { level: magic.level, maxLevel: magic.maxLevel })
+              : tr("第 {level} 层（不可升级）", { level: magic.level })}
           </div>
         </div>
       </div>
@@ -317,7 +318,7 @@ export const MagicTooltip: React.FC<MagicTooltipProps> = ({ isVisible, magic, po
         <div style={{ marginBottom: spacing.sm }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
             <span style={{ fontSize: typography.fontSize.xs, color: modernColors.text.secondary }}>
-              修炼进度
+              {tr("修炼进度")}
             </span>
             <span style={{ fontSize: typography.fontSize.xs, color: modernColors.text.muted }}>
               {magic.currentLevelExp} / {magic.levelUpExp}
@@ -337,7 +338,11 @@ export const MagicTooltip: React.FC<MagicTooltipProps> = ({ isVisible, magic, po
 
       {/* 属性 */}
       <div style={{ marginTop: spacing.sm }}>
-        <StatRow label="内力消耗" value={magic.manaCost.toString()} color={modernColors.stats.mp} />
+        <StatRow
+          label={tr("内力消耗")}
+          value={magic.manaCost.toString()}
+          color={modernColors.stats.mp}
+        />
       </div>
 
       {/* 描述 */}
@@ -352,7 +357,7 @@ export const MagicTooltip: React.FC<MagicTooltipProps> = ({ isVisible, magic, po
               lineHeight: 1.5,
             }}
           >
-            {magic.intro}
+            {trc(magic.intro)}
           </div>
         </>
       )}
@@ -432,20 +437,20 @@ export function getItemGlowColor(good: { cost: number } | null | undefined): str
 function getItemTypeLabel(kind: number, part?: number): string {
   if (kind === 1 && part && part > 0) {
     const partMap: Record<number, string> = {
-      1: "头饰",
-      2: "项链",
-      3: "衣甲",
-      4: "披风",
-      5: "兵器",
-      6: "护腕",
-      7: "靴履",
+      1: tr("头饰"),
+      2: tr("项链"),
+      3: tr("衣甲"),
+      4: tr("披风"),
+      5: tr("兵器"),
+      6: tr("护腕"),
+      7: tr("靴履"),
     };
-    return partMap[part] ?? "装备";
+    return partMap[part] ?? tr("装备");
   }
   const typeMap: Record<number, string> = {
-    0: "消耗品",
-    1: "装备",
-    2: "任务物品",
+    0: tr("消耗品"),
+    1: tr("装备"),
+    2: tr("任务物品"),
   };
-  return typeMap[kind] ?? "其他";
+  return typeMap[kind] ?? tr("其他");
 }

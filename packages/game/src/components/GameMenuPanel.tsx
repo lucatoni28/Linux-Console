@@ -5,6 +5,7 @@
  */
 
 import { useAnimatedVisibility, useAuth } from "@miu2d/shared";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { useEffect, useState } from "react";
 import { HiOutlineXMark } from "react-icons/hi2";
 import { SettingsPanel, type SettingsPanelProps } from "./common/SidePanel";
@@ -37,8 +38,8 @@ export interface GameMenuPanelProps {
 }
 
 const TABS: { key: MenuTab; label: string }[] = [
-  { key: "save", label: "存档" },
-  { key: "settings", label: "设置" },
+  { key: "save", label: tr("存档") },
+  { key: "settings", label: tr("设置") },
 ];
 
 export function GameMenuPanel({
@@ -121,7 +122,7 @@ export function GameMenuPanel({
               onClick={() => setShowFeedback(true)}
               className="px-2.5 py-1 text-xs text-white/40 hover:text-white/70 hover:bg-white/10 rounded-md transition-colors mr-1"
             >
-              反馈Bug
+              {tr("反馈Bug")}
             </button>
           )}
           <button
@@ -169,11 +170,11 @@ export function GameMenuPanel({
             >
               <HiOutlineXMark style={{ strokeWidth: 2.2 }} />
             </button>
-            <p className="text-white/80 text-sm mb-1">遇到问题？</p>
-            <p className="text-white/40 text-xs mb-4">剧情走不下去、遇到Bug，微信扫码反馈</p>
+            <p className="text-white/80 text-sm mb-1">{tr("遇到问题？")}</p>
+            <p className="text-white/40 text-xs mb-4">{tr("剧情走不下去、遇到Bug，微信扫码反馈")}</p>
             <img
               src="https://williamchan.me/assets/qrcode.jpg"
-              alt="微信反馈二维码"
+              alt={tr("微信反馈二维码")}
               className="mx-auto w-40 h-auto rounded-lg"
               loading="lazy"
             />

@@ -3,6 +3,7 @@
  * 显示在屏幕左上角，毛玻璃风格
  */
 
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useAsfImage } from "../classic/hooks";
 import type { PartnerInfo } from "../classic/LittleHeadGui";
@@ -51,7 +52,11 @@ const PartnerHead: React.FC<{
         e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
         onHover?.(false);
       }}
-      title={partner.canEquip ? `${partner.name} - 点击打开装备` : partner.name}
+      title={
+        partner.canEquip
+          ? tr("{name} - 点击打开装备", { name: trc(partner.name) })
+          : trc(partner.name)
+      }
     >
       <img
         src={portrait.dataUrl}

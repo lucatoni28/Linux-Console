@@ -5,6 +5,7 @@
  */
 
 import { trpc, useAuth } from "@miu2d/shared";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { useState } from "react";
 import { GlassModal } from "./GlassModal";
 
@@ -46,7 +47,7 @@ export function AuthModal({ visible, onClose }: AuthModalProps) {
 
     if (mode === "register") {
       if (password !== confirmPassword) {
-        setError("两次输入的密码不一致");
+        setError(tr("两次输入的密码不一致"));
         return;
       }
       registerMutation.mutate({ name, email, password });
@@ -64,12 +65,12 @@ export function AuthModal({ visible, onClose }: AuthModalProps) {
     <GlassModal
       visible={visible}
       onClose={onClose}
-      title={mode === "login" ? "登录" : "注册"}
+      title={mode === "login" ? tr("登录") : tr("注册")}
       widthClass="w-[400px]"
     >
       <div className="px-6 py-6">
         <p className="text-white/60 text-sm text-center mb-4">
-          {mode === "login" ? "登录后即可使用云存档功能" : "注册账号即可使用云存档功能"}
+          {mode === "login" ? tr("登录后即可使用云存档功能") : tr("注册账号即可使用云存档功能")}
         </p>
         <form onSubmit={handleSubmit} className="space-y-3">
           {mode === "register" && (
@@ -77,7 +78,7 @@ export function AuthModal({ visible, onClose }: AuthModalProps) {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="昵称"
+              placeholder={tr("昵称")}
               required
               className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white
                 placeholder-white/30 focus:outline-none focus:border-white/30"
@@ -87,7 +88,7 @@ export function AuthModal({ visible, onClose }: AuthModalProps) {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="邮箱"
+            placeholder={tr("邮箱")}
             required
             className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white
               placeholder-white/30 focus:outline-none focus:border-white/30"
@@ -96,7 +97,7 @@ export function AuthModal({ visible, onClose }: AuthModalProps) {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="密码"
+            placeholder={tr("密码")}
             required
             minLength={4}
             className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white
@@ -107,7 +108,7 @@ export function AuthModal({ visible, onClose }: AuthModalProps) {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="确认密码"
+              placeholder={tr("确认密码")}
               required
               minLength={4}
               className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white
@@ -123,11 +124,11 @@ export function AuthModal({ visible, onClose }: AuthModalProps) {
           >
             {isPending
               ? mode === "login"
-                ? "登录中..."
-                : "注册中..."
+                ? tr("登录中...")
+                : tr("注册中...")
               : mode === "login"
-                ? "登录"
-                : "注册"}
+                ? tr("登录")
+                : tr("注册")}
           </button>
         </form>
         <p className="text-center mt-3">
@@ -136,7 +137,7 @@ export function AuthModal({ visible, onClose }: AuthModalProps) {
             onClick={switchMode}
             className="text-blue-400/70 hover:text-blue-400 text-xs transition-colors"
           >
-            {mode === "login" ? "没有账号？点此注册" : "已有账号？点此登录"}
+            {mode === "login" ? tr("没有账号？点此注册") : tr("已有账号？点此登录")}
           </button>
         </p>
       </div>

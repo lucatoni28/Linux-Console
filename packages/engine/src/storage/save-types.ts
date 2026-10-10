@@ -9,6 +9,7 @@
  * Web 版使用 JSON 格式存档
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { logger } from "../core/logger";
 
 // ============= 存档数据结构 =============
@@ -530,7 +531,14 @@ export function formatSaveTime(date: Date = new Date()): string {
   const hour = String(date.getHours()).padStart(2, "0");
   const minute = String(date.getMinutes()).padStart(2, "0");
   const second = String(date.getSeconds()).padStart(2, "0");
-  return `${year}年${month}月${day}日 ${hour}时${minute}分${second}秒`;
+  return tr("{year}年{month}月{day}日 {hour}时{minute}分{second}秒", {
+    year,
+    month,
+    day,
+    hour,
+    minute,
+    second,
+  });
 }
 
 /** 从 canvas 生成截图 */

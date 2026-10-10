@@ -2,6 +2,8 @@
  * Modern StatePanel - 武侠风格状态面板
  * 使用毛玻璃效果 + 武侠配色
  */
+
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useMemo } from "react";
 import { HiOutlineXMark } from "react-icons/hi2";
@@ -274,7 +276,7 @@ export const StatePanel: React.FC<StatePanelProps> = ({
   isVisible,
   stats,
   onClose,
-  playerName = "主角",
+  playerName = tr("主角"),
 }) => {
   const panelWidth = 280;
 
@@ -389,7 +391,7 @@ export const StatePanel: React.FC<StatePanelProps> = ({
                   }}
                 />
               ) : (
-                <span style={{ fontSize: 28, color: wuxiaAccent.goldDark }}>侠</span>
+                <span style={{ fontSize: 28, color: wuxiaAccent.goldDark }}>{tr("侠")}</span>
               )}
             </div>
           </div>
@@ -420,7 +422,7 @@ export const StatePanel: React.FC<StatePanelProps> = ({
                   color: modernColors.text.muted,
                 }}
               >
-                等级
+                {tr("等级")}
               </span>
               <span
                 style={{
@@ -448,7 +450,7 @@ export const StatePanel: React.FC<StatePanelProps> = ({
             }}
           >
             <span style={{ fontSize: typography.fontSize.xs, color: modernColors.text.secondary }}>
-              修为进度
+              {tr("修为进度")}
             </span>
             <span
               style={{
@@ -504,7 +506,7 @@ export const StatePanel: React.FC<StatePanelProps> = ({
               display: "inline-block",
             }}
           />
-          三维属性
+          {tr("三维属性")}
           <span
             style={{
               flex: 1,
@@ -516,21 +518,21 @@ export const StatePanel: React.FC<StatePanelProps> = ({
         </div>
 
         <StatBar
-          label="生命"
+          label={tr("生命")}
           type="life"
           current={stats.life}
           max={stats.lifeMax}
           color={modernColors.stats.life}
         />
         <StatBar
-          label="体力"
+          label={tr("体力")}
           type="thew"
           current={stats.thew}
           max={stats.thewMax}
           color={modernColors.stats.thew}
         />
         <StatBar
-          label="内力"
+          label={tr("内力")}
           type="mana"
           current={stats.manaLimit ? 1 : stats.mana}
           max={stats.manaLimit ? 1 : stats.manaMax}
@@ -558,7 +560,7 @@ export const StatePanel: React.FC<StatePanelProps> = ({
               display: "inline-block",
             }}
           />
-          战斗属性
+          {tr("战斗属性")}
           <span
             style={{
               flex: 1,
@@ -570,9 +572,9 @@ export const StatePanel: React.FC<StatePanelProps> = ({
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-          <CombatStat label="攻击" type="attack" value={attackText} bonus={attackBonusText} />
-          <CombatStat label="防御" type="defend" value={defendText} bonus={defendBonusText} />
-          <CombatStat label="身法" type="evade" value={stats.evade} />
+          <CombatStat label={tr("攻击")} type="attack" value={attackText} bonus={attackBonusText} />
+          <CombatStat label={tr("防御")} type="defend" value={defendText} bonus={defendBonusText} />
+          <CombatStat label={tr("身法")} type="evade" value={stats.evade} />
         </div>
       </div>
 

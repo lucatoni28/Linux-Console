@@ -16,6 +16,7 @@
  * ================================================
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type { Player as PlayerType } from "@miu2d/types";
 import type { AudioManager } from "../audio";
 import { logger } from "../core/logger";
@@ -247,9 +248,9 @@ export class Loader {
    * 两个加载路径共享相同的进度逻辑
    */
   private async loadMapPhase(mapPath: string, timings: Array<[string, number]>): Promise<void> {
-    this.reportProgress(2, "加载地图...");
+    this.reportProgress(2, tr("加载地图..."));
     this.deps.setMapProgressCallback((mapProgress, _text) => {
-      this.reportProgress(Math.round(2 + mapProgress * 63), "加载地图资源...");
+      this.reportProgress(Math.round(2 + mapProgress * 63), tr("加载地图资源..."));
     });
     const tMap = performance.now();
     await this.deps.loadMap(mapPath);
@@ -317,7 +318,7 @@ export class Loader {
       this.deps.screenEffects.setMainLum(32);
 
       // ── Phase 1: 读取配置 ──
-      this.reportProgress(0, "读取游戏配置...");
+      this.reportProgress(0, tr("读取游戏配置..."));
       const tConfig = performance.now();
       const config = getGameConfig();
       const initialMap = config?.initialMap || "map002";
@@ -350,14 +351,14 @@ export class Loader {
       }
 
       // ── Phase 3: 预设 NpcIniIndex（必须在武功加载前完成） ──
-      this.reportProgress(66, "初始化角色...");
+      this.reportProgress(66, tr("初始化角色..."));
       const apiPlayerData = this.findApiPlayer(playerKey);
       if (apiPlayerData?.npcIni) {
         await player.setNpcIni(apiPlayerData.npcIni);
       }
 
       // ── Phase 4: 并行加载所有资源模块 ──
-      this.reportProgress(68, "加载游戏数据...");
+      this.reportProgress(68, tr("加载游戏数据..."));
 
       const parallelTasks: Array<Promise<void>> = [];
 
@@ -427,14 +428,14 @@ export class Loader {
       await Promise.all(parallelTasks);
 
       // ── Phase 5: 收尾 ──
-      this.reportProgress(90, "应用装备效果...");
+      this.reportProgress(90, tr("应用装备效果..."));
       const tEffects = performance.now();
       this.finalizeLoad(timings, tEffects);
 
-      this.reportProgress(95, "初始化视角...");
+      this.reportProgress(95, tr("初始化视角..."));
       this.deps.centerCameraOnPlayer();
       this.deps.onLoadComplete?.();
-      this.reportProgress(100, "加载完成");
+      this.reportProgress(100, tr("加载完成"));
 
       // ── 打印耗时汇总 ──
       const total = performance.now() - loadStart;
@@ -513,7 +514,7 @@ export class Loader {
 
     try {
       // ── Phase 1: 重置状态（同步，极快）──
-      this.reportProgress(0, "重置游戏状态...");
+      this.reportProgress(0, tr("重置游戏状态..."));
       const tReset = performance.now();
       screenEffects.setFadeTransparency(1);
       screenEffects.resetColors();
@@ -557,7 +558,7 @@ export class Loader {
       }
 
       // ── Phase 3: 预设 NpcIniIndex ──
-      this.reportProgress(66, "初始化角色...");
+      this.reportProgress(66, tr("初始化角色..."));
       if (data.player?.npcIni) {
         await player.setNpcIni(data.player.npcIni);
       }
@@ -569,7 +570,7 @@ export class Loader {
       await this.deps.setDifficulty(difficulty, { recalc: false });
 
       // ── Phase 4: 并行加载所有独立模块 ──
-      this.reportProgress(68, "加载游戏数据...");
+      this.reportProgress(68, tr("加载游戏数据..."));
 
       const parallelTasks: Array<Promise<void>> = [];
 
@@ -626,7 +627,7 @@ export class Loader {
                 // 将近距离 NPC 进度映射到内部 68 → 85%
                 this.reportProgress(
                   Math.round(68 + (done / Math.max(nearTotal, 1)) * 17),
-                  "加载游戏数据..."
+                  tr("加载游戏数据...")
                 );
               },
             });
@@ -668,7 +669,7 @@ export class Loader {
       }
 
       // ── Phase 5: 收尾 ──
-      this.reportProgress(90, "应用装备效果...");
+      this.reportProgress(90, tr("应用装备效果..."));
       const tEffects = performance.now();
 
       // 恢复分组存储
@@ -817,7 +818,7 @@ export class Loader {
       });
 
       // ── Phase 6: 完成 ──
-      this.reportProgress(95, "初始化视角...");
+      this.reportProgress(95, tr("初始化视角..."));
       this.deps.centerCameraOnPlayer();
       this.deps.onLoadComplete?.();
 
@@ -826,7 +827,7 @@ export class Loader {
       // 执行淡入效果
       screenEffects.fadeIn();
 
-      this.reportProgress(100, "加载完成");
+      this.reportProgress(100, tr("加载完成"));
 
       // ── 打印耗时汇总 ──
       const total = performance.now() - loadStart;

@@ -29,6 +29,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 // 统一楷体字体
 const KAITI_FONT = '"STKaiti", "楷体", "KaiTi", "SimKai", serif';
 
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import { type AsfAnimationData, playUiSound, useAsfAnimation, useAsfImage } from "./hooks";
 import { useLittleMapGuiConfig } from "./useUISettings";
 
@@ -362,7 +363,7 @@ export const LittleMapGui: React.FC<LittleMapGuiProps> = ({
       ctx.font = "14px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText("加载中...", VIEW_WIDTH / 2, VIEW_HEIGHT / 2);
+      ctx.fillText(tr("加载中..."), VIEW_WIDTH / 2, VIEW_HEIGHT / 2);
     }
 
     // 绘制角色标记
@@ -530,7 +531,7 @@ export const LittleMapGui: React.FC<LittleMapGuiProps> = ({
   }, [screenWidth, screenHeight, config, panelImage.width, panelImage.height]);
 
   // 地图名称显示
-  const displayName = mapDisplayName || mapName || "无名地图";
+  const displayName = trc(mapDisplayName) || mapName || tr("无名地图");
 
   if (!isVisible || !config || !panelStyle) return null;
 
@@ -554,7 +555,7 @@ export const LittleMapGui: React.FC<LittleMapGuiProps> = ({
       {panelImage.dataUrl && (
         <img
           src={panelImage.dataUrl}
-          alt="小地图面板"
+          alt={tr("小地图面板")}
           style={{
             position: "absolute",
             left: 0,
@@ -659,7 +660,7 @@ export const LittleMapGui: React.FC<LittleMapGuiProps> = ({
           pointerEvents: "none",
         }}
       >
-        点击小地图进行移动
+        {tr("点击小地图进行移动")}
       </div>
 
       {/* 移动失败消息 */}
@@ -679,7 +680,7 @@ export const LittleMapGui: React.FC<LittleMapGuiProps> = ({
             pointerEvents: "none",
           }}
         >
-          无法移动到目的地
+          {tr("无法移动到目的地")}
         </div>
       )}
     </div>

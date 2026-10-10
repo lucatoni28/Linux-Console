@@ -3,6 +3,7 @@
  * Manages player's inventory and equipment
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { getEngineContext } from "../../core/engine-context";
 import { logger } from "../../core/logger";
 import { EquipPosition, Good, GoodKind, getGood } from "./good";
@@ -236,7 +237,7 @@ export class GoodsListManager {
       }
     }
 
-    this.onShowMessage?.("物品栏已满");
+    this.onShowMessage?.(tr("物品栏已满"));
     return { success: false, index: -1, good: null };
   }
 
@@ -299,7 +300,7 @@ export class GoodsListManager {
    * Show bag full message (exposed for cross-character operations)
    */
   showBagFullMessage(): void {
-    this.onShowMessage?.("物品栏已满");
+    this.onShowMessage?.(tr("物品栏已满"));
   }
 
   /**
@@ -431,7 +432,7 @@ export class GoodsListManager {
       }
     }
 
-    this.onShowMessage?.("物品栏已满");
+    this.onShowMessage?.(tr("物品栏已满"));
     return -1;
   }
 
@@ -564,14 +565,14 @@ export class GoodsListManager {
     // if (good.User != null && good.User.Length > 0) { if (!good.User.Contains(user.Name)) ... }
     if (good.user && good.user.length > 0 && playerName) {
       if (!good.user.includes(playerName)) {
-        this.onShowMessage?.(`使用者：${good.user.join("，")}`);
+        this.onShowMessage?.(tr("使用者：{join}", { join: good.user.join(tr("，")) }));
         return false;
       }
     }
 
     // Check level requirement
     if (good.minUserLevel > 0 && playerLevel < good.minUserLevel) {
-      this.onShowMessage?.(`需要等级 ${good.minUserLevel}`);
+      this.onShowMessage?.(tr("需要等级 {minUserLevel}", { minUserLevel: good.minUserLevel }));
       return false;
     }
 
@@ -579,7 +580,7 @@ export class GoodsListManager {
       case GoodKind.Drug:
         // Check cooldown
         if (info.remainColdMilliseconds > 0) {
-          this.onShowMessage?.("该物品尚未冷却");
+          this.onShowMessage?.(tr("该物品尚未冷却"));
           return false;
         }
 

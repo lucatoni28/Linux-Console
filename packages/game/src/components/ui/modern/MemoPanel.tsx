@@ -2,6 +2,8 @@
  * Modern MemoPanel - 任务面板
  * 重新设计为与其他面板一致的武侠毛玻璃样式
  */
+
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useMemo, useState } from "react";
 import { HiOutlineDocumentText, HiOutlineXMark } from "react-icons/hi2";
@@ -178,7 +180,7 @@ export const MemoPanel: React.FC<MemoPanelProps> = ({ isVisible, memos, onClose 
             letterSpacing: "0.05em",
           }}
         >
-          任务记录
+          {tr("任务记录")}
         </h3>
         {memos.length > 0 && (
           <span
@@ -193,7 +195,7 @@ export const MemoPanel: React.FC<MemoPanelProps> = ({ isVisible, memos, onClose 
               border: `1px solid ${modernColors.border.glass}`,
             }}
           >
-            {memos.length} 条
+            {tr("{memos} 条", { memos: memos.length })}
           </span>
         )}
       </div>
@@ -226,14 +228,14 @@ export const MemoPanel: React.FC<MemoPanelProps> = ({ isVisible, memos, onClose 
                 color: modernColors.text.muted,
               }}
             >
-              暂无任务记录
+              {tr("暂无任务记录")}
             </span>
           </div>
         ) : (
           memos.map((memo, idx) => (
             <MemoItem
               key={`memo-${idx}-${memo.slice(0, 16)}`}
-              text={memo}
+              text={trc(memo)}
               index={idx}
               isLast={idx === memos.length - 1}
             />

@@ -4,7 +4,16 @@
  * 状态机：发牌 → 叫地主 → 出牌 → 结算
  */
 
-import type { Card, Move, ComboType } from "./card-engine";
+import { tr } from "@miu2d/shared/lib/game-i18n";
+import {
+  type AIContext,
+  aiSelectPlay,
+  CardTracker,
+  evaluateHandStrength,
+  type PlayerRole,
+  shouldBid,
+} from "./ai-player";
+import type { Card, ComboType, Move } from "./card-engine";
 import {
   analyzeCombo,
   canBeat,
@@ -12,14 +21,6 @@ import {
   deal,
   sortCards,
 } from "./card-engine";
-import {
-  type AIContext,
-  type PlayerRole,
-  aiSelectPlay,
-  CardTracker,
-  evaluateHandStrength,
-  shouldBid,
-} from "./ai-player";
 
 // ============= Types =============
 
@@ -169,7 +170,7 @@ export class DoudizhuManager {
     this.playedCards = [[], [], []];
     this.passFlags = [false, false, false];
     this.playCounts = [0, 0, 0];
-    this.message = "准备开始";
+    this.message = tr("准备开始");
     this.emitUpdate();
   }
 
@@ -195,7 +196,7 @@ export class DoudizhuManager {
       { hand: sortCards(hands[2]), role: "farmer", isLandlord: false, cardCount: 17 },
     ];
     this.landlordCards = landlordCards;
-    this.message = "发牌中…";
+    this.message = tr("发牌中…");
 
     this.emitUpdate();
 
@@ -225,7 +226,7 @@ export class DoudizhuManager {
     this.bidResults = [null, null, null];
     this.currentPlayer = this.biddingPlayer;
     this.message =
-      this.biddingPlayer === 0 ? "请叫地主" : `${this.playerName(this.biddingPlayer)}正在叫地主…`;
+      this.biddingPlayer === 0 ? tr("请叫地主") : tr("{biddingPlayer}正在叫地主…", { biddingPlayer: this.playerName(this.biddingPlayer) });
     this.emitUpdate();
 
     // AI auto-bid
@@ -242,17 +243,17 @@ export class DoudizhuManager {
     if (bid) {
       this.landlordCandidate = 0;
       this.biddingPassed = 0;
-      this.message = "你叫了地主！";
+      this.message = tr("你叫了地主！");
     } else {
       this.biddingPassed++;
-      this.message = "你不叫";
+      this.message = tr("你不叫");
     }
 
     this.emitUpdate();
 
     if (this.biddingPassed >= 3 && this.landlordCandidate === -1) {
       // Nobody bid, redeal
-      this.message = "没人叫地主，重新发牌";
+      this.message = tr("没人叫地主，重新发牌");
       this.emitUpdate();
       setTimeout(() => this.beginGame(), 2000);
       return;
@@ -284,16 +285,16 @@ export class DoudizhuManager {
     if (decision) {
       this.landlordCandidate = this.biddingPlayer;
       this.biddingPassed = 0;
-      this.message = `${this.playerName(this.biddingPlayer)}叫地主`;
+      this.message = tr("{biddingPlayer}叫地主", { biddingPlayer: this.playerName(this.biddingPlayer) });
     } else {
       this.biddingPassed++;
-      this.message = `${this.playerName(this.biddingPlayer)}不叫`;
+      this.message = tr("{biddingPlayer}不叫", { biddingPlayer: this.playerName(this.biddingPlayer) });
     }
 
     this.emitUpdate();
 
     if (this.biddingPassed >= 3 && this.landlordCandidate === -1) {
-      this.message = "没人叫地主，重新发牌";
+      this.message = tr("没人叫地主，重新发牌");
       this.emitUpdate();
       setTimeout(() => this.beginGame(), 2000);
       return;
@@ -330,8 +331,8 @@ export class DoudizhuManager {
     }
 
     this.multiplier *= 2; // 叫地主 ×2
-    this.comboLabel = "地主×2";
-    this.message = `${this.playerName(index)}成为地主！倍率 ×${this.multiplier}`;
+    this.comboLabel = tr("地主×2");
+    this.message = tr("{index}成为地主！倍率 ×{multiplier}", { index: this.playerName(index), multiplier: this.multiplier });
     this.phase = "playing";
     this.currentPlayer = index;
     this.lastMove = null;
@@ -359,7 +360,7 @@ export class DoudizhuManager {
     }
 
     if (!combo) {
-      this.message = "无效牌型！";
+      this.message = tr("无效牌型！");
       this.emitUpdate();
       return false;
     }
@@ -367,7 +368,7 @@ export class DoudizhuManager {
     // Need to beat last move
     if (this.lastMove && this.lastMovePlayer !== 0) {
       if (!canBeat(this.lastMove, combo)) {
-        this.message = "管不上！";
+        this.message = tr("管不上！");
         this.emitUpdate();
         return false;
       }
@@ -381,7 +382,7 @@ export class DoudizhuManager {
   playerPass(): boolean {
     if (this.phase !== "playing" || this.currentPlayer !== 0) return false;
     if (!this.lastMove || this.lastMovePlayer === 0) {
-      this.message = "你必须出牌！";
+      this.message = tr("你必须出牌！");
       this.emitUpdate();
       return false;
     }
@@ -411,9 +412,9 @@ export class DoudizhuManager {
     if (multInfo.mult > 1) {
       this.multiplier *= multInfo.mult;
       this.comboLabel += (this.comboLabel ? " " : "") + multInfo.label;
-      this.message = `${this.playerName(playerIndex)}${multInfo.msg}！倍率 ×${multInfo.mult}`;
+      this.message = tr("{playerIndex}{msg}！倍率 ×{mult}", { playerIndex: this.playerName(playerIndex), msg: multInfo.msg, mult: multInfo.mult });
     } else {
-      this.message = `${this.playerName(playerIndex)}出了${this.getComboName(combo.type)}`;
+      this.message = tr("{playerIndex}出了{type}", { playerIndex: this.playerName(playerIndex), type: this.getComboName(combo.type) });
     }
 
     // Check win
@@ -432,7 +433,7 @@ export class DoudizhuManager {
     this.passCount++;
     this.playedCards[playerIndex] = [];
     this.passFlags[playerIndex] = true;
-    this.message = `${this.playerName(playerIndex)}不出`;
+    this.message = tr("{playerIndex}不出", { playerIndex: this.playerName(playerIndex) });
 
     // If 2 passes, next player leads (table clears)
     if (this.passCount >= 2) {
@@ -503,10 +504,10 @@ export class DoudizhuManager {
     const farmers = [0, 1, 2].filter((i) => i !== this.landlordIndex);
     if (winnerRole === "landlord" && farmers.every((i) => this.playCounts[i] === 0)) {
       this.multiplier *= 8;
-      this.springLabel = "春天×8";
+      this.springLabel = tr("春天×8");
     } else if (winnerRole === "farmer" && this.playCounts[this.landlordIndex] <= 1) {
       this.multiplier *= 8;
-      this.springLabel = "反春天×8";
+      this.springLabel = tr("反春天×8");
     } else {
       this.springLabel = "";
     }
@@ -518,14 +519,14 @@ export class DoudizhuManager {
     const parts: string[] = [];
     if (this.comboLabel) parts.push(this.comboLabel);
     if (this.springLabel) parts.push(this.springLabel);
-    const detail = parts.length > 0 ? `（${parts.join(" + ")}）` : "";
+    const detail = parts.length > 0 ? tr("（{join}）", { join: parts.join(" + ") }) : "";
 
     if (playerWon) {
       this.playerRef!.money += prize;
-      this.message = `${playerIsLandlord ? "地主" : "农民"}胜利！×${this.multiplier}${detail} +${prize.toLocaleString()} 两`;
+      this.message = tr("{playerIsLandlord}胜利！×{multiplier}{detail} +{prize} 两", { playerIsLandlord: playerIsLandlord ? tr("地主") : tr("农民"), multiplier: this.multiplier, detail, prize: prize.toLocaleString() });
     } else {
       this.playerRef!.money -= prize;
-      this.message = `${winnerRole === "landlord" ? "地主" : "农民"}胜利 ×${this.multiplier}${detail} -${prize.toLocaleString()} 两`;
+      this.message = tr("{landlord}胜利 ×{multiplier}{detail} -{prize} 两", { landlord: winnerRole === "landlord" ? tr("地主") : tr("农民"), multiplier: this.multiplier, detail, prize: prize.toLocaleString() });
     }
 
     this.emitUpdate();
@@ -535,35 +536,35 @@ export class DoudizhuManager {
   private calcComboMultiplier(combo: Move): { mult: number; label: string; msg: string } {
     if (combo.type === "rocket") {
       this.bombCount++;
-      return { mult: 40, label: "火箭×40", msg: "放出火箭💣💣" };
+      return { mult: 40, label: tr("火箭×40"), msg: tr("放出火箭💣💣") };
     }
     if (combo.type === "bomb") {
       this.bombCount++;
-      return { mult: 4, label: "炸弹×4", msg: "放出炸弹💣" };
+      return { mult: 4, label: tr("炸弹×4"), msg: tr("放出炸弹💣") };
     }
     // 飞机带牌 ×5（≥2 组连续三条 + kicker = 8+ 张）
     if ((combo.type === "plane_single" || combo.type === "plane_pair") && combo.cards.length >= 8) {
-      return { mult: 5, label: "飞机×5", msg: "打出飞机✈️" };
+      return { mult: 5, label: tr("飞机×5"), msg: tr("打出飞机✈️") };
     }
     // 纯飞机 ×3
     if (combo.type === "plane" && combo.cards.length >= 6) {
-      return { mult: 3, label: "飞机×3", msg: "打出飞机✈️" };
+      return { mult: 3, label: tr("飞机×3"), msg: tr("打出飞机✈️") };
     }
     // 超长顺子（≥10 张）×3
     if (combo.type === "straight" && combo.cards.length >= 10) {
-      return { mult: 3, label: "长顺×3", msg: "打出超长顺子🔥" };
+      return { mult: 3, label: tr("长顺×3"), msg: tr("打出超长顺子🔥") };
     }
     // 长顺子（≥7 张）×2
     if (combo.type === "straight" && combo.cards.length >= 7) {
-      return { mult: 2, label: "长顺×2", msg: "打出长顺子" };
+      return { mult: 2, label: tr("长顺×2"), msg: tr("打出长顺子") };
     }
     // 超长连对（≥5 对 = 10 张）×3
     if (combo.type === "straight_pair" && combo.cards.length >= 10) {
-      return { mult: 3, label: "长连对×3", msg: "打出超长连对🔥" };
+      return { mult: 3, label: tr("长连对×3"), msg: tr("打出超长连对🔥") };
     }
     // 长连对（≥4 对 = 8 张）×2
     if (combo.type === "straight_pair" && combo.cards.length >= 8) {
-      return { mult: 2, label: "长连对×2", msg: "打出长连对" };
+      return { mult: 2, label: tr("长连对×2"), msg: tr("打出长连对") };
     }
     return { mult: 1, label: "", msg: "" };
   }
@@ -575,18 +576,18 @@ export class DoudizhuManager {
   }
 
   private playerName(index: number): string {
-    return index === 0 ? "你" : index === 1 ? "下家" : "上家";
+    return index === 0 ? tr("你") : index === 1 ? tr("下家") : tr("上家");
   }
 
   private getComboName(type: ComboType): string {
     const names: Record<string, string> = {
-      single: "单张", pair: "对子", triple: "三条",
-      triple_one: "三带一", triple_pair: "三带二",
-      straight: "顺子", straight_pair: "连对",
-      plane: "飞机", plane_single: "飞机带单", plane_pair: "飞机带对",
-      four_two: "四带二", bomb: "炸弹", rocket: "火箭",
+      single: tr("单张"), pair: tr("对子"), triple: tr("三条"),
+      triple_one: tr("三带一"), triple_pair: tr("三带二"),
+      straight: tr("顺子"), straight_pair: tr("连对"),
+      plane: tr("飞机"), plane_single: tr("飞机带单"), plane_pair: tr("飞机带对"),
+      four_two: tr("四带二"), bomb: tr("炸弹"), rocket: tr("火箭"),
     };
-    return names[type ?? ""] ?? "牌";
+    return names[type ?? ""] ?? tr("牌");
   }
 
   private emitUpdate(): void {

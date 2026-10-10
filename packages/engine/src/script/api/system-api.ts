@@ -2,6 +2,7 @@
  * System APIs - Dialog, Variable, Input, Save, ScriptRunner implementations
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { logger } from "../../core/logger";
 import { resolveScriptPath } from "../../resource/resource-paths";
 import { BlockingEvent, type BlockingResolver } from "../blocking-resolver";
@@ -202,10 +203,10 @@ export function createScriptRunnerAPI(
       // 让玩家选择游戏
       ctx.clearMouseInput?.();
       ctx.guiManager.showSelection([
-        { text: `🎲 骰子赌坊（${cost} 两/次）`, label: "0", enabled: true },
-        { text: "🎰 老虎机（1000 两/次）", label: "1", enabled: true },
-        { text: `🃏 斗地主（${cost} 两/次）`, label: "2", enabled: true },
-      ], "请选择要玩的游戏：");
+        { text: tr("🎲 骰子赌坊（{cost} 两/次）", { cost }), label: "0", enabled: true },
+        { text: tr("🎰 老虎机（1000 两/次）"), label: "1", enabled: true },
+        { text: tr("🃏 斗地主（{cost} 两/次）", { cost }), label: "2", enabled: true },
+      ], tr("请选择要玩的游戏："));
       const choice = await resolver.waitForEvent<number>(BlockingEvent.SELECTION_MADE);
 
       const initialMoney = ctx.player.money;

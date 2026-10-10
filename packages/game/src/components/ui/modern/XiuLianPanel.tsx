@@ -5,6 +5,7 @@
 
 import type { MagicItemInfo } from "@miu2d/engine/magic";
 import { MAGIC_LIST_CONFIG } from "@miu2d/engine/player/magic/magic-list-config";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import { HiOutlineAcademicCap, HiOutlineSparkles, HiOutlineXMark } from "react-icons/hi2";
@@ -179,13 +180,13 @@ const MagicDisplay: React.FC<MagicDisplayProps> = ({
   const displayMagic = magicInfo?.magic ?? magic;
   if (!displayMagic) return null;
 
-  const name = displayMagic.name;
+  const name = trc(displayMagic.name);
   const level = magicInfo?.level ?? (magic as XiuLianMagic | null)?.level ?? 0;
   const maxLevel = 10;
   const currentLevelExp = magicInfo?.exp ?? magic?.exp ?? 0;
   const levelUpExp = magicInfo?.magic?.levelupExp ?? magic?.levelUpExp ?? 100;
   const manaCost = magicInfo?.magic?.manaCost ?? 0;
-  const intro = magicInfo?.magic?.intro ?? magic?.intro ?? "";
+  const intro = trc(magicInfo?.magic?.intro ?? magic?.intro ?? "");
   const expProgress = levelUpExp > 0 ? (currentLevelExp / levelUpExp) * 100 : 0;
   // 是否可升级（有等级数据）
   const canUpgrade = !!(magicInfo?.magic?.levels && magicInfo.magic.levels.size > 0);
@@ -269,7 +270,7 @@ const MagicDisplay: React.FC<MagicDisplayProps> = ({
             }}
           >
             <span style={{ fontSize: typography.fontSize.sm, color: modernColors.text.muted }}>
-              境界
+              {tr("境界")}
             </span>
             <span
               style={{
@@ -288,7 +289,7 @@ const MagicDisplay: React.FC<MagicDisplayProps> = ({
               </span>
             ) : (
               <span style={{ fontSize: typography.fontSize.xs, color: modernColors.text.muted }}>
-                （不可升级）
+                {tr("（不可升级）")}
               </span>
             )}
           </div>
@@ -307,7 +308,7 @@ const MagicDisplay: React.FC<MagicDisplayProps> = ({
             }}
           >
             <span style={{ fontSize: typography.fontSize.xs, color: modernColors.text.secondary }}>
-              修炼进度
+              {tr("修炼进度")}
             </span>
             <span
               style={{
@@ -345,8 +346,8 @@ const MagicDisplay: React.FC<MagicDisplayProps> = ({
 
       {/* 属性信息 */}
       <div style={{ display: "flex", gap: spacing.sm }}>
-        <StatItem label="内力消耗" value={manaCost.toString()} color={wuxiaAccent.azure} />
-        <StatItem label="当前层数" value={`${level} 层`} color={wuxiaAccent.gold} />
+        <StatItem label={tr("内力消耗")} value={manaCost.toString()} color={wuxiaAccent.azure} />
+        <StatItem label={tr("当前层数")} value={tr("{level} 层", { level })} color={wuxiaAccent.gold} />
       </div>
 
       {/* 武功介绍 */}
@@ -363,7 +364,7 @@ const MagicDisplay: React.FC<MagicDisplayProps> = ({
             fontStyle: "italic",
           }}
         >
-          「{intro}」
+          {tr("「{intro}」", { intro })}
         </div>
       )}
     </div>
@@ -547,7 +548,7 @@ export const XiuLianPanel: React.FC<XiuLianPanelProps> = ({
                 marginBottom: spacing.xs,
               }}
             >
-              内功修炼
+              {tr("内功修炼")}
             </div>
             <div
               style={{
@@ -555,7 +556,7 @@ export const XiuLianPanel: React.FC<XiuLianPanelProps> = ({
                 color: modernColors.text.secondary,
               }}
             >
-              {hasMagic ? "正在修炼中..." : "尚未选择修炼武功"}
+              {hasMagic ? tr("正在修炼中...") : tr("尚未选择修炼武功")}
             </div>
           </div>
         </div>
@@ -563,7 +564,7 @@ export const XiuLianPanel: React.FC<XiuLianPanelProps> = ({
 
       {/* 修炼内容区域 */}
       <div style={{ padding: spacing.lg }}>
-        <SectionTitle title="修炼武功" />
+        <SectionTitle title={tr("修炼武功")} />
 
         {/* 修炼武功槽位 - 支持拖放 */}
         <div
@@ -631,7 +632,7 @@ export const XiuLianPanel: React.FC<XiuLianPanelProps> = ({
                 <HiOutlineSparkles style={{ ...iconStyle, fontSize: 24 }} />
               </div>
               <span style={{ fontSize: typography.fontSize.sm, textAlign: "center" }}>
-                拖放武功到此处修炼
+                {tr("拖放武功到此处修炼")}
               </span>
             </div>
           )}
@@ -657,10 +658,10 @@ export const XiuLianPanel: React.FC<XiuLianPanelProps> = ({
               }}
             >
               <p style={{ margin: 0 }}>
-                <span style={{ color: wuxiaAccent.azure }}>拖拽</span> 武功面板中的武功到上方槽位
+                <span style={{ color: wuxiaAccent.azure }}>{tr("拖拽")}</span> {tr("武功面板中的武功到上方槽位")}
               </p>
               <p style={{ margin: `${spacing.xs}px 0 0` }}>
-                或在武功面板 <span style={{ color: wuxiaAccent.azure }}>右键</span> 点击设为修炼目标
+                {tr("或在武功面板")} <span style={{ color: wuxiaAccent.azure }}>{tr("右键")}</span> {tr("点击设为修炼目标")}
               </p>
             </div>
           </div>

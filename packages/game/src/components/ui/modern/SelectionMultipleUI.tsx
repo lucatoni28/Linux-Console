@@ -2,6 +2,8 @@
  * Modern SelectionMultipleUI - 多选选择框
  * 位置与经典UI一致
  */
+
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import { useGameUIContext } from "../../../contexts";
@@ -96,7 +98,7 @@ export const SelectionMultipleUI: React.FC<SelectionMultipleUIProps> = ({
             marginLeft: spacing.md,
           }}
         >
-          (已选 {selectedIndices.size} 项)
+          {tr("(已选 {size} 项)", { size: selectedIndices.size })}
         </span>
       </div>
 
@@ -193,9 +195,9 @@ export const SelectionMultipleUI: React.FC<SelectionMultipleUIProps> = ({
           gap: spacing.md,
         }}
       >
-        <GlassButton onClick={onCancel}>取消</GlassButton>
+        <GlassButton onClick={onCancel}>{tr("取消")}</GlassButton>
         <GlassButton onClick={handleConfirm} primary>
-          确定
+          {tr("确定")}
         </GlassButton>
       </div>
     </div>

@@ -12,6 +12,7 @@
 
 import { Direction } from "@miu2d/engine/core/types";
 import type { GameEngine } from "@miu2d/engine/runtime/game-engine";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MobileActionButtons } from "./MobileActionButtons";
 import { MobileInteractionBar } from "./MobileInteractionBar";
@@ -325,7 +326,7 @@ export function MobileControls({
         className="absolute pointer-events-auto"
         style={{
           left: 20,
-          bottom: 30,
+          bottom: "calc(30px + env(safe-area-inset-bottom, 0px))",
         }}
       >
         <VirtualJoystick
@@ -343,7 +344,7 @@ export function MobileControls({
         className="absolute pointer-events-auto"
         style={{
           right: 25,
-          bottom: 40,
+          bottom: "calc(40px + env(safe-area-inset-bottom, 0px))",
         }}
       >
         <MobileActionButtons
@@ -363,9 +364,11 @@ export function MobileControls({
       {/* 底部提示 */}
       <div
         className="absolute left-1/2 transform -translate-x-1/2 pointer-events-none"
-        style={{ bottom: 8 }}
+        style={{ bottom: "calc(8px + env(safe-area-inset-bottom, 0px))" }}
       >
-        <div className="text-white/20 text-[10px] text-center">摇杆移动 · 按住技能滑动瞄准</div>
+        <div className="text-white/20 text-[10px] text-center whitespace-nowrap">
+          {tr("摇杆移动 · 按住技能滑动瞄准")}
+        </div>
       </div>
     </div>
   );

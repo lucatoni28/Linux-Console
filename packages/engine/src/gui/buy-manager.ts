@@ -14,6 +14,7 @@
  * Number=1                   可购买数量(当NumberValid=1时有效)
  */
 
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type { Shop } from "@miu2d/types";
 import type { Character } from "../character";
 import { logger } from "../core/logger";
@@ -160,7 +161,7 @@ export class BuyManager {
     }
 
     if (this.state.numberValid && itemInfo.count <= 0) {
-      this.onShowMessage?.("该物品已售罄");
+      this.onShowMessage?.(tr("该物品已售罄"));
       return false;
     }
 
@@ -173,13 +174,13 @@ export class BuyManager {
     }
 
     if (playerMoney < cost) {
-      this.onShowMessage?.("没有足够的钱！");
+      this.onShowMessage?.(tr("没有足够的钱！"));
       return false;
     }
 
     const addResult = await addGoodToPlayer(itemInfo.good.fileName);
     if (!addResult) {
-      this.onShowMessage?.("物品栏已满！");
+      this.onShowMessage?.(tr("物品栏已满！"));
       return false;
     }
 

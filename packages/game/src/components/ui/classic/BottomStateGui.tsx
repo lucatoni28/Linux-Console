@@ -5,6 +5,8 @@
  * uses ColumnView for each stat bar
  * Resources: asf/ui/column/ColLife.asf, ColThew.asf, ColMana.asf, panel9.asf
  */
+
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useMemo } from "react";
 import { useGameUIContext } from "../../../contexts";
@@ -129,7 +131,7 @@ export const BottomStateGui: React.FC = () => {
       {panelImage.dataUrl && (
         <img
           src={panelImage.dataUrl}
-          alt="状态栏"
+          alt={tr("状态栏")}
           style={{
             position: "absolute",
             left: 0,

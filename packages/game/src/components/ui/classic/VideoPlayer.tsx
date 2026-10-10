@@ -10,6 +10,7 @@ import { logger } from "@miu2d/engine/core/logger";
 import { GameEvents, type UIVideoPlayEvent } from "@miu2d/engine/events/game-events";
 import { getResourceUrl, ResourcePath } from "@miu2d/engine/resource/resource-paths";
 import type { GameEngine } from "@miu2d/engine/runtime";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { loadAudioSettings, saveAudioSettings } from "../../common/SidePanel";
 
@@ -435,7 +436,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 type="button"
                 onClick={handleTogglePause}
                 className="w-10 h-10 flex items-center justify-center text-white hover:bg-white/20 rounded-full transition-colors"
-                title={isPaused ? "播放 (空格)" : "暂停 (空格)"}
+                title={isPaused ? tr("播放 (空格)") : tr("暂停 (空格)")}
               >
                 {isPaused ? (
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -462,7 +463,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   type="button"
                   onClick={handleToggleMute}
                   className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/20 rounded-full transition-colors"
-                  title={isMuted ? "取消静音 (M)" : "静音 (M)"}
+                  title={isMuted ? tr("取消静音 (M)") : tr("静音 (M)")}
                 >
                   {isMuted || volume === 0 ? (
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -487,7 +488,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   onChange={handleVolumeChange}
                   onClick={(e) => e.stopPropagation()}
                   className="w-20 h-1 bg-white/30 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
-                  title="音量 (↑/↓)"
+                  title={tr("音量 (↑/↓)")}
                 />
               </div>
 
@@ -496,16 +497,16 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 type="button"
                 onClick={handleSkip}
                 className="px-4 py-1.5 text-white/80 hover:text-white text-sm border border-white/30 hover:border-white/60 rounded transition-colors"
-                title="跳过 (Esc)"
+                title={tr("跳过 (Esc)")}
               >
-                跳过
+                {tr("跳过")}
               </button>
             </div>
           </div>
 
           {/* Keyboard hints */}
           <div className="mt-2 text-center text-white/40 text-xs">
-            空格 暂停 | ← → 快进快退 | ↑ ↓ 音量 | M 静音 | Esc 跳过
+            {tr("空格 暂停 | ← → 快进快退 | ↑ ↓ 音量 | M 静音 | Esc 跳过")}
           </div>
         </div>
       </div>

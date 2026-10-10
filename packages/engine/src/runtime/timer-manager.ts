@@ -4,6 +4,8 @@
  *
  * 用于实现游戏中的时间限制功能，如限时任务
  */
+
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import { logger } from "../core/logger";
 
 export interface TimeScript {
@@ -202,7 +204,10 @@ export class TimerManager {
   getFormattedTime(): string {
     const minutes = Math.floor(this.state.seconds / 60);
     const seconds = this.state.seconds % 60;
-    return `${minutes.toString().padStart(2, "0")}分${seconds.toString().padStart(2, "0")}秒`;
+    return tr("{minutes}分{seconds}秒", {
+      minutes: minutes.toString().padStart(2, "0"),
+      seconds: seconds.toString().padStart(2, "0"),
+    });
   }
 
   /**

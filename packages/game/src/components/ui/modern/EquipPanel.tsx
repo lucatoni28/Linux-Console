@@ -4,6 +4,7 @@
  */
 
 import type { UIGoodData } from "@miu2d/engine/gui/ui-types";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import type { ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
@@ -52,13 +53,13 @@ interface EquipPanelProps {
 
 // 槽位名称
 const slotNames: Record<EquipSlotType, string> = {
-  head: "头饰",
-  neck: "项链",
-  body: "衣甲",
-  back: "披风",
-  hand: "兵器",
-  wrist: "护腕",
-  foot: "靴履",
+  head: tr("头饰"),
+  neck: tr("项链"),
+  body: tr("衣甲"),
+  back: tr("披风"),
+  hand: tr("兵器"),
+  wrist: tr("护腕"),
+  foot: tr("靴履"),
 };
 
 // 槽位图标
@@ -452,7 +453,7 @@ export const EquipPanel: React.FC<EquipPanelProps> = ({
                 marginBottom: spacing.xs,
               }}
             >
-              随身装备
+              {tr("随身装备")}
             </div>
             <div
               style={{
@@ -460,11 +461,11 @@ export const EquipPanel: React.FC<EquipPanelProps> = ({
                 color: modernColors.text.secondary,
               }}
             >
-              已装备{" "}
+              {tr("已装备")}{" "}
               <span style={{ color: wuxiaAccent.gold, fontWeight: typography.fontWeight.semibold }}>
                 {equippedCount}
               </span>{" "}
-              / 7 件
+              {tr("/ 7 件")}
             </div>
           </div>
         </div>
@@ -551,11 +552,11 @@ export const EquipPanel: React.FC<EquipPanelProps> = ({
         }}
       >
         <span style={{ fontSize: typography.fontSize.xs, color: modernColors.text.muted }}>
-          <span style={{ color: wuxiaAccent.azure }}>拖拽</span> 物品到槽位装备
+          <span style={{ color: wuxiaAccent.azure }}>{tr("拖拽")}</span> {tr("物品到槽位装备")}
         </span>
         <span style={{ color: modernColors.border.glass }}>|</span>
         <span style={{ fontSize: typography.fontSize.xs, color: modernColors.text.muted }}>
-          <span style={{ color: wuxiaAccent.azure }}>右键</span> 卸下装备
+          <span style={{ color: wuxiaAccent.azure }}>{tr("右键")}</span> {tr("卸下装备")}
         </span>
       </div>
 

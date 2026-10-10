@@ -4,9 +4,10 @@
  * 包含：伙伴选择、装备栏、武功栏、主角物品栏
  */
 
-import type { MagicItemInfo } from "@miu2d/engine/magic";
 import type { UIGoodData } from "@miu2d/engine/gui/ui-types";
+import type { MagicItemInfo } from "@miu2d/engine/magic";
 import { MAGIC_LIST_CONFIG } from "@miu2d/engine/player/magic/magic-list-config";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import type { TouchDragData } from "../../../contexts";
@@ -16,8 +17,8 @@ import { AsfAnimatedSprite } from "../classic/AsfAnimatedSprite";
 import type { DragData, EquipItemData, EquipSlots, EquipSlotType } from "../classic/EquipGui";
 import { slotTypeToEquipPosition } from "../classic/EquipGui";
 import type { GoodItemData } from "../classic/GoodsGui";
-import type { MagicDragData } from "../classic/MagicGui";
 import { useAsfImage } from "../classic/hooks";
+import type { MagicDragData } from "../classic/MagicGui";
 import { getItemBorderColor, getItemGlowColor, getItemQuality, ItemQuality } from "./Tooltips";
 import { borderRadius, glassEffect, modernColors, spacing, transitions, typography } from "./theme";
 
@@ -88,13 +89,13 @@ interface PartnerPanelProps {
 // ============= Slot Names & Icons =============
 
 const slotNames: Record<EquipSlotType, string> = {
-  head: "头饰",
-  neck: "项链",
-  body: "衣甲",
-  back: "披风",
-  hand: "兵器",
-  wrist: "护腕",
-  foot: "靴履",
+  head: tr("头饰"),
+  neck: tr("项链"),
+  body: tr("衣甲"),
+  back: tr("披风"),
+  hand: tr("兵器"),
+  wrist: tr("护腕"),
+  foot: tr("靴履"),
 };
 
 const slotIcons: Record<EquipSlotType, string> = {
@@ -248,7 +249,7 @@ const PartnerPortrait: React.FC<{
           textAlign: "center",
         }}
       >
-        {partner.name}
+        {trc(partner.name)}
       </span>
       <span
         style={{
@@ -804,7 +805,7 @@ export const PartnerPanel: React.FC<PartnerPanelProps> = ({
         <div style={{ display: "flex", alignItems: "center", gap: spacing.sm, marginBottom: spacing.sm }}>
           <span style={{ fontSize: 14 }}>👥</span>
           <span style={{ fontSize: typography.fontSize.md, fontWeight: typography.fontWeight.bold, color: modernColors.text.primary, textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}>
-            伙伴管理
+            {tr("伙伴管理")}
           </span>
           {selectedPartner && (
             <span style={{ fontSize: typography.fontSize.sm, color: modernColors.text.secondary, marginLeft: "auto" }}>
@@ -823,7 +824,7 @@ export const PartnerPanel: React.FC<PartnerPanelProps> = ({
           ))}
           {partners.length === 0 && (
             <span style={{ fontSize: typography.fontSize.sm, color: modernColors.text.muted, padding: spacing.sm }}>
-              暂无伙伴
+              {tr("暂无伙伴")}
             </span>
           )}
         </div>
@@ -833,7 +834,7 @@ export const PartnerPanel: React.FC<PartnerPanelProps> = ({
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
         {/* 左列：装备 */}
         <div style={{ width: 240, padding: spacing.md, borderRight: `1px solid ${modernColors.border.glass}`, display: "flex", flexDirection: "column", alignItems: "center", gap: spacing.sm, overflowY: "auto" }}>
-          <SectionTitle title="装备" icon="🛡️" />
+          <SectionTitle title={tr("装备")} icon="🛡️" />
           <div style={{ display: "flex", gap: spacing.lg }}>
             {topRow.map((slot) => (
               <EquipSlotItem key={slot} slot={slot} item={equips[slot]} onSlotClick={() => onEquipRightClick?.(slot)} onSlotRightClick={() => onEquipRightClick?.(slot)} onSlotDrop={handleEquipDrop(slot)} onSlotDragStart={handleEquipDragStart(slot)} onSlotMouseEnter={handleEquipMouseEnter(slot)} onSlotMouseLeave={onEquipMouseLeave} />
@@ -850,13 +851,13 @@ export const PartnerPanel: React.FC<PartnerPanelProps> = ({
             ))}
           </div>
           <span style={{ fontSize: typography.fontSize.xs, color: modernColors.text.muted }}>
-            已装备 <span style={{ color: wuxiaAccent.gold }}>{equippedCount}</span>/7
+            {tr("已装备")} <span style={{ color: wuxiaAccent.gold }}>{equippedCount}</span>/7
           </span>
         </div>
 
         {/* 中列：武功 */}
         <div style={{ width: 320, padding: spacing.md, borderRight: `1px solid ${modernColors.border.glass}`, display: "flex", flexDirection: "column", gap: spacing.sm, overflowY: "auto" }}>
-          <SectionTitle title="武功" icon="⚔️" />
+          <SectionTitle title={tr("武功")} icon="⚔️" />
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: spacing.xs }}>
             {[0, 1, 2].map((rowIndex) => (
               <div key={`magic-row-${rowIndex}`} style={{ display: "flex", gap: spacing.xs, marginLeft: rowIndex % 2 === 1 ? 30 : 0 }}>
@@ -884,7 +885,7 @@ export const PartnerPanel: React.FC<PartnerPanelProps> = ({
                 <button onClick={() => setMagicScrollOffset((p) => Math.max(0, p - 1))} disabled={magicScrollOffset === 0} style={{ width: 22, height: 22, background: magicScrollOffset > 0 ? modernColors.bg.hover : "transparent", border: `1px solid ${modernColors.border.glass}`, borderRadius: borderRadius.sm, color: magicScrollOffset > 0 ? modernColors.text.secondary : modernColors.text.muted, fontSize: 10, cursor: magicScrollOffset > 0 ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center" }}>▲</button>
                 <span style={{ fontSize: typography.fontSize.xs, color: modernColors.text.secondary, minWidth: 40, textAlign: "center" }}>{magicScrollOffset + 1}/{maxMagicScrollRow + 1}</span>
                 <button onClick={() => setMagicScrollOffset((p) => Math.min(maxMagicScrollRow, p + 1))} disabled={magicScrollOffset === maxMagicScrollRow} style={{ width: 22, height: 22, background: magicScrollOffset < maxMagicScrollRow ? modernColors.bg.hover : "transparent", border: `1px solid ${modernColors.border.glass}`, borderRadius: borderRadius.sm, color: magicScrollOffset < maxMagicScrollRow ? modernColors.text.secondary : modernColors.text.muted, fontSize: 10, cursor: magicScrollOffset < maxMagicScrollRow ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center" }}>▼</button>
-                <span style={{ fontSize: typography.fontSize.xs, color: modernColors.text.muted }}>已习得 <span style={{ color: wuxiaAccent.gold }}>{magicCount}</span> 种</span>
+                <span style={{ fontSize: typography.fontSize.xs, color: modernColors.text.muted }}>{tr("已习得")} <span style={{ color: wuxiaAccent.gold }}>{magicCount}</span> {tr("种")}</span>
               </div>
             )}
           </div>
@@ -892,7 +893,7 @@ export const PartnerPanel: React.FC<PartnerPanelProps> = ({
           <div style={{ marginTop: spacing.sm }}>
             <div style={{ fontSize: typography.fontSize.xs, color: modernColors.text.secondary, marginBottom: spacing.xs, display: "flex", alignItems: "center", gap: spacing.sm }}>
               <span style={{ width: 12, height: 1, background: wuxiaAccent.goldDark }} />
-              快捷栏
+              {tr("快捷栏")}
               <span style={{ flex: 1, height: 1, background: `linear-gradient(90deg, transparent, ${modernColors.border.glass})` }} />
             </div>
             <div style={{ display: "flex", gap: spacing.sm, justifyContent: "center" }}>
@@ -922,7 +923,7 @@ export const PartnerPanel: React.FC<PartnerPanelProps> = ({
             setGoodsScrollOffset((prev) => Math.max(0, Math.min(maxGoodsScrollRows, prev + delta)));
           }}
         >
-          <SectionTitle title="物品栏" icon="🎒" />
+          <SectionTitle title={tr("物品栏")} icon="🎒" />
           <div style={{ display: "grid", gridTemplateColumns: `repeat(${goodsColumns}, ${goodsSlotSize}px)`, gap: 4, justifyContent: "center" }}>
             {visibleGoods.map((item, idx) => {
               const actualIndex = goodsScrollOffset * goodsColumns + idx + 1;
@@ -969,11 +970,11 @@ export const PartnerPanel: React.FC<PartnerPanelProps> = ({
         }}
       >
         <span style={{ fontSize: typography.fontSize.xs, color: modernColors.text.muted }}>
-          <span style={{ color: wuxiaAccent.azure }}>拖拽</span> 物品到装备槽
+          <span style={{ color: wuxiaAccent.azure }}>{tr("拖拽")}</span> {tr("物品到装备槽")}
         </span>
         <span style={{ color: modernColors.border.glass }}>|</span>
         <span style={{ fontSize: typography.fontSize.xs, color: modernColors.text.muted }}>
-          <span style={{ color: wuxiaAccent.azure }}>右键</span> 卸下装备
+          <span style={{ color: wuxiaAccent.azure }}>{tr("右键")}</span> {tr("卸下装备")}
         </span>
       </div>
 

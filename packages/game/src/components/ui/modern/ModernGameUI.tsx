@@ -17,6 +17,7 @@ import type {
   UIShopState,
   UITimerState,
 } from "@miu2d/engine/gui/ui-types";
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import type { MagicHoverData } from "../../../contexts";
@@ -500,7 +501,7 @@ export const ModernGameUI: React.FC<ModernGameUIProps> = ({
         {/* 多选框 */}
         <SelectionMultipleUI
           isVisible={multiSelectionState?.isVisible ?? false}
-          title={multiSelectionState?.message ?? "请选择"}
+          title={multiSelectionState?.message ?? tr("请选择")}
           options={multiSelectionState?.options?.map((o) => o.text) ?? []}
           onConfirm={handleSelectionMultipleConfirm}
           onCancel={handleSelectionMultipleCancel}

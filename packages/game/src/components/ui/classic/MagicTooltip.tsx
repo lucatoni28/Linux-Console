@@ -13,6 +13,7 @@ function solidColor(c: UiColorRGBA): string {
 }
 
 import type { MagicItemInfo } from "@miu2d/engine/magic";
+import { tr, trc } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAsfAnimation, useAsfImage } from "./hooks";
@@ -55,9 +56,9 @@ const MagicTooltipType1: React.FC<MagicTooltipProps> = ({ magicInfo, position, i
   const adjustedX = Math.min(position.x + 10, window.innerWidth - tooltipWidth - 20);
   const adjustedY = Math.min(position.y + 27, window.innerHeight - tooltipHeight - 20);
 
-  const name = magic?.name || "无名称";
-  const level = `等级： ${magicInfo.level}`;
-  const intro = magic?.intro || "无简介";
+  const name = trc(magic?.name) || tr("无名称");
+  const level = tr("等级： {level}", { level: magicInfo.level });
+  const intro = trc(magic?.intro) || tr("无简介");
 
   return (
     <div
@@ -228,9 +229,9 @@ const MagicTooltipType2: React.FC<MagicTooltipProps> = ({ magicInfo, position, i
   const lineHeight = 20;
   const introLineH = 17;
 
-  const name = magic?.name || "无名称";
-  const levelText = `等级： ${magicInfo.level}`;
-  const intro = magic?.intro || "";
+  const name = trc(magic?.name) || tr("无名称");
+  const levelText = tr("等级： {level}", { level: magicInfo.level });
+  const intro = trc(magic?.intro) || "";
 
   const tooltipWidth = cfg.width;
 

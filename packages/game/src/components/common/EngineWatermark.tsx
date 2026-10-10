@@ -1,3 +1,4 @@
+import { tr } from "@miu2d/shared/lib/game-i18n";
 import type React from "react";
 
 interface EngineWatermarkProps {
@@ -23,6 +24,6 @@ export const EngineWatermark: React.FC<EngineWatermarkProps> = ({ zIndex }) => (
     <div>
       Powered by Miu2D Engine · v{__APP_VERSION__} · #{__COMMIT_HASH__}
     </div>
-    <div>游戏资源版权归原作者所有，如您介意请联系我删除，本项目仅用于交流学习</div>
+    <div>{tr("游戏资源版权归原作者所有，如您介意请联系我删除，本项目仅用于交流学习")}</div>
   </div>
 );
