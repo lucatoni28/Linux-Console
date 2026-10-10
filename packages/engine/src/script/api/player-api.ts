@@ -1,0 +1,333 @@
+/**
+ * PlayerAPI Implementation - Delegates to existing playerCommands logic
+ */
+
+import { logger } from "../../core/logger";
+import { CharacterState } from "../../core/types";
+import type { Npc } from "../../npc";
+import type { Player } from "../../player/player";
+import { PathType } from "../../utils/path-finder";
+import type { BlockingResolver } from "../blocking-resolver";
+import type { PlayerAPI } from "./game-api";
+import { isCharacterMoveEnd } from "./helpers";
+import type { ScriptCommandContext } from "./types";
+
+export function createPlayerAPI(ctx: ScriptCommandContext, resolver: BlockingResolver): PlayerAPI {
+  const {
+    player,
+    npcManager,
+    goodsListManager,
+    checkTrap,
+    centerCameraOnPlayer,
+    isMapObstacleForCharacter,
+  } = ctx;
+
+  // In-memory snapshots for SavePlayer/LoadPlayer (shared across all scripts)
+  const playerSnapshots = new Map<string, Record<string, number>>();
+
+  /**
+   * 获取当前玩家角色
+   * 优先级: NPC with Kind=Player > ControledCharacter > ThePlayer
+   * PlayerGoto/PlayerRunTo/SetPlayerScn 等命令都作用于此角色
+   */
+  const getPlayerKindCharacter = (): Player | Npc => {
+    const npcWithPlayerKind = npcManager.getPlayerKindCharacter();
+    if (npcWithPlayerKind) return npcWithPlayerKind;
+    if (player.controledCharacter) return player.controledCharacter as Player | Npc;
+    return player;
+  };
+
+  const pa = (fn: (p: Player) => void, label: string) => () => {
+    fn(player);
+    logger.log(`[GameAPI.player] ${label}`);
+  };
+
+  return {
+    setPosition: (x, y, characterName?) => {
+      let targetCharacter: Player | Npc | null = null;
+      if (characterName) {
+        if (player.name === characterName) {
+          targetCharacter = player;
+        } else {
+          targetCharacter = npcManager.getNpc(characterName);
+        }
+      } else {
+        targetCharacter = getPlayerKindCharacter();
+      }
+      if (!targetCharacter) {
+        logger.warn(`[GameAPI.player] setPosition: character not found: ${characterName}`);
+        return;
+      }
+      // Mirror C++ setPlayerPosition: beginStand() is called first, which
+      // implicitly revives the player if in death state.
+      if (targetCharacter.isDeath || targetCharacter.isDeathInvoked) {
+        targetCharacter.fullLife();
+      }
+      targetCharacter.setPosition(x, y);
+      centerCameraOnPlayer();
+      player.resetPartnerPosition();
+      checkTrap({ x, y });
+    },
+    setDirection: (direction) => {
+      player.setDirection(direction);
+    },
+    setState: (state) => {
+      player.setFightState(state !== 0);
+    },
+
+    // Blocking movement → Promise
+    // skipDirectionFallback=true: 脚本命令不使用方向行走回退，匹配 C++ 原版行为
+    walkTo: async (x, y) => {
+      const target = getPlayerKindCharacter();
+      const destination = { x, y };
+      // logger.log(`[playerWalkTo] start: (${x}, ${y}), player at (${target.tilePosition.x}, ${target.tilePosition.y}), state=${target.state}`);
+      const walkResult = target.walkTo(destination, PathType.End, true);
+      // logger.log(`[playerWalkTo] walkTo returned: ${walkResult}, path.length=${target.path?.length ?? 'null'}, state=${target.state}`);
+      if (
+        isCharacterMoveEnd(
+          target,
+          destination,
+          (_c, d) => target.walkTo(d, PathType.End, true),
+          isMapObstacleForCharacter,
+          "playerWalkTo"
+        )
+      ) {
+        // logger.log(`[playerWalkTo] sync done (first check returned true)`);
+        return;
+      }
+      // logger.log(`[playerWalkTo] entering waitForCondition poll loop...`);
+      let pollCount = 0;
+      await resolver.waitForCondition(() => {
+        pollCount++;
+        const result = isCharacterMoveEnd(
+          target,
+          destination,
+          (_c, d) => target.walkTo(d, PathType.End, true),
+          isMapObstacleForCharacter,
+          "playerWalkTo"
+        );
+        // if (result) {
+        //   logger.log(`[playerWalkTo] poll done after ${pollCount} frames, at (${target.tilePosition.x}, ${target.tilePosition.y}), state=${target.state}`);
+        // } else if (pollCount % 60 === 0) {
+        //   // 每秒打印一次进度
+        //   logger.log(`[playerWalkTo] polling... frame=${pollCount}, at (${target.tilePosition.x}, ${target.tilePosition.y}), state=${target.state}, path.length=${target.path?.length ?? 'null'}`);
+        // }
+        return result;
+      });
+    },
+
+    walkToDir: async (direction, steps) => {
+      const target = getPlayerKindCharacter();
+      target.walkToDirection(direction, steps);
+      if (target.state === CharacterState.Stand || target.state === CharacterState.Stand1) return;
+      await resolver.waitForCondition(
+        () => target.state === CharacterState.Stand || target.state === CharacterState.Stand1
+      );
+    },
+
+    runTo: async (x, y) => {
+      const target = getPlayerKindCharacter();
+      const destination = { x, y };
+      target.runTo(destination, PathType.End, true);
+      if (
+        isCharacterMoveEnd(
+          target,
+          destination,
+          (_c, d) => target.runTo(d, PathType.End, true),
+          isMapObstacleForCharacter,
+          "playerRunTo"
+        )
+      ) {
+        return;
+      }
+      await resolver.waitForCondition(() =>
+        isCharacterMoveEnd(
+          target,
+          destination,
+          (_c, d) => target.runTo(d, PathType.End, true),
+          isMapObstacleForCharacter,
+          "playerRunTo"
+        )
+      );
+    },
+
+    jumpTo: async (x, y) => {
+      const target = getPlayerKindCharacter();
+      const success = target.jumpTo({ x, y });
+      logger.log(`[GameAPI.player] jumpTo: (${x}, ${y}) success=${success}`);
+      if (target.state === CharacterState.Stand || target.state === CharacterState.Stand1) return;
+      await resolver.waitForCondition(
+        () => target.state === CharacterState.Stand || target.state === CharacterState.Stand1
+      );
+    },
+
+    walkToNonBlocking: (x, y) => {
+      const target = getPlayerKindCharacter();
+      target.walkTo({ x, y });
+    },
+    runToNonBlocking: (x, y) => {
+      const target = getPlayerKindCharacter();
+      target.runTo({ x, y });
+    },
+    centerCamera: () => {
+      ctx.centerCameraOnPlayer();
+    },
+    setWalkIsRun: (value) => {
+      player.walkIsRun = value;
+    },
+    toNonFightingState: () => {
+      const target = getPlayerKindCharacter();
+      target.toNonFightingState();
+    },
+    change: async (index) => {
+      await ctx.changePlayer(index);
+      logger.log(`[GameAPI.player] change: switched to index ${index}`);
+    },
+
+    // Stats
+    getMoney: () => player.money,
+    setMoney: (amount) => {
+      player.setMoney(amount);
+    },
+    addMoney: (amount) => {
+      player.addMoney(amount);
+    },
+    addRandMoney: (min, max) => {
+      const amount = min + Math.floor(Math.random() * (max - min + 1));
+      player.addMoney(amount);
+    },
+    getExp: () => player.exp,
+    addExp: (amount) => {
+      player.addExp(amount);
+    },
+    getLevel: () => player.level,
+    setLevel: (level) => {
+      player.setLevelTo(level);
+      logger.log(`[GameAPI.player] setLevel: ${level}`);
+    },
+    getStat: (stateName) => {
+      switch (stateName) {
+        case "Level":
+          return player.level;
+        case "Attack":
+          return player.attack;
+        case "Defend":
+          return player.defend;
+        case "Evade":
+          return player.evade;
+        case "Life":
+          return player.life;
+        case "Thew":
+          return player.thew;
+        case "Mana":
+          return player.mana;
+        default:
+          return 0;
+      }
+    },
+    fullLife: pa((p) => p.fullLife(), "FullLife"),
+    fullMana: pa((p) => p.fullMana(), "FullMana"),
+    fullThew: pa((p) => p.fullThew(), "FullThew"),
+    addLife: (amount) => {
+      player.addLife(amount);
+    },
+    addMana: (amount) => {
+      player.addMana(amount);
+    },
+    addThew: (amount) => {
+      player.addThew(amount);
+    },
+    addLifeMax: (value) => {
+      player.lifeMax += value;
+    },
+    addManaMax: (value) => {
+      player.manaMax += value;
+    },
+    addThewMax: (value) => {
+      player.thewMax += value;
+    },
+    addAttack: (value, type) => {
+      const t = type ?? 1;
+      if (t === 1) player.attack += value;
+      else if (t === 2) player.attack2 += value;
+      else if (t === 3) player.attack3 += value;
+    },
+    addDefend: (value, type) => {
+      const t = type ?? 1;
+      if (t === 1) player.defend = Math.max(0, player.defend + value);
+      else if (t === 2) player.defend2 = Math.max(0, player.defend2 + value);
+      else if (t === 3) player.defend3 = Math.max(0, player.defend3 + value);
+    },
+    addEvade: (value) => {
+      player.evade += value;
+    },
+    limitMana: (limit) => {
+      player.manaLimit = limit;
+    },
+    addMoveSpeedPercent: (percent) => {
+      player.addMoveSpeedPercent = (player.addMoveSpeedPercent || 0) + percent;
+    },
+    isEquipWeapon: () => {
+      const weapon = goodsListManager.get(205);
+      return weapon !== null;
+    },
+
+    // Abilities
+    setFightEnabled: (enabled) => {
+      player.isFightDisabled = !enabled;
+    },
+    setJumpEnabled: (enabled) => {
+      player.isJumpDisabled = !enabled;
+    },
+    setRunEnabled: (enabled) => {
+      player.isRunDisabled = !enabled;
+    },
+
+    setMagicWhenAttacked: (magicFile, direction) => {
+      player.magicToUseWhenBeAttacked = magicFile;
+      if (direction !== undefined) {
+        player.magicDirectionWhenBeAttacked = direction;
+      }
+    },
+
+    // In-memory snapshot (for SavePlayer / LoadPlayer commands)
+    saveSnapshot: (key) => {
+      const snapshot = {
+        level: player.level,
+        life: player.life,
+        lifeMax: player.lifeMax,
+        mana: player.mana,
+        manaMax: player.manaMax,
+        thew: player.thew,
+        thewMax: player.thewMax,
+        attack: player.attack,
+        defend: player.defend,
+        evade: player.evade,
+        exp: player.exp,
+        money: player.money,
+      };
+      playerSnapshots.set(key, snapshot);
+      logger.log(`[GameAPI.player] saveSnapshot: key=${key}`);
+    },
+    loadSnapshot: (key) => {
+      const snapshot = playerSnapshots.get(key);
+      if (!snapshot) {
+        logger.warn(`[GameAPI.player] loadSnapshot: no snapshot for key=${key}`);
+        return;
+      }
+      player.level = snapshot.level;
+      player.life = snapshot.life;
+      player.lifeMax = snapshot.lifeMax;
+      player.mana = snapshot.mana;
+      player.manaMax = snapshot.manaMax;
+      player.thew = snapshot.thew;
+      player.thewMax = snapshot.thewMax;
+      player.attack = snapshot.attack;
+      player.defend = snapshot.defend;
+      player.evade = snapshot.evade;
+      player.exp = snapshot.exp;
+      player.setMoney(snapshot.money);
+      logger.log(`[GameAPI.player] loadSnapshot: key=${key}`);
+    },
+  };
+}

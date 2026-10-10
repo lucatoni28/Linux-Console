@@ -1,0 +1,391 @@
+/**
+ * useAsfImage Hook - Load ASF files and convert to usable images
+ * () pattern
+ */
+
+import { type AsfData, getCompositeFrameCanvas, loadAsf } from "@miu2d/engine/resource/format/asf";
+import { useEffect, useRef, useState } from "react";
+
+export interface AsfImageData {
+  asf: AsfData | null;
+  dataUrl: string | null;
+  width: number;
+  height: number;
+  isLoading: boolean;
+  error: string | null;
+}
+
+// 缓存单帧图片的 dataUrl
+const singleFrameCache = new Map<string, { dataUrl: string; width: number; height: number }>();
+
+/**
+ * Hook to load an ASF file and get image data
+ */
+export function useAsfImage(path: string | null, frameIndex: number = 0): AsfImageData {
+  const [asf, setAsf] = useState<AsfData | null>(null);
+  const [dataUrl, setDataUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // 用于追踪是否已加载过
+  const loadedKeyRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!path) {
+      setAsf(null);
+      setDataUrl(null);
+      loadedKeyRef.current = null;
+      return;
+    }
+
+    // Normalize path - remove leading backslash and convert to forward slashes
+    let normalizedPath = path.replace(/\\/g, "/");
+    if (normalizedPath.startsWith("/")) {
+      normalizedPath = normalizedPath.substring(1);
+    }
+
+    // loadAsf 内部的 resourceLoader 会自动添加资源根目录
+    const cacheKey = `${normalizedPath}:${frameIndex}`;
+
+    // 如果已加载过相同的，跳过
+    if (cacheKey === loadedKeyRef.current && dataUrl) {
+      return;
+    }
+
+    // 检查缓存
+    const cached = singleFrameCache.get(cacheKey);
+    if (cached) {
+      loadedKeyRef.current = cacheKey;
+      setDataUrl(cached.dataUrl);
+      // 还需要加载 asf 数据用于 width/height
+      loadAsf(normalizedPath).then((data) => {
+        if (data) setAsf(data);
+      });
+      return;
+    }
+
+    let cancelled = false;
+    setIsLoading(true);
+    setError(null);
+
+    loadAsf(normalizedPath)
+      .then((data) => {
+        if (cancelled) return;
+        if (data) {
+          setAsf(data);
+          // Generate data URL for the specified frame
+          if (data.frames.length > 0) {
+            const idx = Math.min(frameIndex, data.frames.length - 1);
+            const canvas = getCompositeFrameCanvas(data, idx);
+            const url = canvas.toDataURL();
+
+            // 缓存
+            singleFrameCache.set(cacheKey, {
+              dataUrl: url,
+              width: data.width,
+              height: data.height,
+            });
+            loadedKeyRef.current = cacheKey;
+
+            setDataUrl(url);
+          }
+        } else {
+          setError(`Failed to load ASF: ${normalizedPath}`);
+        }
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(err.message);
+        setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [path, frameIndex, dataUrl]);
+
+  return {
+    asf,
+    dataUrl,
+    width: asf?.width ?? 0,
+    height: asf?.height ?? 0,
+    isLoading,
+    error,
+  };
+}
+
+/**
+ * Hook to load multiple ASF files
+ */
+export function useMultipleAsfImages(paths: (string | null)[]): Map<string, AsfImageData> {
+  const [results, setResults] = useState<Map<string, AsfImageData>>(new Map());
+
+  useEffect(() => {
+    const newResults = new Map<string, AsfImageData>();
+    let cancelled = false;
+
+    const loadAll = async () => {
+      for (const path of paths) {
+        if (!path) continue;
+
+        // Normalize path
+        let normalizedPath = path.replace(/\\/g, "/");
+        if (normalizedPath.startsWith("/")) {
+          normalizedPath = normalizedPath.substring(1);
+        }
+
+        try {
+          const data = await loadAsf(normalizedPath);
+          if (cancelled) return;
+
+          if (data && data.frames.length > 0) {
+            const canvas = getCompositeFrameCanvas(data, 0);
+            newResults.set(path, {
+              asf: data,
+              dataUrl: canvas.toDataURL(),
+              width: data.width,
+              height: data.height,
+              isLoading: false,
+              error: null,
+            });
+          }
+        } catch (err) {
+          if (cancelled) return;
+          newResults.set(path, {
+            asf: null,
+            dataUrl: null,
+            width: 0,
+            height: 0,
+            isLoading: false,
+            error: (err as Error).message,
+          });
+        }
+      }
+
+      if (!cancelled) {
+        setResults(new Map(newResults));
+      }
+    };
+
+    loadAll();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [paths]);
+
+  return results;
+}
+
+/**
+ * Get frame data URL from ASF for a specific frame
+ */
+export function getAsfFrameDataUrl(asf: AsfData | null, frameIndex: number): string | null {
+  if (!asf || asf.frames.length === 0) return null;
+  const idx = Math.min(frameIndex, asf.frames.length - 1);
+  const canvas = getCompositeFrameCanvas(asf, idx);
+  return canvas.toDataURL();
+}
+
+/**
+ * Hook to create a ColumnView-style clipped image (transparent from top based on percent)
+ *
+ * 性能优化：只在 ASF 加载时调用一次 toDataURL 缓存结果，
+ * 裁剪通过 CSS clip 实现，避免每帧重新编码 PNG。
+ */
+export function useColumnView(
+  path: string | null,
+  percent: number // 0 to 1, how much to show from bottom
+): { dataUrl: string | null; width: number; height: number; clipPercent: number; isLoading: boolean } {
+  const { asf, dataUrl: cachedUrl, isLoading } = useAsfImage(path, 0);
+
+  return {
+    dataUrl: cachedUrl,
+    width: asf?.width ?? 0,
+    height: asf?.height ?? 0,
+    clipPercent: Math.max(0, Math.min(1, percent)),
+    isLoading,
+  };
+}
+
+export interface AsfAnimationData {
+  asf: AsfData | null;
+  dataUrl: string | null;
+  width: number;
+  height: number;
+  isLoading: boolean;
+  error: string | null;
+  frameIndex: number;
+  frameCount: number;
+}
+
+// 缓存每个 ASF 文件的所有帧 dataUrl
+const frameDataUrlCache = new Map<string, string[]>();
+
+/**
+ * Hook to load an ASF file and animate it (play through all frames)
+ *  class with Update() method for animation
+ *
+ * 性能优化：预先生成并缓存所有帧的 dataUrl，避免每帧调用 toDataURL()
+ *
+ * @param path - Path to the ASF file
+ * @param autoPlay - Whether to automatically play the animation (default: true)
+ * @param loop - Whether to loop the animation (default: true)
+ */
+export function useAsfAnimation(
+  path: string | null,
+  autoPlay: boolean = true,
+  loop: boolean = true
+): AsfAnimationData {
+  const [asf, setAsf] = useState<AsfData | null>(null);
+  const [frameIndex, setFrameIndex] = useState(0);
+  const [frameDataUrls, setFrameDataUrls] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const animationRef = useRef<number | null>(null);
+  const lastTimeRef = useRef<number>(0);
+
+  // 用于追踪是否已加载过
+  const loadedPathRef = useRef<string | null>(null);
+
+  // Load ASF file - 当 path 改变时重新加载
+  useEffect(() => {
+    // 如果路径没变且已加载，跳过
+    if (path === loadedPathRef.current && frameDataUrls.length > 0) {
+      return;
+    }
+
+    // 清理之前的动画
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+    lastTimeRef.current = 0;
+
+    if (!path) {
+      setAsf(null);
+      setFrameDataUrls([]);
+      setFrameIndex(0);
+      loadedPathRef.current = null;
+      return;
+    }
+
+    // Normalize path - remove leading backslash and convert to forward slashes
+    let normalizedPath = path.replace(/\\/g, "/");
+    if (normalizedPath.startsWith("/")) {
+      normalizedPath = normalizedPath.substring(1);
+    }
+
+    // 检查缓存 - 如果已缓存直接使用
+    const cached = frameDataUrlCache.get(normalizedPath);
+    if (cached && cached.length > 0) {
+      loadedPathRef.current = path;
+
+      // 从缓存加载 ASF 数据
+      loadAsf(normalizedPath).then((data) => {
+        if (data) {
+          setAsf(data);
+          setFrameDataUrls(cached);
+          setFrameIndex(0);
+        }
+      });
+      return;
+    }
+
+    let cancelled = false;
+    setIsLoading(true);
+    setError(null);
+    // 重置状态以避免显示旧图像
+    setFrameDataUrls([]);
+    setFrameIndex(0);
+
+    loadAsf(normalizedPath)
+      .then((data) => {
+        if (cancelled) return;
+        if (data) {
+          setAsf(data);
+          setFrameIndex(0);
+          loadedPathRef.current = path;
+
+          // 预先生成所有帧的 dataUrl 并缓存（使用 composite 还原 canvas 尺寸）
+          const urls = data.frames.map((_, idx) => {
+            const canvas = getCompositeFrameCanvas(data, idx);
+            return canvas.toDataURL();
+          });
+          frameDataUrlCache.set(normalizedPath, urls);
+          setFrameDataUrls(urls);
+        } else {
+          setError(`Failed to load ASF: ${normalizedPath}`);
+        }
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(err.message);
+        setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [path, frameDataUrls.length]); // 移除 frameDataUrls.length 依赖，避免循环
+
+  // Animation loop - 只更新 frameIndex，不再调用 toDataURL
+  useEffect(() => {
+    if (!asf || !autoPlay || asf.frames.length <= 1 || frameDataUrls.length === 0) {
+      return;
+    }
+
+    // 使用文件中的 interval 值，如果为 0 或未定义则使用默认值
+    // Texture.Update() 使用 _texture.Interval，当 interval 为 0 时每帧更新
+    // 这里设置合理的默认值 100ms (10 FPS)
+    const interval = asf.interval > 0 ? asf.interval : 100;
+
+    const animate = (timestamp: number) => {
+      if (!lastTimeRef.current) {
+        lastTimeRef.current = timestamp;
+      }
+
+      const elapsed = timestamp - lastTimeRef.current;
+
+      if (elapsed >= interval) {
+        lastTimeRef.current = timestamp;
+
+        setFrameIndex((prevIndex) => {
+          let nextIndex = prevIndex + 1;
+          if (nextIndex >= asf.frames.length) {
+            nextIndex = loop ? 0 : asf.frames.length - 1;
+          }
+          return nextIndex;
+        });
+      }
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+      lastTimeRef.current = 0;
+    };
+  }, [asf, autoPlay, loop, frameDataUrls.length]);
+
+  // 从缓存的 dataUrls 中获取当前帧
+  const dataUrl = frameDataUrls[frameIndex] ?? null;
+
+  return {
+    asf,
+    dataUrl,
+    width: asf?.width ?? 0,
+    height: asf?.height ?? 0,
+    isLoading,
+    error,
+    frameIndex,
+    frameCount: asf?.frames.length ?? 0,
+  };
+}

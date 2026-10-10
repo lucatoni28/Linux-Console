@@ -1,0 +1,183 @@
+@import "tailwindcss" source("../../src");
+
+/* 添加 monorepo 其他包的源文件扫描路径 */
+@source "../../../ui/src";
+@source "../../../viewer/src";
+@source "../../../game/src";
+@source "../../../dashboard/src";
+@source "../../../shared/src";
+
+/* Tailwind CSS v4 暗色模式配置 - 使用 class 策略 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Tailwind CSS v4 主题配置 */
+@theme {
+  --spacing-15: 3.75rem; /* 60px for mb-15, mt-15 */
+
+  /* VS Code Dark theme - border colors */
+  --color-panel-border: #2b2b2b;     /* 结构性面板分隔 (sidebar-r, header-b, activity-bar) */
+  --color-widget-border: #3c3c3c;    /* 卡片/弹窗/输入框/分组 borders */
+  --color-focus-border: #007fd4;     /* 焦点状态 */
+}
+
+/*
+ * 注意：Tailwind CSS v4 的 @import "tailwindcss" 已包含 Preflight 重置样式
+ * 不要再写 * { margin: 0; padding: 0; } 否则会覆盖 Tailwind 的工具类！
+ */
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+/* 按钮默认手型光标 */
+button,
+[role="button"] {
+  cursor: pointer;
+}
+
+kbd {
+  font-family: monospace;
+  padding: 2px 6px;
+  background: #374151;
+  border-radius: 4px;
+  margin: 0 2px;
+}
+
+/* 统一滚动条样式 - 适配所有浏览器 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Tooltip 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* NumberInput 错误抖动动画 */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+/* ============= 移动端样式 ============= */
+
+/* 移动端：防止默认触摸行为（缩放、滚动等） */
+@media (max-width: 1024px) {
+  html, body {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* 全屏模式 */
+  #root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  /* 隐藏滚动条 */
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
+  * {
+    scrollbar-width: none;
+  }
+}
+
+/* 移动端横屏提示 */
+@media (max-width: 1024px) and (orientation: portrait) {
+  .mobile-landscape-hint {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 1.25rem;
+  }
+
+  .mobile-landscape-hint::before {
+    content: '📱';
+    font-size: 4rem;
+    animation: rotate-phone 1s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes rotate-phone {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(90deg);
+  }
+}
+
+/* 移动端虚拟摇杆样式增强 */
+@media (pointer: coarse) {
+  /* 触摸设备上增大触控区域 */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* ============= Toast 通知动画 ============= */
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+

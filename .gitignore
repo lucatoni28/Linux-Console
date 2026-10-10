@@ -1,0 +1,53 @@
+# Logs
+logs
+.data
+*.log
+*.bak
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+ui_demo
+__pycache__
+*.pyc
+*.pyo
+.venv
+node_modules
+dist
+dist-ssr
+dev-dist
+*.local
+*.tsbuildinfo
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+/resources*
+/JxqyHD
+/canghai
+/JXQY-all-in-one
+/Sword2
+/deploy/*
+.env
+vfx-demo
+# Docker data
+.data/
+/magic
+/maplogos-512/
+.codegraph/
+
+# Deployment operations are private and kept outside this repository.
+/ops/
+/docs/*deploy*
+/docs/*tunnel*
+/docs/*cloudflare*
+/docs/private/
+/.private/

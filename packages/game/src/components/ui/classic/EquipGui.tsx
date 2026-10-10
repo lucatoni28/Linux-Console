@@ -1,0 +1,500 @@
+/**
+ * EquipGui Component - based on JxqyHD Engine/Gui/EquipGui.cs
+ * Displays player equipment slots with full drag-drop support
+ *
+ * shows 7 equipment slots (head, neck, body, back, hand, wrist, foot)
+ * Resources loaded from UI_Settings.ini
+ */
+
+import type { UIGoodData } from "@miu2d/engine/gui/ui-types";
+import { useDevice } from "@miu2d/shared";
+import type React from "react";
+import { useCallback, useMemo } from "react";
+import type { TouchDragData } from "../../../contexts";
+import { useTouchDragSource, useTouchDropTarget } from "../../../hooks";
+import { useAsfImage } from "./hooks";
+import type { PlayerStats } from "./StateGui";
+import { useEquipGuiConfig, useStateGuiConfig } from "./useUISettings";
+
+// Equipment slot type
+export type EquipSlotType = "head" | "neck" | "body" | "back" | "hand" | "wrist" | "foot";
+
+// Map EquipPosition enum to slot type
+export function equipPositionToSlotType(position: number): EquipSlotType | null {
+  switch (position) {
+    case 1:
+      return "head";
+    case 2:
+      return "neck";
+    case 3:
+      return "body";
+    case 4:
+      return "back";
+    case 5:
+      return "hand";
+    case 6:
+      return "wrist";
+    case 7:
+      return "foot";
+    default:
+      return null;
+  }
+}
+
+export function slotTypeToEquipPosition(slot: EquipSlotType): number {
+  // biome-ignore lint/nursery/noUnnecessaryConditions: switch on string union is always non-null by design
+  switch (slot) {
+    case "head":
+      return 1;
+    case "neck":
+      return 2;
+    case "body":
+      return 3;
+    case "back":
+      return 4;
+    case "hand":
+      return 5;
+    case "wrist":
+      return 6;
+    case "foot":
+      return 7;
+  }
+}
+
+// Equipped item data
+export interface EquipItemData {
+  good: UIGoodData;
+  count: number;
+}
+
+// Equipment slots data
+export type EquipSlots = Partial<Record<EquipSlotType, EquipItemData | null>>;
+
+// Drag data for drag-drop operations
+export interface DragData {
+  type: "equip" | "goods" | "bottom";
+  index: number;
+  good: UIGoodData;
+  sourceSlot?: EquipSlotType;
+}
+
+interface EquipGuiProps {
+  isVisible: boolean;
+  equips: EquipSlots;
+  screenWidth: number;
+  onSlotClick?: (slot: EquipSlotType) => void;
+  onSlotRightClick?: (slot: EquipSlotType) => void;
+  onSlotDrop?: (slot: EquipSlotType, dragData: DragData) => void;
+  onSlotDragStart?: (slot: EquipSlotType, good: UIGoodData) => void;
+  onSlotMouseEnter?: (slot: EquipSlotType, good: UIGoodData | null, rect: DOMRect) => void;
+  onSlotMouseLeave?: () => void;
+  onClose: () => void;
+  dragData?: DragData | null;
+  /** 移动端触摸拖拽 drop 回调 */
+  onTouchDrop?: (slot: EquipSlotType, data: TouchDragData) => void;
+  /**
+   * 整合模式：在装备面板容器内叠加渲染玩家属性文字（demo2 [State] 与 [Equip] 共用背景）。
+   * 传入后，文字坐标直接相对于本容器（与 [State] ini 配置一致），无需额外定位。
+   */
+  overlayStats?: PlayerStats;
+}
+
+// Slot names for display
+const slotNames: Record<EquipSlotType, string> = {
+  head: "头部",
+  neck: "项链",
+  body: "衣服",
+  back: "披风",
+  hand: "武器",
+  wrist: "护腕",
+  foot: "鞋子",
+};
+
+/**
+ * Single equipment slot component with drag-drop support
+ */
+interface EquipSlotProps {
+  slot: EquipSlotType;
+  item: EquipItemData | null | undefined;
+  config: { left: number; top: number; width: number; height: number };
+  onClick?: () => void;
+  onRightClick?: (e: React.MouseEvent) => void;
+  onDrop?: (e: React.DragEvent) => void;
+  onDragStart?: (e: React.DragEvent) => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onMouseEnter?: (e: React.MouseEvent) => void;
+  onMouseLeave?: () => void;
+  /** 触摸拖拽 drop 回调 */
+  onTouchDrop?: (data: TouchDragData) => void;
+}
+
+const EquipSlot: React.FC<EquipSlotProps> = ({
+  slot,
+  item,
+  config,
+  onClick,
+  onRightClick,
+  onDrop,
+  onDragStart,
+  onDragOver,
+  onMouseEnter,
+  onMouseLeave,
+  onTouchDrop,
+}) => {
+  // Use slot icon (iconPath) for equip slots; fall back to imagePath if no icon defined.
+  // Scale to 85% of slot so the slot border frame remains visible.
+  const itemImage = useAsfImage(item?.good?.iconPath || item?.good?.imagePath || null, 0);
+  const { isMobile } = useDevice();
+
+  // 触摸拖拽支持（仅移动端）
+  const touchHandlers = useTouchDragSource({
+    hasContent: !!item,
+    getDragData: () =>
+      item
+        ? {
+            type: "equip",
+            equipSlot: slot,
+            source: "equipGui",
+            goodsInfo: item.good,
+            displayName: item.good.name,
+            iconPath: item.good.iconPath || item.good.imagePath,
+          }
+        : null,
+    onClick,
+    enabled: isMobile,
+  });
+
+  // 触摸拖拽目标（仅移动端）- 接受物品和装备拖拽
+  const dropRef = useTouchDropTarget({
+    id: `equip-slot-${slot}`,
+    onDrop: (data) => {
+      console.log(
+        "[EquipGui] EquipSlot onDrop:",
+        data.type,
+        "bagIndex:",
+        data.bagIndex,
+        "equipSlot:",
+        data.equipSlot,
+        "target slot:",
+        slot
+      );
+      onTouchDrop?.(data);
+    },
+    canDrop: (data) => data.type === "goods" || data.type === "equip",
+    enabled: isMobile,
+  });
+
+  return (
+    <div
+      ref={dropRef}
+      style={{
+        position: "absolute",
+        left: config.left,
+        top: config.top,
+        width: config.width,
+        height: config.height,
+        cursor: item ? "grab" : "default",
+        borderRadius: 2,
+        overflow: "hidden",
+        boxShadow: "inset 0 0 0 1px rgba(100,80,30,0.4)",
+        touchAction: isMobile ? "none" : undefined,
+      }}
+      title={item?.good?.name || slotNames[slot]}
+      onClick={onClick}
+      onContextMenu={
+        !isMobile
+          ? (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onRightClick?.(e);
+            }
+          : undefined
+      }
+      // PC 端拖放事件
+      onDrop={!isMobile ? onDrop : undefined}
+      onDragOver={!isMobile ? onDragOver : undefined}
+      // PC 端鼠标事件
+      onMouseEnter={!isMobile ? onMouseEnter : undefined}
+      onMouseLeave={!isMobile ? onMouseLeave : undefined}
+      // 移动端触摸事件
+      {...touchHandlers}
+    >
+      {item && itemImage.dataUrl && (
+        <>
+          {(() => {
+            const scale =
+              itemImage.width > 0 && itemImage.height > 0
+                ? Math.min(
+                    1,
+                    Math.min(config.width / itemImage.width, config.height / itemImage.height)
+                  )
+                : 1;
+            const displayW = itemImage.width * scale;
+            const displayH = itemImage.height * scale;
+            return (
+              <img
+                src={itemImage.dataUrl}
+                alt={item.good.name}
+                draggable={!isMobile}
+                onDragStart={!isMobile ? onDragStart : undefined}
+                style={{
+                  position: "absolute",
+                  left: (config.width - displayW) / 2,
+                  top: (config.height - displayH) / 2,
+                  width: displayW,
+                  height: displayH,
+                  imageRendering: "pixelated",
+                  cursor: "grab",
+                }}
+              />
+            );
+          })()}
+          {/* Count display - always show count like TopLeftText */}
+          <span
+            style={{
+              position: "absolute",
+              left: 2,
+              top: 1,
+              fontSize: 10,
+              color: "rgba(167, 157, 255, 0.9)",
+              textShadow: "0 1px 2px #000",
+              pointerEvents: "none",
+            }}
+          >
+            {item.count}
+          </span>
+        </>
+      )}
+    </div>
+  );
+};
+
+export const EquipGui: React.FC<EquipGuiProps> = ({
+  isVisible,
+  equips,
+  screenWidth,
+  onSlotClick,
+  onSlotRightClick,
+  onSlotDrop,
+  onSlotDragStart,
+  onSlotMouseEnter,
+  onSlotMouseLeave,
+  dragData,
+  onTouchDrop,
+  overlayStats,
+}) => {
+  // Load config from UI_Settings.ini
+  const config = useEquipGuiConfig();
+  // 整合模式：加载 State 配置（即使不用 overlayStats，也须始终在顶层调用 Hook）
+  const stateConfig = useStateGuiConfig();
+
+  // Load panel background
+  const panelImage = useAsfImage(config?.panel.image || "asf/ui/common/panel7.asf");
+  // 装饰性叠加图（如 sword2 的 equip/image.msf 装备格子边框）
+  const overlayImage = useAsfImage(config?.panel.overlayImage ?? "");
+
+  // Calculate panel position - Globals.WindowWidth / 2f - Width + leftAdjust
+  const panelStyle = useMemo(() => {
+    if (!config) return null;
+    const panelWidth = panelImage.width || 300;
+    const panelHeight = panelImage.height || 400;
+
+    return {
+      position: "absolute" as const,
+      left: screenWidth / 2 - panelWidth + config.panel.leftAdjust,
+      top: config.panel.topAdjust,
+      width: panelWidth,
+      height: panelHeight,
+      pointerEvents: "auto" as const,
+    };
+  }, [screenWidth, panelImage.width, panelImage.height, config]);
+
+  // Check if drag can be dropped in slot
+  const canDropInSlot = useCallback(
+    (slot: EquipSlotType): boolean => {
+      if (!dragData) return false;
+      if (dragData.type === "equip" && dragData.sourceSlot === slot) return false;
+
+      // Check if item's part matches slot
+      const slotPosition = slotTypeToEquipPosition(slot);
+      return dragData.good.part === slotPosition;
+    },
+    [dragData]
+  );
+
+  // Handle drag over
+  const handleDragOver = useCallback(
+    (_slot: EquipSlotType) => (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    []
+  );
+
+  // Handle drop
+  const handleDrop = useCallback(
+    (slot: EquipSlotType) => (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (dragData && canDropInSlot(slot)) {
+        onSlotDrop?.(slot, dragData);
+      }
+    },
+    [dragData, canDropInSlot, onSlotDrop]
+  );
+
+  // Handle drag start
+  const handleDragStart = useCallback(
+    (slot: EquipSlotType) => (e: React.DragEvent) => {
+      const item = equips[slot];
+      if (item) {
+        onSlotDragStart?.(slot, item.good);
+        if (e.dataTransfer) {
+          e.dataTransfer.effectAllowed = "move";
+          // 使用img元素作为拖拽图像
+          const img = e.currentTarget.querySelector("img");
+          if (img) {
+            e.dataTransfer.setDragImage(img, img.width / 2, img.height / 2);
+          }
+        }
+      }
+    },
+    [equips, onSlotDragStart]
+  );
+
+  // Handle mouse enter for tooltip
+  const handleMouseEnter = useCallback(
+    (slot: EquipSlotType) => (e: React.MouseEvent) => {
+      const item = equips[slot];
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      onSlotMouseEnter?.(slot, item?.good ?? null, rect);
+    },
+    [equips, onSlotMouseEnter]
+  );
+
+  if (!isVisible || !config || !panelStyle) return null;
+
+  // Build slot list
+  const slots: [EquipSlotType, { left: number; top: number; width: number; height: number }][] = [
+    ["head", config.head],
+    ["neck", config.neck],
+    ["body", config.body],
+    ["back", config.back],
+    ["hand", config.hand],
+    ["wrist", config.wrist],
+    ["foot", config.foot],
+  ];
+
+  return (
+    <div style={panelStyle} onClick={(e) => e.stopPropagation()}>
+      {/* Background panel */}
+      {panelImage.dataUrl && (
+        <img
+          src={panelImage.dataUrl}
+          alt="装备面板"
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            width: panelImage.width,
+            height: panelImage.height,
+            imageRendering: "pixelated",
+            pointerEvents: "none",
+          }}
+        />
+      )}
+
+      {/* 装饰性叠加图（装备格子边框）*/}
+      {overlayImage.dataUrl && (
+        <img
+          src={overlayImage.dataUrl}
+          alt=""
+          style={{
+            position: "absolute",
+            left: config.panel.overlayLeft ?? 0,
+            top: config.panel.overlayTop ?? 0,
+            width: overlayImage.width,
+            height: overlayImage.height,
+            imageRendering: "pixelated",
+            pointerEvents: "none",
+          }}
+        />
+      )}
+
+      {/* 整合模式：在装备面板内叠加渲染玩家属性文字 */}
+      {overlayStats &&
+        stateConfig &&
+        (() => {
+          const getTextStyle = (textCfg: {
+            left: number;
+            top: number;
+            width: number;
+            height: number;
+            color: string;
+          }): React.CSSProperties => ({
+            position: "absolute",
+            left: textCfg.left,
+            top: textCfg.top - 3,
+            width: textCfg.width,
+            fontSize: 12,
+            fontFamily: "SimSun, serif",
+            color: "white",
+            textAlign: "left",
+            pointerEvents: "none",
+          });
+          const s = overlayStats;
+          const sc = stateConfig;
+          const attackText =
+            s.attack2 || s.attack3
+              ? `${s.attack}(${s.attack2 ?? 0})(${s.attack3 ?? 0})`
+              : s.attack.toString();
+          const defendText =
+            s.defend2 || s.defend3
+              ? `${s.defend}(${s.defend2 ?? 0})(${s.defend3 ?? 0})`
+              : s.defend.toString();
+          const manaText = s.manaLimit ? "1/1" : `${s.mana}/${s.manaMax}`;
+          return (
+            <>
+              <div style={getTextStyle(sc.level)}>{s.level}</div>
+              <div style={getTextStyle(sc.exp)}>{s.exp}</div>
+              <div style={getTextStyle(sc.levelUp)}>{s.levelUpExp}</div>
+              <div style={getTextStyle(sc.life)}>
+                {s.life}/{s.lifeMax}
+              </div>
+              <div style={getTextStyle(sc.thew)}>
+                {s.thew}/{s.thewMax}
+              </div>
+              <div style={getTextStyle(sc.mana)}>{manaText}</div>
+              <div style={getTextStyle(sc.attack)}>{attackText}</div>
+              <div style={getTextStyle(sc.defend)}>{defendText}</div>
+              <div style={getTextStyle(sc.evade)}>{s.evade}</div>
+            </>
+          );
+        })()}
+
+      {/* Equipment slots */}
+      {slots.map(([slotType, slotConfig]) => {
+        const item = equips[slotType];
+        // 使用装备名称作为 key 的一部分，确保装备变化时组件正确重新渲染
+        const contentKey = item?.good?.name ?? "empty";
+        return (
+          <EquipSlot
+            key={`${slotType}-${contentKey}`}
+            slot={slotType}
+            item={item}
+            config={slotConfig}
+            onClick={() => onSlotClick?.(slotType)}
+            onRightClick={() => onSlotRightClick?.(slotType)}
+            onDrop={handleDrop(slotType)}
+            onDragOver={handleDragOver(slotType)}
+            onDragStart={handleDragStart(slotType)}
+            onMouseEnter={handleMouseEnter(slotType)}
+            onMouseLeave={onSlotMouseLeave}
+            onTouchDrop={(data) => onTouchDrop?.(slotType, data)}
+          />
+        );
+      })}
+    </div>
+  );
+};

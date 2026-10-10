@@ -1,0 +1,853 @@
+/**
+ * Player 服务
+ * 使用 PostgreSQL 数据库存储，数据以 JSON 形式存储在 data 字段中
+ * 类型定义在 @miu2d/types 中，供引擎、前端、后端共用
+ */
+
+import type {
+  BatchImportPlayerInput,
+  BatchImportPlayerResult,
+  ClearAllPlayersInput,
+  ClearAllPlayersResult,
+  CreatePlayerInput,
+  ImportPlayerInput,
+  ListPlayerInput,
+  Player,
+  PlayerInitialGood,
+  PlayerInitialMagic,
+  PlayerListItem,
+  UpdatePlayerInput,
+} from "@miu2d/types";
+import { createDefaultPlayer } from "@miu2d/types";
+import type { Prisma, Player as PrismaPlayer } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
+import { db } from "../../db/client";
+import type { Language } from "../../i18n";
+import { getMessage } from "../../i18n";
+import { requireGameIdBySlug } from "../../utils/game";
+import { verifyGameAccess } from "../../utils/gameAccess";
+
+export class PlayerService {
+  /**
+   * 将数据库记录转换为 Player 类型
+   */
+  private toPlayer(row: PrismaPlayer): Player {
+    const data = row.data as Omit<
+      Player,
+      "id" | "gameId" | "key" | "name" | "index" | "createdAt" | "updatedAt"
+    >;
+    return {
+      ...data,
+      id: row.id,
+      gameId: row.gameId,
+      key: row.key,
+      name: row.name,
+      index: row.index,
+      createdAt: row.createdAt?.toISOString() ?? new Date().toISOString(),
+      updatedAt: row.updatedAt?.toISOString() ?? new Date().toISOString(),
+    };
+  }
+
+  /**
+   * 公开接口：通过 slug 列出游戏的所有玩家角色（无需认证）
+   * 用于游戏客户端加载角色数据
+   */
+  async listPublicByGameId(gameId: string): Promise<Player[]> {
+    const rows = await db.player.findMany({ where: { gameId }, orderBy: { index: "asc" } });
+    return rows.map((row) => this.toPlayer(row));
+  }
+
+  async listPublicBySlug(gameSlug: string): Promise<Player[]> {
+    return this.listPublicByGameId(await requireGameIdBySlug(gameSlug));
+  }
+
+  /**
+   * 获取单个玩家角色
+   */
+  async get(
+    gameId: string,
+    playerId: string,
+    userId: string,
+    language: Language
+  ): Promise<Player | null> {
+    await verifyGameAccess(gameId, userId, language);
+
+    const row = await db.player.findFirst({ where: { id: playerId, gameId } });
+
+    if (!row) return null;
+    return this.toPlayer(row);
+  }
+
+  /**
+   * 列出玩家角色
+   */
+  async list(
+    input: ListPlayerInput,
+    userId: string,
+    language: Language
+  ): Promise<PlayerListItem[]> {
+    await verifyGameAccess(input.gameId, userId, language);
+
+    const rows = await db.player.findMany({
+      where: { gameId: input.gameId },
+      orderBy: { index: "asc" },
+    });
+
+    return rows.map((row) => {
+      const data = row.data as Record<string, unknown>;
+      return {
+        id: row.id,
+        key: row.key,
+        name: row.name,
+        index: row.index,
+        level: (data.level as number) ?? 1,
+        npcIni: (data.npcIni as string) ?? "",
+        updatedAt: row.updatedAt?.toISOString() ?? new Date().toISOString(),
+      };
+    });
+  }
+
+  /**
+   * 创建玩家角色
+   * index 未提供时自动递增（当前最大 index + 1）
+   */
+  async create(input: CreatePlayerInput, userId: string, language: Language): Promise<Player> {
+    await verifyGameAccess(input.gameId, userId, language);
+
+    const defaultPlayer = createDefaultPlayer(input.gameId, input.key);
+    const fullPlayer = {
+      ...defaultPlayer,
+      ...input,
+    };
+
+    // 分离索引字段和 data 字段
+    const {
+      gameId,
+      key,
+      name,
+      index: inputIndex,
+      id: _id,
+      createdAt: _c,
+      updatedAt: _u,
+      ...data
+    } = fullPlayer;
+
+    // index 未指定时自动递增
+    let index = inputIndex;
+    if (index === undefined || index === null) {
+      const agg = await db.player.aggregate({ where: { gameId }, _max: { index: true } });
+      index = (agg._max.index ?? -1) + 1;
+    }
+
+    const row = await db.player.create({
+      data: {
+        gameId,
+        key,
+        name: name ?? "",
+        index,
+        data: data as unknown as Prisma.InputJsonValue,
+      },
+    });
+
+    return this.toPlayer(row);
+  }
+
+  /**
+   * 更新玩家角色
+   */
+  async update(input: UpdatePlayerInput, userId: string, language: Language): Promise<Player> {
+    await verifyGameAccess(input.gameId, userId, language);
+
+    // 检查是否存在（直接查 DB，避免重复触发 verifyGameAccess）
+    const existingRow = await db.player.findFirst({
+      where: { id: input.id, gameId: input.gameId },
+    });
+    if (!existingRow) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: getMessage(language, "errors.npc.notFound"),
+      });
+    }
+    const existing = this.toPlayer(existingRow);
+
+    const { id, gameId, ...inputData } = input;
+    const merged = { ...existing, ...inputData };
+
+    const {
+      id: _id,
+      gameId: _gameId,
+      key,
+      name,
+      index,
+      createdAt: _createdAt,
+      updatedAt: _updatedAt,
+      ...data
+    } = merged;
+
+    const row = await db.player.update({
+      where: { id },
+      data: {
+        key,
+        name,
+        index: index ?? 0,
+        data: data as unknown as Prisma.InputJsonValue,
+        updatedAt: new Date(),
+      },
+    });
+
+    return this.toPlayer(row);
+  }
+
+  /**
+   * 删除玩家角色
+   */
+  async delete(
+    gameId: string,
+    playerId: string,
+    userId: string,
+    language: Language
+  ): Promise<{ id: string }> {
+    await verifyGameAccess(gameId, userId, language);
+
+    await db.player.delete({ where: { id: playerId } });
+
+    return { id: playerId };
+  }
+
+  /**
+   * 清空游戏的所有玩家角色
+   */
+  async clearAll(
+    input: ClearAllPlayersInput,
+    userId: string,
+    language: Language
+  ): Promise<ClearAllPlayersResult> {
+    await verifyGameAccess(input.gameId, userId, language);
+    const result = await db.player.deleteMany({ where: { gameId: input.gameId } });
+    return { deletedCount: result.count };
+  }
+
+  /**
+   * 从 INI 导入玩家角色
+   */
+  async importFromIni(
+    input: ImportPlayerInput,
+    userId: string,
+    language: Language
+  ): Promise<Player> {
+    await verifyGameAccess(input.gameId, userId, language);
+
+    if (!input.iniContent) {
+      throw new Error("角色配置内容为空");
+    }
+
+    const parsed = this.parsePlayerIni(input.iniContent);
+    const key = input.fileName;
+
+    // 从文件名提取 index（如 Player0.ini -> 0）
+    const indexMatch = key.match(/Player(\d+)/i);
+    const index = indexMatch ? parseInt(indexMatch[1], 10) : 0;
+
+    return this.create(
+      {
+        gameId: input.gameId,
+        key,
+        name: parsed.name ?? key.replace(/\.ini$/i, ""),
+        index,
+        ...parsed,
+      },
+      userId,
+      language
+    );
+  }
+
+  /**
+   * 批量导入玩家角色（支持武功/物品 INI 和清空+导入）
+   */
+  async batchImportFromIni(
+    input: BatchImportPlayerInput,
+    userId: string,
+    language: Language
+  ): Promise<BatchImportPlayerResult> {
+    await verifyGameAccess(input.gameId, userId, language);
+
+    // 清空现有角色
+    if (input.clearBeforeImport) {
+      await db.player.deleteMany({ where: { gameId: input.gameId } });
+    }
+
+    // 预加载当前游戏的所有武功和物品，用于解析 iniFile 引用
+    const magicLookup = await this.buildMagicLookup(input.gameId);
+    const goodsLookup = await this.buildGoodsLookup(input.gameId);
+
+    const success: BatchImportPlayerResult["success"] = [];
+    const failed: BatchImportPlayerResult["failed"] = [];
+    const warnings: string[] = [];
+
+    // ── 解析阶段（纯内存，无 DB 调用）────────────────────────────────
+    type InsertRow = {
+      gameId: string;
+      key: string;
+      name: string;
+      index: number;
+      data: Record<string, unknown>;
+    };
+    const rows: InsertRow[] = [];
+    const keyToMeta = new Map<string, { fileName: string; index: number }>();
+
+    for (const item of input.items) {
+      try {
+        if (!item.iniContent) {
+          throw new Error("角色配置内容为空");
+        }
+
+        const parsed = this.parsePlayerIni(item.iniContent);
+        const key = item.fileName;
+
+        const indexMatch = key.match(/Player(\d+)/i);
+        const index = indexMatch ? parseInt(indexMatch[1], 10) : 0;
+
+        const rawMagics = item.magicIniContent ? this.parseMagicIni(item.magicIniContent) : [];
+        const initialMagics = this.resolveMagicRefs(
+          rawMagics,
+          magicLookup,
+          item.fileName,
+          warnings
+        );
+
+        const rawGoods = item.goodsIniContent ? this.parseGoodsIni(item.goodsIniContent) : [];
+        const initialGoods = this.resolveGoodsRefs(rawGoods, goodsLookup, item.fileName, warnings);
+
+        const defaultPlayer = createDefaultPlayer(input.gameId, key);
+        const fullPlayer = {
+          ...defaultPlayer,
+          ...parsed,
+          name: parsed.name ?? item.fileName.replace(/\.ini$/i, ""),
+          initialMagics,
+          initialGoods,
+        };
+        const {
+          gameId: _g,
+          key: _k,
+          name,
+          index: _i,
+          id: _id,
+          createdAt: _c,
+          updatedAt: _u,
+          ...data
+        } = fullPlayer;
+        rows.push({ gameId: input.gameId, key, name: name ?? "", index, data });
+        keyToMeta.set(key, { fileName: item.fileName, index });
+      } catch (error) {
+        failed.push({
+          fileName: item.fileName,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+
+    // ── 批量写入：一次 SQL 替代 N 次串行 INSERT ──────────────────────
+    if (rows.length > 0) {
+      const upserted = await db.$transaction(
+        rows.map((row) =>
+          db.player.upsert({
+            where: { players_game_id_key_unique: { gameId: row.gameId, key: row.key } },
+            create: {
+              gameId: row.gameId,
+              key: row.key,
+              name: row.name,
+              index: row.index,
+              data: row.data as unknown as Prisma.InputJsonValue,
+            },
+            update: {
+              name: row.name,
+              index: row.index,
+              data: row.data as unknown as Prisma.InputJsonValue,
+              updatedAt: new Date(),
+            },
+          })
+        )
+      );
+
+      for (const row of upserted) {
+        const p = this.toPlayer(row);
+        const meta = keyToMeta.get(row.key)!;
+        success.push({ fileName: meta.fileName, id: p.id, name: p.name, index: p.index });
+      }
+    }
+
+    return { success, failed, warnings: warnings.length > 0 ? warnings : undefined };
+  }
+
+  /**
+   * 构建武功查找表：normalizedKey → dbKey, name → dbKey
+   */
+  private async buildMagicLookup(gameId: string): Promise<{
+    byKey: Map<string, string>;
+    byName: Map<string, string>;
+  }> {
+    const rows = await db.magic.findMany({ where: { gameId }, select: { key: true, name: true } });
+
+    const byKey = new Map<string, string>();
+    const byName = new Map<string, string>();
+    for (const row of rows) {
+      byKey.set(row.key.toLowerCase(), row.key);
+      if (row.name) {
+        byName.set(row.name.toLowerCase(), row.key);
+      }
+    }
+    return { byKey, byName };
+  }
+
+  /**
+   * 构建物品查找表：normalizedKey → dbKey, name → dbKey
+   */
+  private async buildGoodsLookup(gameId: string): Promise<{
+    byKey: Map<string, string>;
+    byName: Map<string, string>;
+  }> {
+    const rows = await db.good.findMany({ where: { gameId }, select: { key: true, data: true } });
+
+    const byKey = new Map<string, string>();
+    const byName = new Map<string, string>();
+    for (const row of rows) {
+      byKey.set(row.key.toLowerCase(), row.key);
+      const data = row.data as Record<string, unknown>;
+      const name = data.name as string | undefined;
+      if (name) {
+        byName.set(name.toLowerCase(), row.key);
+      }
+    }
+    return { byKey, byName };
+  }
+
+  /**
+   * 从 iniFile 文件名中提取中文名
+   * 如 "player-magic-清心咒.ini" → "清心咒"
+   * 如 "magic008_云蒸霞蔚.ini" → "云蒸霞蔚"
+   * 如 "Goods214_灵芝草.ini" → "灵芝草"
+   */
+  private extractNameFromIniFile(iniFile: string): string | null {
+    // 去掉 .ini 后缀
+    const base = iniFile.replace(/\.ini$/i, "");
+    // 匹配: 前缀-中文 或 前缀_中文
+    const match = base.match(/[-_]([^\d_-][\u4e00-\u9fff\w]+)$/);
+    if (match) return match[1];
+    // 最后一段
+    const parts = base.split(/[-_]/);
+    const last = parts[parts.length - 1];
+    if (last && /[\u4e00-\u9fff]/.test(last)) return last;
+    return null;
+  }
+
+  /**
+   * 解析武功引用：精确 key 匹配 → 名称回退匹配
+   */
+  private resolveMagicRefs(
+    parsed: PlayerInitialMagic[],
+    lookup: { byKey: Map<string, string>; byName: Map<string, string> },
+    playerFile: string,
+    warnings: string[]
+  ): PlayerInitialMagic[] {
+    return parsed.map((m) => {
+      const normalizedKey = m.iniFile.toLowerCase();
+
+      // 1. 精确 key 匹配（大小写不敏感）
+      const exactMatch = lookup.byKey.get(normalizedKey);
+      if (exactMatch) {
+        return { ...m, iniFile: exactMatch };
+      }
+
+      // 2. 名称回退匹配
+      const extractedName = this.extractNameFromIniFile(m.iniFile);
+      if (extractedName) {
+        const nameMatch = lookup.byName.get(extractedName.toLowerCase());
+        if (nameMatch) {
+          warnings.push(
+            `[${playerFile}] 武功 "${m.iniFile}" 未精确匹配，按名称"${extractedName}"匹配到 "${nameMatch}"`
+          );
+          return { ...m, iniFile: nameMatch };
+        }
+      }
+
+      // 3. 未匹配
+      warnings.push(
+        `[${playerFile}] 武功 "${m.iniFile}" 未在当前游戏中找到匹配（slot=${m.index}）`
+      );
+      return m;
+    });
+  }
+
+  /**
+   * 解析物品引用：精确 key 匹配 → 名称回退匹配
+   */
+  private resolveGoodsRefs(
+    parsed: PlayerInitialGood[],
+    lookup: { byKey: Map<string, string>; byName: Map<string, string> },
+    playerFile: string,
+    warnings: string[]
+  ): PlayerInitialGood[] {
+    return parsed.map((g) => {
+      const normalizedKey = g.iniFile.toLowerCase();
+
+      // 1. 精确 key 匹配（大小写不敏感）
+      const exactMatch = lookup.byKey.get(normalizedKey);
+      if (exactMatch) {
+        return { ...g, iniFile: exactMatch };
+      }
+
+      // 2. 名称回退匹配
+      const extractedName = this.extractNameFromIniFile(g.iniFile);
+      if (extractedName) {
+        const nameMatch = lookup.byName.get(extractedName.toLowerCase());
+        if (nameMatch) {
+          warnings.push(
+            `[${playerFile}] 物品 "${g.iniFile}" 未精确匹配，按名称"${extractedName}"匹配到 "${nameMatch}"`
+          );
+          return { ...g, iniFile: nameMatch };
+        }
+      }
+
+      // 3. 未匹配
+      warnings.push(
+        `[${playerFile}] 物品 "${g.iniFile}" 未在当前游戏中找到匹配（slot=${g.index ?? "auto"}）`
+      );
+      return g;
+    });
+  }
+
+  /**
+   * 解析 Player INI 内容（save/game/PlayerX.ini）
+   */
+  parsePlayerIni(content: string): Partial<Player> {
+    const result: Partial<Player> = {};
+    const lines = content.split(/\r?\n/);
+    let currentSection = "";
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("//") || trimmed.startsWith(";")) {
+        continue;
+      }
+
+      const sectionMatch = trimmed.match(/^\[(.+)\]$/);
+      if (sectionMatch) {
+        currentSection = sectionMatch[1].toUpperCase();
+        continue;
+      }
+
+      const kvMatch = trimmed.match(/^([^=]+)=(.*)$/);
+      if (!kvMatch || currentSection !== "INIT") continue;
+
+      const key = kvMatch[1].trim();
+      const value = kvMatch[2].trim();
+
+      switch (key) {
+        case "Name":
+          result.name = value;
+          break;
+        case "Kind":
+          result.kind = parseInt(value, 10) || 2;
+          break;
+        case "NpcIni":
+          result.npcIni = value;
+          break;
+        case "Dir":
+          result.dir = parseInt(value, 10) || 0;
+          break;
+        case "MapX":
+          result.mapX = parseInt(value, 10) || 0;
+          break;
+        case "MapY":
+          result.mapY = parseInt(value, 10) || 0;
+          break;
+        case "Action":
+          result.action = parseInt(value, 10) || 0;
+          break;
+        case "WalkSpeed": {
+          const parsed = parseInt(value, 10);
+          result.walkSpeed = Number.isNaN(parsed) ? 1 : parsed;
+          break;
+        }
+        case "PathFinder":
+          result.pathFinder = parseInt(value, 10) || 0;
+          break;
+        case "DialogRadius":
+          result.dialogRadius = parseInt(value, 10) || 1;
+          break;
+        case "ScriptFile":
+          result.scriptFile = value;
+          break;
+        case "VisionRadius":
+          result.visionRadius = parseInt(value, 10) || 10;
+          break;
+        case "Doing":
+          result.doing = parseInt(value, 10) || 0;
+          break;
+        case "DesX":
+          result.desX = parseInt(value, 10) || 0;
+          break;
+        case "DesY":
+          result.desY = parseInt(value, 10) || 0;
+          break;
+        case "State":
+          result.state = parseInt(value, 10) || 0;
+          break;
+        case "Relation":
+          result.relation = parseInt(value, 10) || 0;
+          break;
+        case "Life":
+          result.life = parseInt(value, 10) || 0;
+          break;
+        case "LifeMax":
+          result.lifeMax = parseInt(value, 10) || 0;
+          break;
+        case "Thew":
+          result.thew = parseInt(value, 10) || 0;
+          break;
+        case "ThewMax":
+          result.thewMax = parseInt(value, 10) || 0;
+          break;
+        case "Mana":
+          result.mana = parseInt(value, 10) || 0;
+          break;
+        case "ManaMax":
+          result.manaMax = parseInt(value, 10) || 0;
+          break;
+        case "Attack":
+          result.attack = parseInt(value, 10) || 0;
+          break;
+        case "Defend":
+          result.defend = parseInt(value, 10) || 0;
+          break;
+        case "Evade":
+          result.evade = parseInt(value, 10) || 0;
+          break;
+        case "Exp":
+          result.exp = parseInt(value, 10) || 0;
+          break;
+        case "ExpBonus":
+          result.expBonus = parseInt(value, 10) || 0;
+          break;
+        case "Belong":
+          result.belong = parseInt(value, 10) || 0;
+          break;
+        case "Idle":
+          result.idle = parseInt(value, 10) || 30;
+          break;
+        case "LevelUpExp":
+          result.levelUpExp = parseInt(value, 10) || 0;
+          break;
+        case "Level":
+          result.level = parseInt(value, 10) || 1;
+          break;
+        case "AttackLevel":
+          result.attackLevel = parseInt(value, 10) || 1;
+          break;
+        case "Lum":
+          result.lum = parseInt(value, 10) || 0;
+          break;
+        case "AttackRadius":
+          result.attackRadius = parseInt(value, 10) || 1;
+          break;
+        case "BodyIni":
+          result.bodyIni = value;
+          break;
+        case "FlyIni":
+          result.flyIni = value;
+          break;
+        case "DeathScript":
+          result.deathScript = value;
+          break;
+        case "FlyIni2":
+          result.flyIni2 = value;
+          break;
+        case "Fight":
+          result.fight = parseInt(value, 10) || 0;
+          break;
+        case "TimeLimit":
+          result.timeLimit = parseInt(value, 10) || 0;
+          break;
+        case "TimeTrigger":
+          result.timeTrigger = parseInt(value, 10) || 0;
+          break;
+        case "TimeCount":
+          result.timeCount = parseInt(value, 10) || 0;
+          break;
+        case "Money":
+          result.money = parseInt(value, 10) || 0;
+          break;
+        case "Magic":
+          result.magic = parseInt(value, 10) || 0;
+          break;
+        case "ManaLimit":
+          result.manaLimit = parseInt(value, 10) || 0;
+          break;
+        case "LevelIni":
+          result.levelIni = value;
+          break;
+        case "TimeScript":
+          result.timeScript = value;
+          break;
+        case "SecondAttack":
+          result.secondAttack = value;
+          break;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * 解析 MagicX.ini 内容 → PlayerInitialMagic[]
+   *
+   * 格式：
+   * [Head]
+   * Count=2
+   * [1]
+   * IniFile=player-magic-清心咒.ini
+   * Level=1
+   * Exp=0
+   * [2]
+   * IniFile=player-magic-烈火情天.ini
+   * Level=1
+   * Exp=0
+   */
+  parseMagicIni(content: string): PlayerInitialMagic[] {
+    const result: PlayerInitialMagic[] = [];
+    const lines = content.split(/\r?\n/);
+    let currentSection = "";
+    let currentSectionIndex = 0;
+    let currentItem: Partial<PlayerInitialMagic> = {};
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("//") || trimmed.startsWith(";")) {
+        continue;
+      }
+
+      const sectionMatch = trimmed.match(/^\[(.+)\]$/);
+      if (sectionMatch) {
+        // 保存上一个条目
+        if (currentItem.iniFile) {
+          result.push({
+            iniFile: currentItem.iniFile,
+            index: currentItem.index ?? currentSectionIndex,
+            level: currentItem.level ?? 1,
+            exp: currentItem.exp ?? 0,
+          });
+        }
+        currentSection = sectionMatch[1].toUpperCase();
+        // 节名数字就是格子序号（如 [1], [2], [40], [61]）
+        const sectionNum = parseInt(sectionMatch[1], 10);
+        currentSectionIndex = Number.isNaN(sectionNum) ? 0 : sectionNum;
+        currentItem = {};
+        continue;
+      }
+
+      if (currentSection === "HEAD") continue;
+
+      const kvMatch = trimmed.match(/^([^=]+)=(.*)$/);
+      if (!kvMatch) continue;
+
+      const key = kvMatch[1].trim();
+      const value = kvMatch[2].trim();
+
+      switch (key) {
+        case "IniFile":
+          currentItem.iniFile = value;
+          break;
+        case "Level":
+          currentItem.level = parseInt(value, 10) || 1;
+          break;
+        case "Exp":
+          currentItem.exp = parseInt(value, 10) || 0;
+          break;
+      }
+    }
+
+    // 最后一个条目
+    if (currentItem.iniFile) {
+      result.push({
+        iniFile: currentItem.iniFile,
+        index: currentItem.index ?? currentSectionIndex,
+        level: currentItem.level ?? 1,
+        exp: currentItem.exp ?? 0,
+      });
+    }
+
+    return result;
+  }
+
+  /**
+   * 解析 GoodsX.ini 内容 → PlayerInitialGood[]
+   *
+   * 格式：
+   * [Head]
+   * Count=1
+   * [1]
+   * IniFile=goods-w12-桃木剑.ini
+   * Number=1
+   */
+  parseGoodsIni(content: string): PlayerInitialGood[] {
+    const result: PlayerInitialGood[] = [];
+    const lines = content.split(/\r?\n/);
+    let currentSection = "";
+    let currentSectionIndex = 0;
+    let currentItem: Partial<PlayerInitialGood> = {};
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("//") || trimmed.startsWith(";")) {
+        continue;
+      }
+
+      const sectionMatch = trimmed.match(/^\[(.+)\]$/);
+      if (sectionMatch) {
+        // 保存上一个条目
+        if (currentItem.iniFile) {
+          result.push({
+            iniFile: currentItem.iniFile,
+            index: currentSectionIndex || undefined,
+            number: currentItem.number ?? 1,
+          });
+        }
+        currentSection = sectionMatch[1].toUpperCase();
+        const sectionNum = parseInt(sectionMatch[1], 10);
+        currentSectionIndex = Number.isNaN(sectionNum) ? 0 : sectionNum;
+        currentItem = {};
+        continue;
+      }
+
+      if (currentSection === "HEAD") continue;
+
+      const kvMatch = trimmed.match(/^([^=]+)=(.*)$/);
+      if (!kvMatch) continue;
+
+      const key = kvMatch[1].trim();
+      const value = kvMatch[2].trim();
+
+      switch (key) {
+        case "IniFile":
+          currentItem.iniFile = value;
+          break;
+        case "Number":
+          currentItem.number = parseInt(value, 10) || 1;
+          break;
+      }
+    }
+
+    // 最后一个条目
+    if (currentItem.iniFile) {
+      result.push({
+        iniFile: currentItem.iniFile,
+        index: currentSectionIndex || undefined,
+        number: currentItem.number ?? 1,
+      });
+    }
+
+    return result;
+  }
+}
+
+export const playerService = new PlayerService();

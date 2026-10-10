@@ -1,0 +1,111 @@
+/**
+ * NPC tRPC 路由
+ */
+
+import {
+  BatchImportNpcInputSchema,
+  BatchImportNpcResultSchema,
+  ClearAllNpcsInputSchema,
+  ClearAllNpcsResultSchema,
+  CreateNpcInputSchema,
+  DeleteNpcInputSchema,
+  GetNpcInputSchema,
+  ImportNpcInputSchema,
+  ListNpcInputSchema,
+  NpcListItemSchema,
+  NpcSchema,
+  UpdateNpcInputSchema,
+} from "@miu2d/types";
+import { z } from "zod";
+import type { AuthenticatedContext } from "../../trpc/context";
+import { Ctx, Mutation, Query, Router, UseMiddlewares } from "../../trpc/decorators";
+import { requireUser } from "../../trpc/middlewares";
+import { Logger } from "../../utils/logger.js";
+import { npcService } from "./npc.service";
+
+@Router({ alias: "npc" })
+export class NpcRouter {
+  private readonly logger = new Logger(NpcRouter.name);
+
+  constructor() {
+    this.logger.log("NpcRouter registered");
+  }
+
+  /**
+   * 获取 NPC 列表
+   */
+  @UseMiddlewares(requireUser)
+  @Query({ input: ListNpcInputSchema, output: z.array(NpcListItemSchema) })
+  async list(input: z.infer<typeof ListNpcInputSchema>, @Ctx() ctx: AuthenticatedContext) {
+    return npcService.list(input, ctx.userId, ctx.language);
+  }
+
+  /**
+   * 获取单个 NPC 详情
+   */
+  @UseMiddlewares(requireUser)
+  @Query({ input: GetNpcInputSchema, output: NpcSchema.nullable() })
+  async get(input: z.infer<typeof GetNpcInputSchema>, @Ctx() ctx: AuthenticatedContext) {
+    return npcService.get(input.gameId, input.id, ctx.userId, ctx.language);
+  }
+
+  /**
+   * 创建 NPC
+   */
+  @UseMiddlewares(requireUser)
+  @Mutation({ input: CreateNpcInputSchema, output: NpcSchema })
+  async create(input: z.infer<typeof CreateNpcInputSchema>, @Ctx() ctx: AuthenticatedContext) {
+    return npcService.create(input, ctx.userId, ctx.language);
+  }
+
+  /**
+   * 更新 NPC
+   */
+  @UseMiddlewares(requireUser)
+  @Mutation({ input: UpdateNpcInputSchema, output: NpcSchema })
+  async update(input: z.infer<typeof UpdateNpcInputSchema>, @Ctx() ctx: AuthenticatedContext) {
+    return npcService.update(input, ctx.userId, ctx.language);
+  }
+
+  /**
+   * 删除 NPC
+   */
+  @UseMiddlewares(requireUser)
+  @Mutation({ input: DeleteNpcInputSchema, output: z.object({ id: z.string() }) })
+  async delete(input: z.infer<typeof DeleteNpcInputSchema>, @Ctx() ctx: AuthenticatedContext) {
+    return npcService.delete(input.gameId, input.id, ctx.userId, ctx.language);
+  }
+
+  /**
+   * 从 INI 导入 NPC
+   */
+  @UseMiddlewares(requireUser)
+  @Mutation({ input: ImportNpcInputSchema, output: NpcSchema })
+  async importFromIni(
+    input: z.infer<typeof ImportNpcInputSchema>,
+    @Ctx() ctx: AuthenticatedContext
+  ) {
+    return npcService.importFromIni(input, ctx.userId, ctx.language);
+  }
+
+  /**
+   * 批量导入 NPC（支持自动关联 npcres）
+   */
+  @UseMiddlewares(requireUser)
+  @Mutation({ input: BatchImportNpcInputSchema, output: BatchImportNpcResultSchema })
+  async batchImportFromIni(
+    input: z.infer<typeof BatchImportNpcInputSchema>,
+    @Ctx() ctx: AuthenticatedContext
+  ) {
+    return npcService.batchImportFromIni(input, ctx.userId, ctx.language);
+  }
+
+  /**
+   * 清空所有 NPC 和 NPC 资源
+   */
+  @UseMiddlewares(requireUser)
+  @Mutation({ input: ClearAllNpcsInputSchema, output: ClearAllNpcsResultSchema })
+  async clearAll(input: z.infer<typeof ClearAllNpcsInputSchema>, @Ctx() ctx: AuthenticatedContext) {
+    return npcService.clearAll(input, ctx.userId, ctx.language);
+  }
+}

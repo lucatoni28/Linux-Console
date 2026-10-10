@@ -1,0 +1,57 @@
+/**
+ * 游戏全局配置 tRPC 路由
+ */
+
+import {
+  GameConfigSchema,
+  GetGameConfigInputSchema,
+  UpdateGameConfigInputSchema,
+} from "@miu2d/types";
+import { z } from "zod";
+import type { AuthenticatedContext } from "../../trpc/context";
+import { Ctx, Mutation, Query, Router, UseMiddlewares } from "../../trpc/decorators";
+import { requireUser } from "../../trpc/middlewares";
+import { Logger } from "../../utils/logger.js";
+import { gameConfigService } from "./gameConfig.service";
+
+@Router({ alias: "gameConfig" })
+export class GameConfigRouter {
+  private readonly logger = new Logger(GameConfigRouter.name);
+
+  constructor() {
+    this.logger.log("GameConfigRouter registered");
+  }
+
+  /**
+   * 获取游戏配置（不存在则自动创建默认配置）
+   */
+  @UseMiddlewares(requireUser)
+  @Query({ input: GetGameConfigInputSchema, output: GameConfigSchema })
+  async get(input: z.infer<typeof GetGameConfigInputSchema>, @Ctx() ctx: AuthenticatedContext) {
+    return gameConfigService.get(input.gameId, ctx.userId, ctx.language);
+  }
+
+  /**
+   * 更新游戏配置
+   */
+  @UseMiddlewares(requireUser)
+  @Mutation({ input: UpdateGameConfigInputSchema, output: GameConfigSchema })
+  async update(
+    input: z.infer<typeof UpdateGameConfigInputSchema>,
+    @Ctx() ctx: AuthenticatedContext
+  ) {
+    return gameConfigService.update(input, ctx.userId, ctx.language);
+  }
+
+  /**
+   * 仅更新 uiTheme 字段（JSON 主题，ImportAllModal 使用）
+   */
+  @UseMiddlewares(requireUser)
+  @Mutation({
+    input: z.object({ gameId: z.string(), uiTheme: z.unknown() }),
+    output: GameConfigSchema,
+  })
+  async setUiTheme(input: { gameId: string; uiTheme: unknown }, @Ctx() ctx: AuthenticatedContext) {
+    return gameConfigService.patchUiTheme(input.gameId, input.uiTheme, ctx.userId, ctx.language);
+  }
+}

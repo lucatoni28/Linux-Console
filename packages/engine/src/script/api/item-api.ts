@@ -1,0 +1,234 @@
+/**
+ * Item APIs - Good, Magic, Memo implementations
+ */
+
+import { logger } from "../../core/logger";
+import { getShopsData } from "../../data/game-data-api";
+import { getNeighbors, tileToPixel } from "../../utils";
+import type { BlockingResolver } from "../blocking-resolver";
+import type { GoodsAPI, MagicAPI, MemoAPI } from "./game-api";
+import type { ScriptCommandContext } from "./types";
+
+export function createGoodsAPI(ctx: ScriptCommandContext, resolver: BlockingResolver): GoodsAPI {
+  const { player, guiManager, buyManager, goodsListManager, getCharacterByName } = ctx;
+
+  // In-memory snapshots for SaveGoods/LoadGoods
+  const goodsSnapshots = new Map<string, Array<{ fileName: string; count: number } | null>>();
+
+  return {
+    add: (goodsName, count) => {
+      let addedGood: { name: string } | null = null;
+      for (let i = 0; i < count; i++) {
+        const result = goodsListManager.addGoodToList(goodsName);
+        if (result.success && result.good) {
+          addedGood = result.good;
+        }
+      }
+      if (addedGood) {
+        guiManager.showMessage(`你获得了${addedGood.name}`);
+      }
+    },
+    remove: (goodsName, count) => {
+      goodsListManager.deleteGoodByName(goodsName, count);
+    },
+    equip: (goodListIndex) => {
+      goodsListManager.equipGood(goodListIndex);
+    },
+    getCountByFile: (goodsFile) => goodsListManager.getGoodsNum(goodsFile),
+    getCountByName: (goodsName) => goodsListManager.getGoodsNumByName(goodsName),
+    clear: () => {
+      goodsListManager.renewList();
+    },
+    deleteByName: (name, count) => {
+      goodsListManager.deleteGoodByName(name, count ?? 1);
+    },
+    hasFreeSpace: () => goodsListManager.hasFreeItemSpace(),
+    addRandom: async (buyFileName) => {
+      try {
+        // 从 /api/data 缓存的商店配置中查找
+        const shops = getShopsData();
+        if (!shops) {
+          logger.error(`[GameAPI.goods] addRandom: shops data not loaded`);
+          return;
+        }
+
+        const normalized = buyFileName.toLowerCase().replace(/\.ini$/, "");
+        const shop = shops.find((s) => s.key.toLowerCase().replace(/\.ini$/, "") === normalized);
+        if (!shop) {
+          logger.error(`[GameAPI.goods] addRandom: shop not found for key "${buyFileName}"`);
+          return;
+        }
+
+        if (shop.items.length === 0) return;
+        const randomItem = shop.items[Math.floor(Math.random() * shop.items.length)];
+        const result = goodsListManager.addGoodToList(randomItem.goodsKey);
+        if (result.success && result.good) {
+          guiManager.showMessage(`你获得了${result.good.name}`);
+        }
+      } catch (error) {
+        logger.error(`[GameAPI.goods] addRandom error:`, error);
+      }
+    },
+    buy: async (buyFile, canSellSelfGoods) => {
+      const success = await buyManager.beginBuy(buyFile, null, canSellSelfGoods);
+      if (success) {
+        guiManager.openBuyGui();
+      }
+      // Wait until buy UI is closed
+      if (!buyManager.isOpen()) return;
+      await resolver.waitForCondition(() => !buyManager.isOpen());
+    },
+    setDropIni: (name, dropFile) => {
+      const character = getCharacterByName(name);
+      if (character) {
+        character.dropIni = dropFile;
+      }
+    },
+    setDropEnabled: (enabled) => {
+      if (enabled) ctx.enableDrop();
+      else ctx.disableDrop();
+    },
+    saveSnapshot: (key) => {
+      const snapshot: Array<{ fileName: string; count: number } | null> = [];
+      const items = goodsListManager.getStoreItems();
+      for (const item of items) {
+        if (item) {
+          snapshot.push({ fileName: item.good.fileName, count: item.count });
+        } else {
+          snapshot.push(null);
+        }
+      }
+      goodsSnapshots.set(key, snapshot);
+      logger.log(`[GoodsAPI] saveSnapshot: key=${key}, items=${snapshot.filter(Boolean).length}`);
+    },
+    loadSnapshot: (key) => {
+      const snapshot = goodsSnapshots.get(key);
+      if (!snapshot) {
+        logger.warn(`[GoodsAPI] loadSnapshot: no snapshot for key=${key}`);
+        return;
+      }
+      // Clear current goods and re-add from snapshot
+      goodsListManager.renewList();
+      for (const item of snapshot) {
+        if (item) {
+          for (let i = 0; i < item.count; i++) {
+            goodsListManager.addGoodToList(item.fileName);
+          }
+        }
+      }
+      logger.log(`[GoodsAPI] loadSnapshot: key=${key}`);
+    },
+  };
+}
+
+export function createMagicAPI(ctx: ScriptCommandContext): MagicAPI {
+  const { player } = ctx;
+
+  return {
+    add: async (magicFile) => {
+      await player.addMagic(magicFile);
+    },
+    delete: (magicFile) => {
+      player.getPlayerMagicInventory().deleteMagic(magicFile);
+    },
+    setLevel: (magicFile, level) => {
+      player.getPlayerMagicInventory().setNonReplaceMagicLevel(magicFile, level);
+    },
+    getLevel: (magicFile) => {
+      const info = player.getPlayerMagicInventory().getMagicByFileName(magicFile);
+      return info?.level || 0;
+    },
+    addExp: (magicFile, amount) => {
+      const inventory = player.getPlayerMagicInventory();
+      const info = inventory.getMagicByFileName(magicFile);
+      if (info) {
+        inventory.addMagicExp(info, amount);
+      } else {
+        logger.warn(`[MagicAPI] addExp: magic not found: ${magicFile}`);
+      }
+    },
+    clear: () => {
+      player.getPlayerMagicInventory().renewList();
+    },
+    hasFreeSpace: () => {
+      return player.getPlayerMagicInventory().getFreeIndex() !== -1;
+    },
+    use: (magicFile, x, y) => {
+      const magicInfo = player.getPlayerMagicInventory().getMagicByFileName(magicFile);
+      if (!magicInfo || !magicInfo.magic) return;
+      let mapX = x ?? 0;
+      let mapY = y ?? 0;
+      if (x === undefined || y === undefined) {
+        const neighbors = getNeighbors(player.tilePosition);
+        const dest = neighbors[player.currentDirection];
+        mapX = dest.x;
+        mapY = dest.y;
+      }
+      const origin = player.positionInWorld;
+      const destination = tileToPixel(mapX, mapY);
+      player.setPendingMagic(magicInfo.magic, origin, destination);
+      player.onMagicCast();
+    },
+    moveToBottomSlot: (magicFile, slotIndex) => {
+      const inventory = player.getPlayerMagicInventory();
+      const storeIndex = inventory.getIndexByFileName(magicFile);
+      if (storeIndex === -1) {
+        logger.warn(`[MagicAPI] moveToBottomSlot: magic not found in panel: ${magicFile}`);
+        return;
+      }
+      // slotIndex is 1-based in scripts (1–5), convert to 0-based internally
+      inventory.assignMagicToBottomSlot(storeIndex, slotIndex - 1);
+    },
+  };
+}
+
+export function createMemoAPI(ctx: ScriptCommandContext): MemoAPI {
+  const { guiManager, memoListManager } = ctx;
+
+  return {
+    add: (text) => {
+      guiManager.addMemo(text);
+    },
+    delete: (text) => {
+      guiManager.delMemo(text);
+    },
+    addById: async (id) => {
+      await guiManager.addToMemo(id);
+    },
+    deleteById: async (id) => {
+      await memoListManager.delMemoById(id);
+      guiManager.updateMemoView();
+    },
+    clear: () => {
+      memoListManager.renewList();
+      guiManager.updateMemoView();
+    },
+    addFlexible: async (textOrId) => {
+      const asNum =
+        typeof textOrId === "number"
+          ? textOrId
+          : /^[0-9]+$/.test(String(textOrId).trim())
+            ? parseInt(String(textOrId), 10)
+            : Number.NaN;
+      if (!Number.isNaN(asNum)) {
+        await guiManager.addToMemo(asNum);
+      } else {
+        guiManager.addMemo(String(textOrId));
+      }
+    },
+    deleteFlexible: async (textOrId) => {
+      const asNum =
+        typeof textOrId === "number"
+          ? textOrId
+          : /^[0-9]+$/.test(String(textOrId).trim())
+            ? parseInt(String(textOrId), 10)
+            : Number.NaN;
+      if (!Number.isNaN(asNum)) {
+        await memoListManager.delMemoById(asNum);
+        guiManager.updateMemoView();
+      } else {
+        guiManager.delMemo(String(textOrId));
+      }
+    },
+  };
+}

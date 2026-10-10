@@ -1,0 +1,376 @@
+/**
+ * Misc Commands - Memo, Timer, Save, Variables, SystemMsg, RandRun
+ * Based on JxqyHD Engine/Script/ScriptExecuter.cs
+ *
+ * Audio commands → audio-commands.ts
+ * Effect/weather/camera commands → effect-commands.ts
+ * Object/trap commands → obj-commands.ts
+ * Goods/magic commerce commands → goods-commands.ts
+ */
+import { logger } from "../../core/logger";
+import type { CommandHandler, CommandRegistry } from "./types";
+
+// ============= Memo Commands =============
+
+/**
+ * Memo - Add memo text directly
+ */
+const memoCommand: CommandHandler = (params, _result, helpers) => {
+  const memoText = helpers.resolveString(params[0] || "");
+  logger.log(`[ScriptExecutor] Memo: "${memoText}"`);
+  helpers.api.memo.add(memoText);
+  return true;
+};
+
+/**
+ * AddToMemo - Add memo from TalkTextList by ID, or directly as text if param is not numeric
+ */
+const addToMemoCommand: CommandHandler = async (params, _result, helpers) => {
+  const param = helpers.resolveString(params[0] || "");
+  await helpers.api.memo.addFlexible(param);
+  return true;
+};
+
+/**
+ * DelMemo - Delete memo
+ */
+const delMemoCommand: CommandHandler = async (params, _result, helpers) => {
+  const param = helpers.resolveString(params[0] || "");
+  await helpers.api.memo.deleteFlexible(param);
+  return true;
+};
+
+/**
+ * ClearMemo - Clear all memo entries
+ * ClearMemo()
+ */
+const clearMemoCommand: CommandHandler = (_params, _result, helpers) => {
+  helpers.api.memo.clear();
+  logger.log("[ScriptExecutor] ClearMemo");
+  return true;
+};
+
+// ============= Timer Commands =============
+
+/**
+ * OpenTimeLimit - Start a countdown timer
+ * OpenTimeLimit(int seconds)
+ */
+const openTimeLimitCommand: CommandHandler = (params, _result, helpers) => {
+  const seconds = helpers.resolveNumber(params[0] || "0");
+  helpers.api.timer.open(seconds);
+  return true;
+};
+
+/**
+ * CloseTimeLimit - Stop and hide the timer
+ */
+const closeTimeLimitCommand: CommandHandler = (_params, _result, helpers) => {
+  helpers.api.timer.close();
+  return true;
+};
+
+/**
+ * HideTimerWnd - Hide the timer window (timer keeps running)
+ */
+const hideTimerWndCommand: CommandHandler = (_params, _result, helpers) => {
+  helpers.api.timer.hide();
+  return true;
+};
+
+/**
+ * SetTimeScript - Set a script to run when timer reaches a certain time
+ * SetTimeScript(int triggerSeconds, string scriptFileName)
+ */
+const setTimeScriptCommand: CommandHandler = (params, _result, helpers) => {
+  const triggerSeconds = helpers.resolveNumber(params[0] || "0");
+  const scriptFileName = helpers.resolveString(params[1] || "");
+  helpers.api.timer.setScript(triggerSeconds, scriptFileName);
+  return true;
+};
+
+// ============= Save Commands =============
+
+/**
+ * ClearAllSave - Delete all save files
+ */
+const clearAllSaveCommand: CommandHandler = (_params, _result, helpers) => {
+  helpers.api.save.clearAll();
+  return true;
+};
+
+/**
+ * EnableSave - Enable saving
+ */
+const enableSaveCommand: CommandHandler = (_params, _result, helpers) => {
+  helpers.api.save.setEnabled(true);
+  return true;
+};
+
+/**
+ * DisableSave - Disable saving
+ */
+const disableSaveCommand: CommandHandler = (_params, _result, helpers) => {
+  helpers.api.save.setEnabled(false);
+  return true;
+};
+
+// ============= Variable Commands =============
+
+/**
+ * ClearAllVar - Clear all variables except specified ones
+ * ClearAllVar(keep1, keep2, ...)
+ */
+const clearAllVarCommand: CommandHandler = (params, _result, helpers) => {
+  const keepsVars = params.map((p) => helpers.resolveString(p));
+  helpers.api.variables.clearAll(keepsVars);
+  return true;
+};
+
+/**
+ * GetPartnerIdx - Get partner index
+ */
+const getPartnerIdxCommand: CommandHandler = (params, _result, helpers) => {
+  const varName = (params[0] || "$PartnerIdx").replace("$", "");
+  const idx = helpers.api.variables.getPartnerIndex();
+  helpers.api.variables.set(varName, idx);
+  return true;
+};
+
+// ============= Date / Season Commands =============
+
+/**
+ * CheckYear - Check if today is in the New Year / Spring Festival period.
+ * CheckYear($varName)
+ */
+const checkYearCommand: CommandHandler = (params, _result, helpers) => {
+  const varName = (params[0] || "").replace("$", "");
+  helpers.api.variables.checkYear(varName);
+  logger.log(`[ScriptExecutor] CheckYear: ${varName}=${helpers.api.variables.get(varName)}`);
+  return true;
+};
+
+// ============= Misc Extended =============
+
+/**
+ * ShowSystemMsg - Show system message
+ * ShowSystemMsg(msg, stayTime?)
+ */
+const showSystemMsgCommand: CommandHandler = (params, _result, helpers) => {
+  const msg = helpers.resolveString(params[0] || "");
+  const stayTime = params.length >= 2 ? helpers.resolveNumber(params[1]) : undefined;
+  helpers.api.dialog.showSystemMessage(msg, stayTime);
+  return true;
+};
+
+/**
+ * RandRun - Randomly run one of two scripts
+ * RandRun(probability, script1, script2)
+ */
+const randRunCommand: CommandHandler = async (params, _result, helpers) => {
+  const probability = helpers.api.variables.get((params[0] || "").replace("$", ""));
+  const script1 = helpers.resolveString(params[1] || "");
+  const script2 = helpers.resolveString(params[2] || "");
+
+  const rand = Math.floor(Math.random() * 100);
+  const scriptToRun = rand <= probability ? script1 : script2;
+  await helpers.api.script.run(scriptToRun);
+  return false; // Script will continue from runScript
+};
+
+/**
+ * HideBottomWnd - Hide the bottom window bar
+ * Paired with ShowBottomWnd
+ */
+const hideBottomWndCommand: CommandHandler = (_params, _result, helpers) => {
+  helpers.api.script.setInterfaceVisible(false);
+  return true;
+};
+
+/**
+ * ShowBottomWnd - Show the bottom window bar
+ * Paired with HideBottomWnd
+ */
+const showBottomWndCommand: CommandHandler = (_params, _result, helpers) => {
+  helpers.api.script.setInterfaceVisible(true);
+  return true;
+};
+
+/**
+ * MessageBox - Show a simple message box
+ * MessageBox("text")
+ */
+const messageBoxCommand: CommandHandler = (params, _result, helpers) => {
+  const text = helpers.resolveString(params[0] || "");
+  helpers.api.dialog.showMessage(text);
+  return true;
+};
+
+/**
+ * UpdateState - Force refresh UI state panels
+ * UpdateState()
+ */
+const updateStateCommand: CommandHandler = (_params, _result, helpers) => {
+  helpers.api.script.updateState();
+  return true;
+};
+
+/**
+ * ShowMouseCursor - Show mouse cursor
+ */
+const showMouseCursorCommand: CommandHandler = (_params, _result, helpers) => {
+  helpers.api.script.showMouseCursor();
+  return true;
+};
+
+/**
+ * HideMouseCursor - Hide mouse cursor
+ */
+const hideMouseCursorCommand: CommandHandler = (_params, _result, helpers) => {
+  helpers.api.script.hideMouseCursor();
+  return true;
+};
+
+/**
+ * SaveGoods - Save goods to in-memory snapshot
+ * SaveGoods(key) or SaveGoods("path")
+ */
+const saveGoodsCommand: CommandHandler = (params, _result, helpers) => {
+  const key = helpers.resolveString(params[0] || "default");
+  helpers.api.goods.saveSnapshot(key);
+  return true;
+};
+
+/**
+ * LoadGoods - Load goods from in-memory snapshot
+ * LoadGoods(key) or LoadGoods("path")
+ */
+const loadGoodsCommand: CommandHandler = (params, _result, helpers) => {
+  const key = helpers.resolveString(params[0] || "default");
+  helpers.api.goods.loadSnapshot(key);
+  return true;
+};
+
+/**
+ * SavePlayer - Save player state to in-memory snapshot
+ * SavePlayer(key)
+ */
+const savePlayerCommand: CommandHandler = (params, _result, helpers) => {
+  const key = helpers.resolveString(params[0] || "default");
+  helpers.api.player.saveSnapshot(key);
+  return true;
+};
+
+/**
+ * LoadPlayer - Load player data from save slot
+ * LoadPlayer(index)
+ * Switches the active player to the one saved at the given index.
+ */
+const loadPlayerCommand: CommandHandler = async (params, _result, helpers) => {
+  const index = helpers.resolveNumber(params[0] ?? "0");
+  logger.log(`[ScriptExecutor] LoadPlayer: index=${index}`);
+  await helpers.api.player.change(index);
+  return true;
+};
+
+/**
+ * SetFadeLum - Set fade luminance level (0-32)
+ * Formula: internalLum = l >= 31 ? 255 : l * 8
+ * Controls the darkness level at start/end of FadeIn/FadeOut.
+ */
+const setFadeLumCommand: CommandHandler = (params, _result, helpers) => {
+  const level = Number(params[0] ?? 0);
+  helpers.api.effects.setFadeLum(level);
+  return true;
+};
+
+/**
+ * PlayerAddEmotion - Add emotion to player
+ * Only in orphaned scripts; stub only.
+ */
+const playerAddEmotionCommand: CommandHandler = (params, _result, _helpers) => {
+  logger.log(`[ScriptExecutor] PlayerAddEmotion: stub (${params.join(", ")})`);
+  return true;
+};
+
+/**
+ * PlayerAddJustice - Add justice to player
+ * Only in orphaned scripts; stub only.
+ */
+const playerAddJusticeCommand: CommandHandler = (params, _result, _helpers) => {
+  logger.log(`[ScriptExecutor] PlayerAddJustice: stub (${params.join(", ")})`);
+  return true;
+};
+
+/**
+ * Gamble - Gambling mini-game
+ * Gamble(cost, type, $result)
+ * Opens the dice mini-game UI. Deducts `cost` money before the player plays.
+ * Win: returns cost*2, sets result=1. Loss: sets result=0.
+ * type: 0=吕文才骰子, 1=赌场老板骰子
+ */
+const gambleCommand: CommandHandler = async (params, _result, helpers) => {
+  const cost = parseInt(params[0] || "0", 10);
+  const npcType = parseInt(params[1] || "0", 10);
+  const varName = (params[2] || "").trim().replace(/^\$/, "");
+
+  const win = await helpers.api.script.showGamble(cost, npcType);
+  logger.info(`[Gamble] 结果: ${win ? "赢" : "输"}，${cost} 银两`);
+
+  if (varName) {
+    helpers.api.variables.set(varName, win ? 1 : 0);
+  }
+  return true;
+};
+
+export function registerMiscCommands(registry: CommandRegistry): void {
+  // Memo
+  registry.set("memo", memoCommand);
+  registry.set("addtomemo", addToMemoCommand);
+  registry.set("delmemo", delMemoCommand);
+  registry.set("clearmemo", clearMemoCommand);
+
+  // Timer
+  registry.set("opentimelimit", openTimeLimitCommand);
+  registry.set("closetimelimit", closeTimeLimitCommand);
+  registry.set("hidetimerwnd", hideTimerWndCommand);
+  registry.set("settimescript", setTimeScriptCommand);
+
+  // Save
+  registry.set("clearallsave", clearAllSaveCommand);
+  registry.set("enablesave", enableSaveCommand);
+  registry.set("disablesave", disableSaveCommand);
+
+  // Variables
+  registry.set("clearallvar", clearAllVarCommand);
+  registry.set("getpartneridx", getPartnerIdxCommand);
+
+  // Date / Season
+  registry.set("checkyear", checkYearCommand);
+
+  // Misc
+  registry.set("showsystemmsg", showSystemMsgCommand);
+  registry.set("randrun", randRunCommand);
+
+  // Stubs (orphaned scripts only)
+  registry.set("hidebottomwnd", hideBottomWndCommand);
+  registry.set("showbottomwnd", showBottomWndCommand);
+  registry.set("setfadelum", setFadeLumCommand);
+  registry.set("playeraddemotion", playerAddEmotionCommand);
+  registry.set("playeraddjustice", playerAddJusticeCommand);
+
+  // Message / UI
+  registry.set("messagebox", messageBoxCommand);
+  registry.set("updatestate", updateStateCommand);
+  registry.set("showmousecursor", showMouseCursorCommand);
+  registry.set("hidemousecursor", hideMouseCursorCommand);
+
+  // Goods / Player save (in-memory)
+  registry.set("savegoods", saveGoodsCommand);
+  registry.set("loadgoods", loadGoodsCommand);
+  registry.set("saveplayer", savePlayerCommand);
+  registry.set("loadplayer", loadPlayerCommand);
+
+  // Gamble stub
+  registry.set("gamble", gambleCommand);
+}
